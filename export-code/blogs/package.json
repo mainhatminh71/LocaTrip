@@ -1,0 +1,590 @@
+{
+  "name": "Check Circle",
+  "version": "1.0.0",
+  "description": "Exported Framer components: Cbx0bVr, Awrvfj6vy, Fug5zhkaq, Tjx1isk1b, GooeyProd, X5rbdzv9v, SectionTag, BlogCard, PrimaryTravel, Cbx0bVr2, Awrvfj6vy2, Fug5zhkaq2, Tjx1isk1b2, GooeyProd2, X5rbdzv9v2, Cbx0bVr3, Awrvfj6vy3, Fug5zhkaq3, Tjx1isk1b3, Cbx0bVr4, Cbx0bVr5, Cbx0bVr6, Awrvfj6vy4, Awrvfj6vy5, Fug5zhkaq4, Fug5zhkaq5, Tjx1isk1b4, Tjx1isk1b5, GooeyProd3, X5rbdzv9v3, GooeyProd4, X5rbdzv9v4, X5rbdzv9v5, SectionTag2, BlogCard2, PrimaryTravel2, SectionTag3, BlogCard3, PrimaryTravel3, SectionTag4, SectionTag5, BlogCard4, PrimaryTravel4, BlogCard5, BlogCard6, PrimaryTravel5, PrimaryTravel6, Cbx0bVr7, Awrvfj6vy6, Fug5zhkaq6, Tjx1isk1b6, GooeyProd5, X5rbdzv9v6, SectionTag6, BlogCard7, PrimaryTravel7, Cbx0bVr8, Awrvfj6vy7, Fug5zhkaq7, Tjx1isk1b7, GooeyProd6, X5rbdzv9v7, Cbx0bVr9, Awrvfj6vy8, Fug5zhkaq8, Tjx1isk1b8, Cbx0bVr10, Cbx0bVr11, Cbx0bVr12, Awrvfj6vy9, Awrvfj6vy10, Fug5zhkaq9, Fug5zhkaq10, Tjx1isk1b9, Tjx1isk1b10, GooeyProd7, X5rbdzv9v8, GooeyProd8, X5rbdzv9v9, X5rbdzv9v10, SectionTag7, BlogCard8, PrimaryTravel8, SectionTag8, BlogCard9, PrimaryTravel9, SectionTag9, SectionTag10, BlogCard10, PrimaryTravel10, BlogCard11, BlogCard12, PrimaryTravel11, PrimaryTravel12, Cbx0bVr13, Awrvfj6vy11, Fug5zhkaq11, Tjx1isk1b11, GooeyProd9, X5rbdzv9v11, SectionTag11, BlogCard13, PrimaryTravel13, Cbx0bVr14, Awrvfj6vy12, Fug5zhkaq12, Tjx1isk1b12, GooeyProd10, X5rbdzv9v12, Cbx0bVr15, Awrvfj6vy13, Fug5zhkaq13, Tjx1isk1b13, Cbx0bVr16, Cbx0bVr17, Cbx0bVr18, Awrvfj6vy14, Awrvfj6vy15, Fug5zhkaq14, Fug5zhkaq15, Tjx1isk1b14, Tjx1isk1b15, GooeyProd11, X5rbdzv9v13, GooeyProd12, X5rbdzv9v14, X5rbdzv9v15, SectionTag12, BlogCard14, PrimaryTravel14, SectionTag13, BlogCard15, PrimaryTravel15, SectionTag14, SectionTag15, BlogCard16, PrimaryTravel16, BlogCard17, BlogCard18, PrimaryTravel17, PrimaryTravel18",
+  "type": "module",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./index.js",
+      "types": "./index.d.ts"
+    },
+    "./Cbx0bVr": {
+      "import": "./Cbx0bVr.js",
+      "types": "./Cbx0bVr.d.ts"
+    },
+    "./Awrvfj6vy": {
+      "import": "./Awrvfj6vy.js",
+      "types": "./Awrvfj6vy.d.ts"
+    },
+    "./Fug5zhkaq": {
+      "import": "./Fug5zhkaq.js",
+      "types": "./Fug5zhkaq.d.ts"
+    },
+    "./Tjx1isk1b": {
+      "import": "./Tjx1isk1b.js",
+      "types": "./Tjx1isk1b.d.ts"
+    },
+    "./GooeyProd": {
+      "import": "./GooeyProd.js",
+      "types": "./GooeyProd.d.ts"
+    },
+    "./X5rbdzv9v": {
+      "import": "./X5rbdzv9v.js",
+      "types": "./X5rbdzv9v.d.ts"
+    },
+    "./SectionTag": {
+      "import": "./SectionTag.js",
+      "types": "./SectionTag.d.ts"
+    },
+    "./BlogCard": {
+      "import": "./BlogCard.js",
+      "types": "./BlogCard.d.ts"
+    },
+    "./PrimaryTravel": {
+      "import": "./PrimaryTravel.js",
+      "types": "./PrimaryTravel.d.ts"
+    },
+    "./Cbx0bVr2": {
+      "import": "./Cbx0bVr2.js",
+      "types": "./Cbx0bVr2.d.ts"
+    },
+    "./Awrvfj6vy2": {
+      "import": "./Awrvfj6vy2.js",
+      "types": "./Awrvfj6vy2.d.ts"
+    },
+    "./Fug5zhkaq2": {
+      "import": "./Fug5zhkaq2.js",
+      "types": "./Fug5zhkaq2.d.ts"
+    },
+    "./Tjx1isk1b2": {
+      "import": "./Tjx1isk1b2.js",
+      "types": "./Tjx1isk1b2.d.ts"
+    },
+    "./GooeyProd2": {
+      "import": "./GooeyProd2.js",
+      "types": "./GooeyProd2.d.ts"
+    },
+    "./X5rbdzv9v2": {
+      "import": "./X5rbdzv9v2.js",
+      "types": "./X5rbdzv9v2.d.ts"
+    },
+    "./Cbx0bVr3": {
+      "import": "./Cbx0bVr3.js",
+      "types": "./Cbx0bVr3.d.ts"
+    },
+    "./Awrvfj6vy3": {
+      "import": "./Awrvfj6vy3.js",
+      "types": "./Awrvfj6vy3.d.ts"
+    },
+    "./Fug5zhkaq3": {
+      "import": "./Fug5zhkaq3.js",
+      "types": "./Fug5zhkaq3.d.ts"
+    },
+    "./Tjx1isk1b3": {
+      "import": "./Tjx1isk1b3.js",
+      "types": "./Tjx1isk1b3.d.ts"
+    },
+    "./Cbx0bVr4": {
+      "import": "./Cbx0bVr4.js",
+      "types": "./Cbx0bVr4.d.ts"
+    },
+    "./Cbx0bVr5": {
+      "import": "./Cbx0bVr5.js",
+      "types": "./Cbx0bVr5.d.ts"
+    },
+    "./Cbx0bVr6": {
+      "import": "./Cbx0bVr6.js",
+      "types": "./Cbx0bVr6.d.ts"
+    },
+    "./Awrvfj6vy4": {
+      "import": "./Awrvfj6vy4.js",
+      "types": "./Awrvfj6vy4.d.ts"
+    },
+    "./Awrvfj6vy5": {
+      "import": "./Awrvfj6vy5.js",
+      "types": "./Awrvfj6vy5.d.ts"
+    },
+    "./Fug5zhkaq4": {
+      "import": "./Fug5zhkaq4.js",
+      "types": "./Fug5zhkaq4.d.ts"
+    },
+    "./Fug5zhkaq5": {
+      "import": "./Fug5zhkaq5.js",
+      "types": "./Fug5zhkaq5.d.ts"
+    },
+    "./Tjx1isk1b4": {
+      "import": "./Tjx1isk1b4.js",
+      "types": "./Tjx1isk1b4.d.ts"
+    },
+    "./Tjx1isk1b5": {
+      "import": "./Tjx1isk1b5.js",
+      "types": "./Tjx1isk1b5.d.ts"
+    },
+    "./GooeyProd3": {
+      "import": "./GooeyProd3.js",
+      "types": "./GooeyProd3.d.ts"
+    },
+    "./X5rbdzv9v3": {
+      "import": "./X5rbdzv9v3.js",
+      "types": "./X5rbdzv9v3.d.ts"
+    },
+    "./GooeyProd4": {
+      "import": "./GooeyProd4.js",
+      "types": "./GooeyProd4.d.ts"
+    },
+    "./X5rbdzv9v4": {
+      "import": "./X5rbdzv9v4.js",
+      "types": "./X5rbdzv9v4.d.ts"
+    },
+    "./X5rbdzv9v5": {
+      "import": "./X5rbdzv9v5.js",
+      "types": "./X5rbdzv9v5.d.ts"
+    },
+    "./SectionTag2": {
+      "import": "./SectionTag2.js",
+      "types": "./SectionTag2.d.ts"
+    },
+    "./BlogCard2": {
+      "import": "./BlogCard2.js",
+      "types": "./BlogCard2.d.ts"
+    },
+    "./PrimaryTravel2": {
+      "import": "./PrimaryTravel2.js",
+      "types": "./PrimaryTravel2.d.ts"
+    },
+    "./SectionTag3": {
+      "import": "./SectionTag3.js",
+      "types": "./SectionTag3.d.ts"
+    },
+    "./BlogCard3": {
+      "import": "./BlogCard3.js",
+      "types": "./BlogCard3.d.ts"
+    },
+    "./PrimaryTravel3": {
+      "import": "./PrimaryTravel3.js",
+      "types": "./PrimaryTravel3.d.ts"
+    },
+    "./SectionTag4": {
+      "import": "./SectionTag4.js",
+      "types": "./SectionTag4.d.ts"
+    },
+    "./SectionTag5": {
+      "import": "./SectionTag5.js",
+      "types": "./SectionTag5.d.ts"
+    },
+    "./BlogCard4": {
+      "import": "./BlogCard4.js",
+      "types": "./BlogCard4.d.ts"
+    },
+    "./PrimaryTravel4": {
+      "import": "./PrimaryTravel4.js",
+      "types": "./PrimaryTravel4.d.ts"
+    },
+    "./BlogCard5": {
+      "import": "./BlogCard5.js",
+      "types": "./BlogCard5.d.ts"
+    },
+    "./BlogCard6": {
+      "import": "./BlogCard6.js",
+      "types": "./BlogCard6.d.ts"
+    },
+    "./PrimaryTravel5": {
+      "import": "./PrimaryTravel5.js",
+      "types": "./PrimaryTravel5.d.ts"
+    },
+    "./PrimaryTravel6": {
+      "import": "./PrimaryTravel6.js",
+      "types": "./PrimaryTravel6.d.ts"
+    },
+    "./Cbx0bVr7": {
+      "import": "./Cbx0bVr7.js",
+      "types": "./Cbx0bVr7.d.ts"
+    },
+    "./Awrvfj6vy6": {
+      "import": "./Awrvfj6vy6.js",
+      "types": "./Awrvfj6vy6.d.ts"
+    },
+    "./Fug5zhkaq6": {
+      "import": "./Fug5zhkaq6.js",
+      "types": "./Fug5zhkaq6.d.ts"
+    },
+    "./Tjx1isk1b6": {
+      "import": "./Tjx1isk1b6.js",
+      "types": "./Tjx1isk1b6.d.ts"
+    },
+    "./GooeyProd5": {
+      "import": "./GooeyProd5.js",
+      "types": "./GooeyProd5.d.ts"
+    },
+    "./X5rbdzv9v6": {
+      "import": "./X5rbdzv9v6.js",
+      "types": "./X5rbdzv9v6.d.ts"
+    },
+    "./SectionTag6": {
+      "import": "./SectionTag6.js",
+      "types": "./SectionTag6.d.ts"
+    },
+    "./BlogCard7": {
+      "import": "./BlogCard7.js",
+      "types": "./BlogCard7.d.ts"
+    },
+    "./PrimaryTravel7": {
+      "import": "./PrimaryTravel7.js",
+      "types": "./PrimaryTravel7.d.ts"
+    },
+    "./Cbx0bVr8": {
+      "import": "./Cbx0bVr8.js",
+      "types": "./Cbx0bVr8.d.ts"
+    },
+    "./Awrvfj6vy7": {
+      "import": "./Awrvfj6vy7.js",
+      "types": "./Awrvfj6vy7.d.ts"
+    },
+    "./Fug5zhkaq7": {
+      "import": "./Fug5zhkaq7.js",
+      "types": "./Fug5zhkaq7.d.ts"
+    },
+    "./Tjx1isk1b7": {
+      "import": "./Tjx1isk1b7.js",
+      "types": "./Tjx1isk1b7.d.ts"
+    },
+    "./GooeyProd6": {
+      "import": "./GooeyProd6.js",
+      "types": "./GooeyProd6.d.ts"
+    },
+    "./X5rbdzv9v7": {
+      "import": "./X5rbdzv9v7.js",
+      "types": "./X5rbdzv9v7.d.ts"
+    },
+    "./Cbx0bVr9": {
+      "import": "./Cbx0bVr9.js",
+      "types": "./Cbx0bVr9.d.ts"
+    },
+    "./Awrvfj6vy8": {
+      "import": "./Awrvfj6vy8.js",
+      "types": "./Awrvfj6vy8.d.ts"
+    },
+    "./Fug5zhkaq8": {
+      "import": "./Fug5zhkaq8.js",
+      "types": "./Fug5zhkaq8.d.ts"
+    },
+    "./Tjx1isk1b8": {
+      "import": "./Tjx1isk1b8.js",
+      "types": "./Tjx1isk1b8.d.ts"
+    },
+    "./Cbx0bVr10": {
+      "import": "./Cbx0bVr10.js",
+      "types": "./Cbx0bVr10.d.ts"
+    },
+    "./Cbx0bVr11": {
+      "import": "./Cbx0bVr11.js",
+      "types": "./Cbx0bVr11.d.ts"
+    },
+    "./Cbx0bVr12": {
+      "import": "./Cbx0bVr12.js",
+      "types": "./Cbx0bVr12.d.ts"
+    },
+    "./Awrvfj6vy9": {
+      "import": "./Awrvfj6vy9.js",
+      "types": "./Awrvfj6vy9.d.ts"
+    },
+    "./Awrvfj6vy10": {
+      "import": "./Awrvfj6vy10.js",
+      "types": "./Awrvfj6vy10.d.ts"
+    },
+    "./Fug5zhkaq9": {
+      "import": "./Fug5zhkaq9.js",
+      "types": "./Fug5zhkaq9.d.ts"
+    },
+    "./Fug5zhkaq10": {
+      "import": "./Fug5zhkaq10.js",
+      "types": "./Fug5zhkaq10.d.ts"
+    },
+    "./Tjx1isk1b9": {
+      "import": "./Tjx1isk1b9.js",
+      "types": "./Tjx1isk1b9.d.ts"
+    },
+    "./Tjx1isk1b10": {
+      "import": "./Tjx1isk1b10.js",
+      "types": "./Tjx1isk1b10.d.ts"
+    },
+    "./GooeyProd7": {
+      "import": "./GooeyProd7.js",
+      "types": "./GooeyProd7.d.ts"
+    },
+    "./X5rbdzv9v8": {
+      "import": "./X5rbdzv9v8.js",
+      "types": "./X5rbdzv9v8.d.ts"
+    },
+    "./GooeyProd8": {
+      "import": "./GooeyProd8.js",
+      "types": "./GooeyProd8.d.ts"
+    },
+    "./X5rbdzv9v9": {
+      "import": "./X5rbdzv9v9.js",
+      "types": "./X5rbdzv9v9.d.ts"
+    },
+    "./X5rbdzv9v10": {
+      "import": "./X5rbdzv9v10.js",
+      "types": "./X5rbdzv9v10.d.ts"
+    },
+    "./SectionTag7": {
+      "import": "./SectionTag7.js",
+      "types": "./SectionTag7.d.ts"
+    },
+    "./BlogCard8": {
+      "import": "./BlogCard8.js",
+      "types": "./BlogCard8.d.ts"
+    },
+    "./PrimaryTravel8": {
+      "import": "./PrimaryTravel8.js",
+      "types": "./PrimaryTravel8.d.ts"
+    },
+    "./SectionTag8": {
+      "import": "./SectionTag8.js",
+      "types": "./SectionTag8.d.ts"
+    },
+    "./BlogCard9": {
+      "import": "./BlogCard9.js",
+      "types": "./BlogCard9.d.ts"
+    },
+    "./PrimaryTravel9": {
+      "import": "./PrimaryTravel9.js",
+      "types": "./PrimaryTravel9.d.ts"
+    },
+    "./SectionTag9": {
+      "import": "./SectionTag9.js",
+      "types": "./SectionTag9.d.ts"
+    },
+    "./SectionTag10": {
+      "import": "./SectionTag10.js",
+      "types": "./SectionTag10.d.ts"
+    },
+    "./BlogCard10": {
+      "import": "./BlogCard10.js",
+      "types": "./BlogCard10.d.ts"
+    },
+    "./PrimaryTravel10": {
+      "import": "./PrimaryTravel10.js",
+      "types": "./PrimaryTravel10.d.ts"
+    },
+    "./BlogCard11": {
+      "import": "./BlogCard11.js",
+      "types": "./BlogCard11.d.ts"
+    },
+    "./BlogCard12": {
+      "import": "./BlogCard12.js",
+      "types": "./BlogCard12.d.ts"
+    },
+    "./PrimaryTravel11": {
+      "import": "./PrimaryTravel11.js",
+      "types": "./PrimaryTravel11.d.ts"
+    },
+    "./PrimaryTravel12": {
+      "import": "./PrimaryTravel12.js",
+      "types": "./PrimaryTravel12.d.ts"
+    },
+    "./Cbx0bVr13": {
+      "import": "./Cbx0bVr13.js",
+      "types": "./Cbx0bVr13.d.ts"
+    },
+    "./Awrvfj6vy11": {
+      "import": "./Awrvfj6vy11.js",
+      "types": "./Awrvfj6vy11.d.ts"
+    },
+    "./Fug5zhkaq11": {
+      "import": "./Fug5zhkaq11.js",
+      "types": "./Fug5zhkaq11.d.ts"
+    },
+    "./Tjx1isk1b11": {
+      "import": "./Tjx1isk1b11.js",
+      "types": "./Tjx1isk1b11.d.ts"
+    },
+    "./GooeyProd9": {
+      "import": "./GooeyProd9.js",
+      "types": "./GooeyProd9.d.ts"
+    },
+    "./X5rbdzv9v11": {
+      "import": "./X5rbdzv9v11.js",
+      "types": "./X5rbdzv9v11.d.ts"
+    },
+    "./SectionTag11": {
+      "import": "./SectionTag11.js",
+      "types": "./SectionTag11.d.ts"
+    },
+    "./BlogCard13": {
+      "import": "./BlogCard13.js",
+      "types": "./BlogCard13.d.ts"
+    },
+    "./PrimaryTravel13": {
+      "import": "./PrimaryTravel13.js",
+      "types": "./PrimaryTravel13.d.ts"
+    },
+    "./Cbx0bVr14": {
+      "import": "./Cbx0bVr14.js",
+      "types": "./Cbx0bVr14.d.ts"
+    },
+    "./Awrvfj6vy12": {
+      "import": "./Awrvfj6vy12.js",
+      "types": "./Awrvfj6vy12.d.ts"
+    },
+    "./Fug5zhkaq12": {
+      "import": "./Fug5zhkaq12.js",
+      "types": "./Fug5zhkaq12.d.ts"
+    },
+    "./Tjx1isk1b12": {
+      "import": "./Tjx1isk1b12.js",
+      "types": "./Tjx1isk1b12.d.ts"
+    },
+    "./GooeyProd10": {
+      "import": "./GooeyProd10.js",
+      "types": "./GooeyProd10.d.ts"
+    },
+    "./X5rbdzv9v12": {
+      "import": "./X5rbdzv9v12.js",
+      "types": "./X5rbdzv9v12.d.ts"
+    },
+    "./Cbx0bVr15": {
+      "import": "./Cbx0bVr15.js",
+      "types": "./Cbx0bVr15.d.ts"
+    },
+    "./Awrvfj6vy13": {
+      "import": "./Awrvfj6vy13.js",
+      "types": "./Awrvfj6vy13.d.ts"
+    },
+    "./Fug5zhkaq13": {
+      "import": "./Fug5zhkaq13.js",
+      "types": "./Fug5zhkaq13.d.ts"
+    },
+    "./Tjx1isk1b13": {
+      "import": "./Tjx1isk1b13.js",
+      "types": "./Tjx1isk1b13.d.ts"
+    },
+    "./Cbx0bVr16": {
+      "import": "./Cbx0bVr16.js",
+      "types": "./Cbx0bVr16.d.ts"
+    },
+    "./Cbx0bVr17": {
+      "import": "./Cbx0bVr17.js",
+      "types": "./Cbx0bVr17.d.ts"
+    },
+    "./Cbx0bVr18": {
+      "import": "./Cbx0bVr18.js",
+      "types": "./Cbx0bVr18.d.ts"
+    },
+    "./Awrvfj6vy14": {
+      "import": "./Awrvfj6vy14.js",
+      "types": "./Awrvfj6vy14.d.ts"
+    },
+    "./Awrvfj6vy15": {
+      "import": "./Awrvfj6vy15.js",
+      "types": "./Awrvfj6vy15.d.ts"
+    },
+    "./Fug5zhkaq14": {
+      "import": "./Fug5zhkaq14.js",
+      "types": "./Fug5zhkaq14.d.ts"
+    },
+    "./Fug5zhkaq15": {
+      "import": "./Fug5zhkaq15.js",
+      "types": "./Fug5zhkaq15.d.ts"
+    },
+    "./Tjx1isk1b14": {
+      "import": "./Tjx1isk1b14.js",
+      "types": "./Tjx1isk1b14.d.ts"
+    },
+    "./Tjx1isk1b15": {
+      "import": "./Tjx1isk1b15.js",
+      "types": "./Tjx1isk1b15.d.ts"
+    },
+    "./GooeyProd11": {
+      "import": "./GooeyProd11.js",
+      "types": "./GooeyProd11.d.ts"
+    },
+    "./X5rbdzv9v13": {
+      "import": "./X5rbdzv9v13.js",
+      "types": "./X5rbdzv9v13.d.ts"
+    },
+    "./GooeyProd12": {
+      "import": "./GooeyProd12.js",
+      "types": "./GooeyProd12.d.ts"
+    },
+    "./X5rbdzv9v14": {
+      "import": "./X5rbdzv9v14.js",
+      "types": "./X5rbdzv9v14.d.ts"
+    },
+    "./X5rbdzv9v15": {
+      "import": "./X5rbdzv9v15.js",
+      "types": "./X5rbdzv9v15.d.ts"
+    },
+    "./SectionTag12": {
+      "import": "./SectionTag12.js",
+      "types": "./SectionTag12.d.ts"
+    },
+    "./BlogCard14": {
+      "import": "./BlogCard14.js",
+      "types": "./BlogCard14.d.ts"
+    },
+    "./PrimaryTravel14": {
+      "import": "./PrimaryTravel14.js",
+      "types": "./PrimaryTravel14.d.ts"
+    },
+    "./SectionTag13": {
+      "import": "./SectionTag13.js",
+      "types": "./SectionTag13.d.ts"
+    },
+    "./BlogCard15": {
+      "import": "./BlogCard15.js",
+      "types": "./BlogCard15.d.ts"
+    },
+    "./PrimaryTravel15": {
+      "import": "./PrimaryTravel15.js",
+      "types": "./PrimaryTravel15.d.ts"
+    },
+    "./SectionTag14": {
+      "import": "./SectionTag14.js",
+      "types": "./SectionTag14.d.ts"
+    },
+    "./SectionTag15": {
+      "import": "./SectionTag15.js",
+      "types": "./SectionTag15.d.ts"
+    },
+    "./BlogCard16": {
+      "import": "./BlogCard16.js",
+      "types": "./BlogCard16.d.ts"
+    },
+    "./PrimaryTravel16": {
+      "import": "./PrimaryTravel16.js",
+      "types": "./PrimaryTravel16.d.ts"
+    },
+    "./BlogCard17": {
+      "import": "./BlogCard17.js",
+      "types": "./BlogCard17.d.ts"
+    },
+    "./BlogCard18": {
+      "import": "./BlogCard18.js",
+      "types": "./BlogCard18.d.ts"
+    },
+    "./PrimaryTravel17": {
+      "import": "./PrimaryTravel17.js",
+      "types": "./PrimaryTravel17.d.ts"
+    },
+    "./PrimaryTravel18": {
+      "import": "./PrimaryTravel18.js",
+      "types": "./PrimaryTravel18.d.ts"
+    }
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0",
+    "react-dom": ">=18.0.0",
+    "framer-motion": ">=10.0.0"
+  },
+  "keywords": [
+    "framer",
+    "react",
+    "components",
+    "exported"
+  ],
+  "license": "MIT"
+}

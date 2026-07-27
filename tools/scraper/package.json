@@ -1,0 +1,16 @@
+{
+  "name": "scraper",
+  "version": "1.0.0",
+  "description": "Scrape locatrip.framer.website into ../locatrip-scrape and sync to my-app",
+  "type": "module",
+  "scripts": {
+    "scrape": "node scrape.mjs",
+    "scrape:deep": "node deep-scrape.mjs",
+    "scrape:all": "node scrape.mjs && node deep-scrape.mjs",
+    "sync": "node sync-to-my-app.mjs"
+  },
+  "dependencies": {
+    "website-scraper": "^6.0.0",
+    "website-scraper-cli": "^0.0.1"
+  }
+}

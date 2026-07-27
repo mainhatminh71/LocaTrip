@@ -1,0 +1,74 @@
+{
+  "name": "Primary Travel button",
+  "version": "1.0.0",
+  "description": "Exported Framer components: PrimaryTravel, PrimaryTravel2, PrimaryTravel3, PrimaryTravel4, PrimaryTravel5, PrimaryTravel6, PrimaryTravel7, PrimaryTravel8, PrimaryTravel9, PrimaryTravel10, PrimaryTravel11, PrimaryTravel12",
+  "type": "module",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./index.js",
+      "types": "./index.d.ts"
+    },
+    "./PrimaryTravel": {
+      "import": "./PrimaryTravel.js",
+      "types": "./PrimaryTravel.d.ts"
+    },
+    "./PrimaryTravel2": {
+      "import": "./PrimaryTravel2.js",
+      "types": "./PrimaryTravel2.d.ts"
+    },
+    "./PrimaryTravel3": {
+      "import": "./PrimaryTravel3.js",
+      "types": "./PrimaryTravel3.d.ts"
+    },
+    "./PrimaryTravel4": {
+      "import": "./PrimaryTravel4.js",
+      "types": "./PrimaryTravel4.d.ts"
+    },
+    "./PrimaryTravel5": {
+      "import": "./PrimaryTravel5.js",
+      "types": "./PrimaryTravel5.d.ts"
+    },
+    "./PrimaryTravel6": {
+      "import": "./PrimaryTravel6.js",
+      "types": "./PrimaryTravel6.d.ts"
+    },
+    "./PrimaryTravel7": {
+      "import": "./PrimaryTravel7.js",
+      "types": "./PrimaryTravel7.d.ts"
+    },
+    "./PrimaryTravel8": {
+      "import": "./PrimaryTravel8.js",
+      "types": "./PrimaryTravel8.d.ts"
+    },
+    "./PrimaryTravel9": {
+      "import": "./PrimaryTravel9.js",
+      "types": "./PrimaryTravel9.d.ts"
+    },
+    "./PrimaryTravel10": {
+      "import": "./PrimaryTravel10.js",
+      "types": "./PrimaryTravel10.d.ts"
+    },
+    "./PrimaryTravel11": {
+      "import": "./PrimaryTravel11.js",
+      "types": "./PrimaryTravel11.d.ts"
+    },
+    "./PrimaryTravel12": {
+      "import": "./PrimaryTravel12.js",
+      "types": "./PrimaryTravel12.d.ts"
+    }
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0",
+    "react-dom": ">=18.0.0",
+    "framer-motion": ">=10.0.0"
+  },
+  "keywords": [
+    "framer",
+    "react",
+    "components",
+    "exported"
+  ],
+  "license": "MIT"
+}

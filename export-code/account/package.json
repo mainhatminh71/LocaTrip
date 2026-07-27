@@ -1,0 +1,54 @@
+{
+  "name": "Mail",
+  "version": "1.0.0",
+  "description": "Exported Framer components: Zd5aumroy, Zd5aumroy2, Zd5aumroy3, Zd5aumroy4, Zd5aumroy5, Zd5aumroy6, Zd5aumroy7",
+  "type": "module",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./index.js",
+      "types": "./index.d.ts"
+    },
+    "./Zd5aumroy": {
+      "import": "./Zd5aumroy.js",
+      "types": "./Zd5aumroy.d.ts"
+    },
+    "./Zd5aumroy2": {
+      "import": "./Zd5aumroy2.js",
+      "types": "./Zd5aumroy2.d.ts"
+    },
+    "./Zd5aumroy3": {
+      "import": "./Zd5aumroy3.js",
+      "types": "./Zd5aumroy3.d.ts"
+    },
+    "./Zd5aumroy4": {
+      "import": "./Zd5aumroy4.js",
+      "types": "./Zd5aumroy4.d.ts"
+    },
+    "./Zd5aumroy5": {
+      "import": "./Zd5aumroy5.js",
+      "types": "./Zd5aumroy5.d.ts"
+    },
+    "./Zd5aumroy6": {
+      "import": "./Zd5aumroy6.js",
+      "types": "./Zd5aumroy6.d.ts"
+    },
+    "./Zd5aumroy7": {
+      "import": "./Zd5aumroy7.js",
+      "types": "./Zd5aumroy7.d.ts"
+    }
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0",
+    "react-dom": ">=18.0.0",
+    "framer-motion": ">=10.0.0"
+  },
+  "keywords": [
+    "framer",
+    "react",
+    "components",
+    "exported"
+  ],
+  "license": "MIT"
+}

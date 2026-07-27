@@ -1,0 +1,218 @@
+{
+  "name": "Section Tag",
+  "version": "1.0.0",
+  "description": "Exported Framer components: SectionTag, TourPackageCard, PrimaryTravel, SectionTag2, TourPackageCard2, PrimaryTravel2, SectionTag3, TourPackageCard3, PrimaryTravel3, SectionTag4, SectionTag5, TourPackageCard4, PrimaryTravel4, TourPackageCard5, PrimaryTravel5, PrimaryTravel6, SectionTag6, TourPackageCard6, PrimaryTravel7, SectionTag7, TourPackageCard7, PrimaryTravel8, SectionTag8, TourPackageCard8, PrimaryTravel9, SectionTag9, SectionTag10, TourPackageCard9, PrimaryTravel10, TourPackageCard10, PrimaryTravel11, PrimaryTravel12, SectionTag11, TourPackageCard11, PrimaryTravel13, SectionTag12, TourPackageCard12, PrimaryTravel14, SectionTag13, TourPackageCard13, PrimaryTravel15, SectionTag14, SectionTag15, TourPackageCard14, PrimaryTravel16, TourPackageCard15, PrimaryTravel17, PrimaryTravel18",
+  "type": "module",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./index.js",
+      "types": "./index.d.ts"
+    },
+    "./SectionTag": {
+      "import": "./SectionTag.js",
+      "types": "./SectionTag.d.ts"
+    },
+    "./TourPackageCard": {
+      "import": "./TourPackageCard.js",
+      "types": "./TourPackageCard.d.ts"
+    },
+    "./PrimaryTravel": {
+      "import": "./PrimaryTravel.js",
+      "types": "./PrimaryTravel.d.ts"
+    },
+    "./SectionTag2": {
+      "import": "./SectionTag2.js",
+      "types": "./SectionTag2.d.ts"
+    },
+    "./TourPackageCard2": {
+      "import": "./TourPackageCard2.js",
+      "types": "./TourPackageCard2.d.ts"
+    },
+    "./PrimaryTravel2": {
+      "import": "./PrimaryTravel2.js",
+      "types": "./PrimaryTravel2.d.ts"
+    },
+    "./SectionTag3": {
+      "import": "./SectionTag3.js",
+      "types": "./SectionTag3.d.ts"
+    },
+    "./TourPackageCard3": {
+      "import": "./TourPackageCard3.js",
+      "types": "./TourPackageCard3.d.ts"
+    },
+    "./PrimaryTravel3": {
+      "import": "./PrimaryTravel3.js",
+      "types": "./PrimaryTravel3.d.ts"
+    },
+    "./SectionTag4": {
+      "import": "./SectionTag4.js",
+      "types": "./SectionTag4.d.ts"
+    },
+    "./SectionTag5": {
+      "import": "./SectionTag5.js",
+      "types": "./SectionTag5.d.ts"
+    },
+    "./TourPackageCard4": {
+      "import": "./TourPackageCard4.js",
+      "types": "./TourPackageCard4.d.ts"
+    },
+    "./PrimaryTravel4": {
+      "import": "./PrimaryTravel4.js",
+      "types": "./PrimaryTravel4.d.ts"
+    },
+    "./TourPackageCard5": {
+      "import": "./TourPackageCard5.js",
+      "types": "./TourPackageCard5.d.ts"
+    },
+    "./PrimaryTravel5": {
+      "import": "./PrimaryTravel5.js",
+      "types": "./PrimaryTravel5.d.ts"
+    },
+    "./PrimaryTravel6": {
+      "import": "./PrimaryTravel6.js",
+      "types": "./PrimaryTravel6.d.ts"
+    },
+    "./SectionTag6": {
+      "import": "./SectionTag6.js",
+      "types": "./SectionTag6.d.ts"
+    },
+    "./TourPackageCard6": {
+      "import": "./TourPackageCard6.js",
+      "types": "./TourPackageCard6.d.ts"
+    },
+    "./PrimaryTravel7": {
+      "import": "./PrimaryTravel7.js",
+      "types": "./PrimaryTravel7.d.ts"
+    },
+    "./SectionTag7": {
+      "import": "./SectionTag7.js",
+      "types": "./SectionTag7.d.ts"
+    },
+    "./TourPackageCard7": {
+      "import": "./TourPackageCard7.js",
+      "types": "./TourPackageCard7.d.ts"
+    },
+    "./PrimaryTravel8": {
+      "import": "./PrimaryTravel8.js",
+      "types": "./PrimaryTravel8.d.ts"
+    },
+    "./SectionTag8": {
+      "import": "./SectionTag8.js",
+      "types": "./SectionTag8.d.ts"
+    },
+    "./TourPackageCard8": {
+      "import": "./TourPackageCard8.js",
+      "types": "./TourPackageCard8.d.ts"
+    },
+    "./PrimaryTravel9": {
+      "import": "./PrimaryTravel9.js",
+      "types": "./PrimaryTravel9.d.ts"
+    },
+    "./SectionTag9": {
+      "import": "./SectionTag9.js",
+      "types": "./SectionTag9.d.ts"
+    },
+    "./SectionTag10": {
+      "import": "./SectionTag10.js",
+      "types": "./SectionTag10.d.ts"
+    },
+    "./TourPackageCard9": {
+      "import": "./TourPackageCard9.js",
+      "types": "./TourPackageCard9.d.ts"
+    },
+    "./PrimaryTravel10": {
+      "import": "./PrimaryTravel10.js",
+      "types": "./PrimaryTravel10.d.ts"
+    },
+    "./TourPackageCard10": {
+      "import": "./TourPackageCard10.js",
+      "types": "./TourPackageCard10.d.ts"
+    },
+    "./PrimaryTravel11": {
+      "import": "./PrimaryTravel11.js",
+      "types": "./PrimaryTravel11.d.ts"
+    },
+    "./PrimaryTravel12": {
+      "import": "./PrimaryTravel12.js",
+      "types": "./PrimaryTravel12.d.ts"
+    },
+    "./SectionTag11": {
+      "import": "./SectionTag11.js",
+      "types": "./SectionTag11.d.ts"
+    },
+    "./TourPackageCard11": {
+      "import": "./TourPackageCard11.js",
+      "types": "./TourPackageCard11.d.ts"
+    },
+    "./PrimaryTravel13": {
+      "import": "./PrimaryTravel13.js",
+      "types": "./PrimaryTravel13.d.ts"
+    },
+    "./SectionTag12": {
+      "import": "./SectionTag12.js",
+      "types": "./SectionTag12.d.ts"
+    },
+    "./TourPackageCard12": {
+      "import": "./TourPackageCard12.js",
+      "types": "./TourPackageCard12.d.ts"
+    },
+    "./PrimaryTravel14": {
+      "import": "./PrimaryTravel14.js",
+      "types": "./PrimaryTravel14.d.ts"
+    },
+    "./SectionTag13": {
+      "import": "./SectionTag13.js",
+      "types": "./SectionTag13.d.ts"
+    },
+    "./TourPackageCard13": {
+      "import": "./TourPackageCard13.js",
+      "types": "./TourPackageCard13.d.ts"
+    },
+    "./PrimaryTravel15": {
+      "import": "./PrimaryTravel15.js",
+      "types": "./PrimaryTravel15.d.ts"
+    },
+    "./SectionTag14": {
+      "import": "./SectionTag14.js",
+      "types": "./SectionTag14.d.ts"
+    },
+    "./SectionTag15": {
+      "import": "./SectionTag15.js",
+      "types": "./SectionTag15.d.ts"
+    },
+    "./TourPackageCard14": {
+      "import": "./TourPackageCard14.js",
+      "types": "./TourPackageCard14.d.ts"
+    },
+    "./PrimaryTravel16": {
+      "import": "./PrimaryTravel16.js",
+      "types": "./PrimaryTravel16.d.ts"
+    },
+    "./TourPackageCard15": {
+      "import": "./TourPackageCard15.js",
+      "types": "./TourPackageCard15.d.ts"
+    },
+    "./PrimaryTravel17": {
+      "import": "./PrimaryTravel17.js",
+      "types": "./PrimaryTravel17.d.ts"
+    },
+    "./PrimaryTravel18": {
+      "import": "./PrimaryTravel18.js",
+      "types": "./PrimaryTravel18.d.ts"
+    }
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0",
+    "react-dom": ">=18.0.0",
+    "framer-motion": ">=10.0.0"
+  },
+  "keywords": [
+    "framer",
+    "react",
+    "components",
+    "exported"
+  ],
+  "license": "MIT"
+}

@@ -1,0 +1,422 @@
+{
+  "name": "Phosphor",
+  "version": "1.0.0",
+  "description": "Exported Framer components: Phosphor, Phosphor2, Phosphor3, FormButton2, Phosphor4, Phosphor5, Phosphor6, FormButton22, Phosphor7, Phosphor8, Phosphor9, FormButton23, Phosphor10, Phosphor11, Phosphor12, Phosphor13, Phosphor14, Phosphor15, Phosphor16, Phosphor17, Phosphor18, Phosphor19, Phosphor20, Phosphor21, Phosphor22, Phosphor23, Phosphor24, FormButton24, FormButton25, FormButton26, FormButton27, FormButton28, FormButton29, Phosphor25, Phosphor26, Phosphor27, FormButton210, Phosphor28, Phosphor29, Phosphor30, FormButton211, Phosphor31, Phosphor32, Phosphor33, FormButton212, Phosphor34, Phosphor35, Phosphor36, Phosphor37, Phosphor38, Phosphor39, Phosphor40, Phosphor41, Phosphor42, Phosphor43, Phosphor44, Phosphor45, Phosphor46, Phosphor47, Phosphor48, FormButton213, FormButton214, FormButton215, FormButton216, FormButton217, FormButton218, Phosphor49, Phosphor50, Phosphor51, FormButton219, Phosphor52, Phosphor53, Phosphor54, FormButton220, Phosphor55, Phosphor56, Phosphor57, FormButton221, Phosphor58, Phosphor59, Phosphor60, Phosphor61, Phosphor62, Phosphor63, Phosphor64, Phosphor65, Phosphor66, Phosphor67, Phosphor68, Phosphor69, Phosphor70, Phosphor71, Phosphor72, FormButton222, FormButton223, FormButton224, FormButton225, FormButton226, FormButton227",
+  "type": "module",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./index.js",
+      "types": "./index.d.ts"
+    },
+    "./Phosphor": {
+      "import": "./Phosphor.js",
+      "types": "./Phosphor.d.ts"
+    },
+    "./Phosphor2": {
+      "import": "./Phosphor2.js",
+      "types": "./Phosphor2.d.ts"
+    },
+    "./Phosphor3": {
+      "import": "./Phosphor3.js",
+      "types": "./Phosphor3.d.ts"
+    },
+    "./FormButton2": {
+      "import": "./FormButton2.js",
+      "types": "./FormButton2.d.ts"
+    },
+    "./Phosphor4": {
+      "import": "./Phosphor4.js",
+      "types": "./Phosphor4.d.ts"
+    },
+    "./Phosphor5": {
+      "import": "./Phosphor5.js",
+      "types": "./Phosphor5.d.ts"
+    },
+    "./Phosphor6": {
+      "import": "./Phosphor6.js",
+      "types": "./Phosphor6.d.ts"
+    },
+    "./FormButton22": {
+      "import": "./FormButton22.js",
+      "types": "./FormButton22.d.ts"
+    },
+    "./Phosphor7": {
+      "import": "./Phosphor7.js",
+      "types": "./Phosphor7.d.ts"
+    },
+    "./Phosphor8": {
+      "import": "./Phosphor8.js",
+      "types": "./Phosphor8.d.ts"
+    },
+    "./Phosphor9": {
+      "import": "./Phosphor9.js",
+      "types": "./Phosphor9.d.ts"
+    },
+    "./FormButton23": {
+      "import": "./FormButton23.js",
+      "types": "./FormButton23.d.ts"
+    },
+    "./Phosphor10": {
+      "import": "./Phosphor10.js",
+      "types": "./Phosphor10.d.ts"
+    },
+    "./Phosphor11": {
+      "import": "./Phosphor11.js",
+      "types": "./Phosphor11.d.ts"
+    },
+    "./Phosphor12": {
+      "import": "./Phosphor12.js",
+      "types": "./Phosphor12.d.ts"
+    },
+    "./Phosphor13": {
+      "import": "./Phosphor13.js",
+      "types": "./Phosphor13.d.ts"
+    },
+    "./Phosphor14": {
+      "import": "./Phosphor14.js",
+      "types": "./Phosphor14.d.ts"
+    },
+    "./Phosphor15": {
+      "import": "./Phosphor15.js",
+      "types": "./Phosphor15.d.ts"
+    },
+    "./Phosphor16": {
+      "import": "./Phosphor16.js",
+      "types": "./Phosphor16.d.ts"
+    },
+    "./Phosphor17": {
+      "import": "./Phosphor17.js",
+      "types": "./Phosphor17.d.ts"
+    },
+    "./Phosphor18": {
+      "import": "./Phosphor18.js",
+      "types": "./Phosphor18.d.ts"
+    },
+    "./Phosphor19": {
+      "import": "./Phosphor19.js",
+      "types": "./Phosphor19.d.ts"
+    },
+    "./Phosphor20": {
+      "import": "./Phosphor20.js",
+      "types": "./Phosphor20.d.ts"
+    },
+    "./Phosphor21": {
+      "import": "./Phosphor21.js",
+      "types": "./Phosphor21.d.ts"
+    },
+    "./Phosphor22": {
+      "import": "./Phosphor22.js",
+      "types": "./Phosphor22.d.ts"
+    },
+    "./Phosphor23": {
+      "import": "./Phosphor23.js",
+      "types": "./Phosphor23.d.ts"
+    },
+    "./Phosphor24": {
+      "import": "./Phosphor24.js",
+      "types": "./Phosphor24.d.ts"
+    },
+    "./FormButton24": {
+      "import": "./FormButton24.js",
+      "types": "./FormButton24.d.ts"
+    },
+    "./FormButton25": {
+      "import": "./FormButton25.js",
+      "types": "./FormButton25.d.ts"
+    },
+    "./FormButton26": {
+      "import": "./FormButton26.js",
+      "types": "./FormButton26.d.ts"
+    },
+    "./FormButton27": {
+      "import": "./FormButton27.js",
+      "types": "./FormButton27.d.ts"
+    },
+    "./FormButton28": {
+      "import": "./FormButton28.js",
+      "types": "./FormButton28.d.ts"
+    },
+    "./FormButton29": {
+      "import": "./FormButton29.js",
+      "types": "./FormButton29.d.ts"
+    },
+    "./Phosphor25": {
+      "import": "./Phosphor25.js",
+      "types": "./Phosphor25.d.ts"
+    },
+    "./Phosphor26": {
+      "import": "./Phosphor26.js",
+      "types": "./Phosphor26.d.ts"
+    },
+    "./Phosphor27": {
+      "import": "./Phosphor27.js",
+      "types": "./Phosphor27.d.ts"
+    },
+    "./FormButton210": {
+      "import": "./FormButton210.js",
+      "types": "./FormButton210.d.ts"
+    },
+    "./Phosphor28": {
+      "import": "./Phosphor28.js",
+      "types": "./Phosphor28.d.ts"
+    },
+    "./Phosphor29": {
+      "import": "./Phosphor29.js",
+      "types": "./Phosphor29.d.ts"
+    },
+    "./Phosphor30": {
+      "import": "./Phosphor30.js",
+      "types": "./Phosphor30.d.ts"
+    },
+    "./FormButton211": {
+      "import": "./FormButton211.js",
+      "types": "./FormButton211.d.ts"
+    },
+    "./Phosphor31": {
+      "import": "./Phosphor31.js",
+      "types": "./Phosphor31.d.ts"
+    },
+    "./Phosphor32": {
+      "import": "./Phosphor32.js",
+      "types": "./Phosphor32.d.ts"
+    },
+    "./Phosphor33": {
+      "import": "./Phosphor33.js",
+      "types": "./Phosphor33.d.ts"
+    },
+    "./FormButton212": {
+      "import": "./FormButton212.js",
+      "types": "./FormButton212.d.ts"
+    },
+    "./Phosphor34": {
+      "import": "./Phosphor34.js",
+      "types": "./Phosphor34.d.ts"
+    },
+    "./Phosphor35": {
+      "import": "./Phosphor35.js",
+      "types": "./Phosphor35.d.ts"
+    },
+    "./Phosphor36": {
+      "import": "./Phosphor36.js",
+      "types": "./Phosphor36.d.ts"
+    },
+    "./Phosphor37": {
+      "import": "./Phosphor37.js",
+      "types": "./Phosphor37.d.ts"
+    },
+    "./Phosphor38": {
+      "import": "./Phosphor38.js",
+      "types": "./Phosphor38.d.ts"
+    },
+    "./Phosphor39": {
+      "import": "./Phosphor39.js",
+      "types": "./Phosphor39.d.ts"
+    },
+    "./Phosphor40": {
+      "import": "./Phosphor40.js",
+      "types": "./Phosphor40.d.ts"
+    },
+    "./Phosphor41": {
+      "import": "./Phosphor41.js",
+      "types": "./Phosphor41.d.ts"
+    },
+    "./Phosphor42": {
+      "import": "./Phosphor42.js",
+      "types": "./Phosphor42.d.ts"
+    },
+    "./Phosphor43": {
+      "import": "./Phosphor43.js",
+      "types": "./Phosphor43.d.ts"
+    },
+    "./Phosphor44": {
+      "import": "./Phosphor44.js",
+      "types": "./Phosphor44.d.ts"
+    },
+    "./Phosphor45": {
+      "import": "./Phosphor45.js",
+      "types": "./Phosphor45.d.ts"
+    },
+    "./Phosphor46": {
+      "import": "./Phosphor46.js",
+      "types": "./Phosphor46.d.ts"
+    },
+    "./Phosphor47": {
+      "import": "./Phosphor47.js",
+      "types": "./Phosphor47.d.ts"
+    },
+    "./Phosphor48": {
+      "import": "./Phosphor48.js",
+      "types": "./Phosphor48.d.ts"
+    },
+    "./FormButton213": {
+      "import": "./FormButton213.js",
+      "types": "./FormButton213.d.ts"
+    },
+    "./FormButton214": {
+      "import": "./FormButton214.js",
+      "types": "./FormButton214.d.ts"
+    },
+    "./FormButton215": {
+      "import": "./FormButton215.js",
+      "types": "./FormButton215.d.ts"
+    },
+    "./FormButton216": {
+      "import": "./FormButton216.js",
+      "types": "./FormButton216.d.ts"
+    },
+    "./FormButton217": {
+      "import": "./FormButton217.js",
+      "types": "./FormButton217.d.ts"
+    },
+    "./FormButton218": {
+      "import": "./FormButton218.js",
+      "types": "./FormButton218.d.ts"
+    },
+    "./Phosphor49": {
+      "import": "./Phosphor49.js",
+      "types": "./Phosphor49.d.ts"
+    },
+    "./Phosphor50": {
+      "import": "./Phosphor50.js",
+      "types": "./Phosphor50.d.ts"
+    },
+    "./Phosphor51": {
+      "import": "./Phosphor51.js",
+      "types": "./Phosphor51.d.ts"
+    },
+    "./FormButton219": {
+      "import": "./FormButton219.js",
+      "types": "./FormButton219.d.ts"
+    },
+    "./Phosphor52": {
+      "import": "./Phosphor52.js",
+      "types": "./Phosphor52.d.ts"
+    },
+    "./Phosphor53": {
+      "import": "./Phosphor53.js",
+      "types": "./Phosphor53.d.ts"
+    },
+    "./Phosphor54": {
+      "import": "./Phosphor54.js",
+      "types": "./Phosphor54.d.ts"
+    },
+    "./FormButton220": {
+      "import": "./FormButton220.js",
+      "types": "./FormButton220.d.ts"
+    },
+    "./Phosphor55": {
+      "import": "./Phosphor55.js",
+      "types": "./Phosphor55.d.ts"
+    },
+    "./Phosphor56": {
+      "import": "./Phosphor56.js",
+      "types": "./Phosphor56.d.ts"
+    },
+    "./Phosphor57": {
+      "import": "./Phosphor57.js",
+      "types": "./Phosphor57.d.ts"
+    },
+    "./FormButton221": {
+      "import": "./FormButton221.js",
+      "types": "./FormButton221.d.ts"
+    },
+    "./Phosphor58": {
+      "import": "./Phosphor58.js",
+      "types": "./Phosphor58.d.ts"
+    },
+    "./Phosphor59": {
+      "import": "./Phosphor59.js",
+      "types": "./Phosphor59.d.ts"
+    },
+    "./Phosphor60": {
+      "import": "./Phosphor60.js",
+      "types": "./Phosphor60.d.ts"
+    },
+    "./Phosphor61": {
+      "import": "./Phosphor61.js",
+      "types": "./Phosphor61.d.ts"
+    },
+    "./Phosphor62": {
+      "import": "./Phosphor62.js",
+      "types": "./Phosphor62.d.ts"
+    },
+    "./Phosphor63": {
+      "import": "./Phosphor63.js",
+      "types": "./Phosphor63.d.ts"
+    },
+    "./Phosphor64": {
+      "import": "./Phosphor64.js",
+      "types": "./Phosphor64.d.ts"
+    },
+    "./Phosphor65": {
+      "import": "./Phosphor65.js",
+      "types": "./Phosphor65.d.ts"
+    },
+    "./Phosphor66": {
+      "import": "./Phosphor66.js",
+      "types": "./Phosphor66.d.ts"
+    },
+    "./Phosphor67": {
+      "import": "./Phosphor67.js",
+      "types": "./Phosphor67.d.ts"
+    },
+    "./Phosphor68": {
+      "import": "./Phosphor68.js",
+      "types": "./Phosphor68.d.ts"
+    },
+    "./Phosphor69": {
+      "import": "./Phosphor69.js",
+      "types": "./Phosphor69.d.ts"
+    },
+    "./Phosphor70": {
+      "import": "./Phosphor70.js",
+      "types": "./Phosphor70.d.ts"
+    },
+    "./Phosphor71": {
+      "import": "./Phosphor71.js",
+      "types": "./Phosphor71.d.ts"
+    },
+    "./Phosphor72": {
+      "import": "./Phosphor72.js",
+      "types": "./Phosphor72.d.ts"
+    },
+    "./FormButton222": {
+      "import": "./FormButton222.js",
+      "types": "./FormButton222.d.ts"
+    },
+    "./FormButton223": {
+      "import": "./FormButton223.js",
+      "types": "./FormButton223.d.ts"
+    },
+    "./FormButton224": {
+      "import": "./FormButton224.js",
+      "types": "./FormButton224.d.ts"
+    },
+    "./FormButton225": {
+      "import": "./FormButton225.js",
+      "types": "./FormButton225.d.ts"
+    },
+    "./FormButton226": {
+      "import": "./FormButton226.js",
+      "types": "./FormButton226.d.ts"
+    },
+    "./FormButton227": {
+      "import": "./FormButton227.js",
+      "types": "./FormButton227.d.ts"
+    }
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0",
+    "react-dom": ">=18.0.0",
+    "framer-motion": ">=10.0.0"
+  },
+  "keywords": [
+    "framer",
+    "react",
+    "components",
+    "exported"
+  ],
+  "license": "MIT"
+}

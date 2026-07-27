@@ -1,0 +1,2338 @@
+{
+  "name": "Video",
+  "version": "1.0.0",
+  "description": "Exported Framer components: Video, PrimaryTravel, Avgdv4pj, Kf85dqox0, Ud0etfbk, SectionTag, PrimaryTravel2, ImageLoopCard, SectionTag2, ExceptionalCard, ExceptionalCard2, ExceptionalCard3, ExceptionalCard4, PrimaryTravel3, SectionTag3, DestinationCard, RunningText1, RunningText2, RunningText3, RunningText4, DestinationBgImage, SectionTag4, TourPackageCard, PrimaryTravel4, SnowfallProd, SectionTag5, WhyUsCard, SectionTag6, TestimonialsCarouselCard, Pricing, SectionTag7, BlogCard, PrimaryTravel5, SectionTag8, Ticker, Video2, PrimaryTravel6, Avgdv4pj2, Kf85dqox02, Ud0etfbk2, PrimaryTravel7, PrimaryTravel8, PrimaryTravel9, PrimaryTravel10, Avgdv4pj3, Kf85dqox03, Ud0etfbk3, Avgdv4pj4, Avgdv4pj5, Kf85dqox04, Kf85dqox05, Ud0etfbk4, Ud0etfbk5, SectionTag9, PrimaryTravel11, ImageLoopCard2, SectionTag10, PrimaryTravel12, ImageLoopCard3, SectionTag11, PrimaryTravel13, SectionTag12, PrimaryTravel14, SectionTag13, PrimaryTravel15, PrimaryTravel16, ImageLoopCard4, ImageLoopCard5, SectionTag14, ExceptionalCard5, ExceptionalCard6, ExceptionalCard7, ExceptionalCard8, PrimaryTravel17, SectionTag15, ExceptionalCard9, ExceptionalCard10, ExceptionalCard11, ExceptionalCard12, PrimaryTravel18, SectionTag16, SectionTag17, ExceptionalCard13, ExceptionalCard14, ExceptionalCard15, ExceptionalCard16, PrimaryTravel19, ExceptionalCard17, ExceptionalCard18, ExceptionalCard19, ExceptionalCard20, ExceptionalCard21, ExceptionalCard22, ExceptionalCard23, ExceptionalCard24, PrimaryTravel20, PrimaryTravel21, SectionTag18, DestinationCard2, RunningText12, RunningText22, RunningText32, RunningText42, DestinationBgImage2, SectionTag19, DestinationCard3, RunningText13, RunningText23, RunningText33, RunningText43, DestinationBgImage3, SectionTag20, DestinationCard4, RunningText14, RunningText24, RunningText34, RunningText44, DestinationBgImage4, SectionTag21, DestinationCard5, SectionTag22, SectionTag23, DestinationCard6, RunningText15, RunningText25, RunningText35, RunningText45, RunningText16, RunningText26, RunningText36, RunningText46, RunningText17, RunningText27, RunningText37, RunningText47, DestinationBgImage5, SectionTag24, TourPackageCard2, PrimaryTravel22, SectionTag25, TourPackageCard3, PrimaryTravel23, SectionTag26, SectionTag27, TourPackageCard4, PrimaryTravel24, TourPackageCard5, TourPackageCard6, PrimaryTravel25, PrimaryTravel26, SnowfallProd2, SectionTag28, WhyUsCard2, SectionTag29, WhyUsCard3, SectionTag30, SectionTag31, WhyUsCard4, SectionTag32, TestimonialsCarouselCard2, Pricing2, SectionTag33, TestimonialsCarouselCard3, SectionTag34, SectionTag35, TestimonialsCarouselCard4, Pricing3, SectionTag36, BlogCard2, PrimaryTravel27, SectionTag37, BlogCard3, PrimaryTravel28, SectionTag38, SectionTag39, BlogCard4, PrimaryTravel29, BlogCard5, BlogCard6, BlogCard7, PrimaryTravel30, PrimaryTravel31, SectionTag40, Ticker2, SectionTag41, Ticker3, SectionTag42, SectionTag43, Ticker4, Ticker5, Video3, PrimaryTravel32, Avgdv4pj6, Kf85dqox06, Ud0etfbk6, SectionTag44, PrimaryTravel33, ImageLoopCard6, SectionTag45, ExceptionalCard25, ExceptionalCard26, ExceptionalCard27, ExceptionalCard28, PrimaryTravel34, SectionTag46, DestinationCard7, RunningText18, RunningText28, RunningText38, RunningText48, DestinationBgImage6, SectionTag47, TourPackageCard7, PrimaryTravel35, SnowfallProd3, SectionTag48, WhyUsCard5, SectionTag49, TestimonialsCarouselCard5, Pricing4, SectionTag50, BlogCard8, PrimaryTravel36, SectionTag51, Ticker6, Video4, PrimaryTravel37, Avgdv4pj7, Kf85dqox07, Ud0etfbk7, PrimaryTravel38, PrimaryTravel39, PrimaryTravel40, PrimaryTravel41, Avgdv4pj8, Kf85dqox08, Ud0etfbk8, Avgdv4pj9, Avgdv4pj10, Kf85dqox09, Kf85dqox010, Ud0etfbk9, Ud0etfbk10, SectionTag52, PrimaryTravel42, ImageLoopCard7, SectionTag53, PrimaryTravel43, ImageLoopCard8, SectionTag54, PrimaryTravel44, SectionTag55, PrimaryTravel45, SectionTag56, PrimaryTravel46, PrimaryTravel47, ImageLoopCard9, ImageLoopCard10, SectionTag57, ExceptionalCard29, ExceptionalCard30, ExceptionalCard31, ExceptionalCard32, PrimaryTravel48, SectionTag58, ExceptionalCard33, ExceptionalCard34, ExceptionalCard35, ExceptionalCard36, PrimaryTravel49, SectionTag59, SectionTag60, ExceptionalCard37, ExceptionalCard38, ExceptionalCard39, ExceptionalCard40, PrimaryTravel50, ExceptionalCard41, ExceptionalCard42, ExceptionalCard43, ExceptionalCard44, ExceptionalCard45, ExceptionalCard46, ExceptionalCard47, ExceptionalCard48, PrimaryTravel51, PrimaryTravel52, SectionTag61, DestinationCard8, RunningText19, RunningText29, RunningText39, RunningText49, DestinationBgImage7, SectionTag62, DestinationCard9, RunningText110, RunningText210, RunningText310, RunningText410, DestinationBgImage8, SectionTag63, DestinationCard10, RunningText111, RunningText211, RunningText311, RunningText411, DestinationBgImage9, SectionTag64, DestinationCard11, SectionTag65, SectionTag66, DestinationCard12, RunningText112, RunningText212, RunningText312, RunningText412, RunningText113, RunningText213, RunningText313, RunningText413, RunningText114, RunningText214, RunningText314, RunningText414, DestinationBgImage10, SectionTag67, TourPackageCard8, PrimaryTravel53, SectionTag68, TourPackageCard9, PrimaryTravel54, SectionTag69, SectionTag70, TourPackageCard10, PrimaryTravel55, TourPackageCard11, TourPackageCard12, PrimaryTravel56, PrimaryTravel57, SnowfallProd4, SectionTag71, WhyUsCard6, SectionTag72, WhyUsCard7, SectionTag73, SectionTag74, WhyUsCard8, SectionTag75, TestimonialsCarouselCard6, Pricing5, SectionTag76, TestimonialsCarouselCard7, SectionTag77, SectionTag78, TestimonialsCarouselCard8, Pricing6, SectionTag79, BlogCard9, PrimaryTravel58, SectionTag80, BlogCard10, PrimaryTravel59, SectionTag81, SectionTag82, BlogCard11, PrimaryTravel60, BlogCard12, BlogCard13, BlogCard14, PrimaryTravel61, PrimaryTravel62, SectionTag83, Ticker7, SectionTag84, Ticker8, SectionTag85, SectionTag86, Ticker9, Ticker10, Video5, PrimaryTravel63, Avgdv4pj11, Kf85dqox011, Ud0etfbk11, SectionTag87, PrimaryTravel64, ImageLoopCard11, SectionTag88, ExceptionalCard49, ExceptionalCard50, ExceptionalCard51, ExceptionalCard52, PrimaryTravel65, SectionTag89, DestinationCard13, RunningText115, RunningText215, RunningText315, RunningText415, DestinationBgImage11, SectionTag90, TourPackageCard13, PrimaryTravel66, SnowfallProd5, SectionTag91, WhyUsCard9, SectionTag92, TestimonialsCarouselCard9, Pricing7, SectionTag93, BlogCard15, PrimaryTravel67, SectionTag94, Ticker11, Video6, PrimaryTravel68, Avgdv4pj12, Kf85dqox012, Ud0etfbk12, PrimaryTravel69, PrimaryTravel70, PrimaryTravel71, PrimaryTravel72, Avgdv4pj13, Kf85dqox013, Ud0etfbk13, Avgdv4pj14, Avgdv4pj15, Kf85dqox014, Kf85dqox015, Ud0etfbk14, Ud0etfbk15, SectionTag95, PrimaryTravel73, ImageLoopCard12, SectionTag96, PrimaryTravel74, ImageLoopCard13, SectionTag97, PrimaryTravel75, SectionTag98, PrimaryTravel76, SectionTag99, PrimaryTravel77, PrimaryTravel78, ImageLoopCard14, ImageLoopCard15, SectionTag100, ExceptionalCard53, ExceptionalCard54, ExceptionalCard55, ExceptionalCard56, PrimaryTravel79, SectionTag101, ExceptionalCard57, ExceptionalCard58, ExceptionalCard59, ExceptionalCard60, PrimaryTravel80, SectionTag102, SectionTag103, ExceptionalCard61, ExceptionalCard62, ExceptionalCard63, ExceptionalCard64, PrimaryTravel81, ExceptionalCard65, ExceptionalCard66, ExceptionalCard67, ExceptionalCard68, ExceptionalCard69, ExceptionalCard70, ExceptionalCard71, ExceptionalCard72, PrimaryTravel82, PrimaryTravel83, SectionTag104, DestinationCard14, RunningText116, RunningText216, RunningText316, RunningText416, DestinationBgImage12, SectionTag105, DestinationCard15, RunningText117, RunningText217, RunningText317, RunningText417, DestinationBgImage13, SectionTag106, DestinationCard16, RunningText118, RunningText218, RunningText318, RunningText418, DestinationBgImage14, SectionTag107, DestinationCard17, SectionTag108, SectionTag109, DestinationCard18, RunningText119, RunningText219, RunningText319, RunningText419, RunningText120, RunningText220, RunningText320, RunningText420, RunningText121, RunningText221, RunningText321, RunningText421, DestinationBgImage15, SectionTag110, TourPackageCard14, PrimaryTravel84, SectionTag111, TourPackageCard15, PrimaryTravel85, SectionTag112, SectionTag113, TourPackageCard16, PrimaryTravel86, TourPackageCard17, TourPackageCard18, PrimaryTravel87, PrimaryTravel88, SnowfallProd6, SectionTag114, WhyUsCard10, SectionTag115, WhyUsCard11, SectionTag116, SectionTag117, WhyUsCard12, SectionTag118, TestimonialsCarouselCard10, Pricing8, SectionTag119, TestimonialsCarouselCard11, SectionTag120, SectionTag121, TestimonialsCarouselCard12, Pricing9, SectionTag122, BlogCard16, PrimaryTravel89, SectionTag123, BlogCard17, PrimaryTravel90, SectionTag124, SectionTag125, BlogCard18, PrimaryTravel91, BlogCard19, BlogCard20, BlogCard21, PrimaryTravel92, PrimaryTravel93, SectionTag126, Ticker12, SectionTag127, Ticker13, SectionTag128, SectionTag129, Ticker14, Ticker15, InstagramStory, InstagramStory2, InstagramStory3, InstagramStory4, Cbx0bVr, Cbx0bVr2, Cbx0bVr3, Cbx0bVr4",
+  "type": "module",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./index.js",
+      "types": "./index.d.ts"
+    },
+    "./Video": {
+      "import": "./Video.js",
+      "types": "./Video.d.ts"
+    },
+    "./PrimaryTravel": {
+      "import": "./PrimaryTravel.js",
+      "types": "./PrimaryTravel.d.ts"
+    },
+    "./Avgdv4pj": {
+      "import": "./Avgdv4pj.js",
+      "types": "./Avgdv4pj.d.ts"
+    },
+    "./Kf85dqox0": {
+      "import": "./Kf85dqox0.js",
+      "types": "./Kf85dqox0.d.ts"
+    },
+    "./Ud0etfbk": {
+      "import": "./Ud0etfbk.js",
+      "types": "./Ud0etfbk.d.ts"
+    },
+    "./SectionTag": {
+      "import": "./SectionTag.js",
+      "types": "./SectionTag.d.ts"
+    },
+    "./PrimaryTravel2": {
+      "import": "./PrimaryTravel2.js",
+      "types": "./PrimaryTravel2.d.ts"
+    },
+    "./ImageLoopCard": {
+      "import": "./ImageLoopCard.js",
+      "types": "./ImageLoopCard.d.ts"
+    },
+    "./SectionTag2": {
+      "import": "./SectionTag2.js",
+      "types": "./SectionTag2.d.ts"
+    },
+    "./ExceptionalCard": {
+      "import": "./ExceptionalCard.js",
+      "types": "./ExceptionalCard.d.ts"
+    },
+    "./ExceptionalCard2": {
+      "import": "./ExceptionalCard2.js",
+      "types": "./ExceptionalCard2.d.ts"
+    },
+    "./ExceptionalCard3": {
+      "import": "./ExceptionalCard3.js",
+      "types": "./ExceptionalCard3.d.ts"
+    },
+    "./ExceptionalCard4": {
+      "import": "./ExceptionalCard4.js",
+      "types": "./ExceptionalCard4.d.ts"
+    },
+    "./PrimaryTravel3": {
+      "import": "./PrimaryTravel3.js",
+      "types": "./PrimaryTravel3.d.ts"
+    },
+    "./SectionTag3": {
+      "import": "./SectionTag3.js",
+      "types": "./SectionTag3.d.ts"
+    },
+    "./DestinationCard": {
+      "import": "./DestinationCard.js",
+      "types": "./DestinationCard.d.ts"
+    },
+    "./RunningText1": {
+      "import": "./RunningText1.js",
+      "types": "./RunningText1.d.ts"
+    },
+    "./RunningText2": {
+      "import": "./RunningText2.js",
+      "types": "./RunningText2.d.ts"
+    },
+    "./RunningText3": {
+      "import": "./RunningText3.js",
+      "types": "./RunningText3.d.ts"
+    },
+    "./RunningText4": {
+      "import": "./RunningText4.js",
+      "types": "./RunningText4.d.ts"
+    },
+    "./DestinationBgImage": {
+      "import": "./DestinationBgImage.js",
+      "types": "./DestinationBgImage.d.ts"
+    },
+    "./SectionTag4": {
+      "import": "./SectionTag4.js",
+      "types": "./SectionTag4.d.ts"
+    },
+    "./TourPackageCard": {
+      "import": "./TourPackageCard.js",
+      "types": "./TourPackageCard.d.ts"
+    },
+    "./PrimaryTravel4": {
+      "import": "./PrimaryTravel4.js",
+      "types": "./PrimaryTravel4.d.ts"
+    },
+    "./SnowfallProd": {
+      "import": "./SnowfallProd.js",
+      "types": "./SnowfallProd.d.ts"
+    },
+    "./SectionTag5": {
+      "import": "./SectionTag5.js",
+      "types": "./SectionTag5.d.ts"
+    },
+    "./WhyUsCard": {
+      "import": "./WhyUsCard.js",
+      "types": "./WhyUsCard.d.ts"
+    },
+    "./SectionTag6": {
+      "import": "./SectionTag6.js",
+      "types": "./SectionTag6.d.ts"
+    },
+    "./TestimonialsCarouselCard": {
+      "import": "./TestimonialsCarouselCard.js",
+      "types": "./TestimonialsCarouselCard.d.ts"
+    },
+    "./Pricing": {
+      "import": "./Pricing.js",
+      "types": "./Pricing.d.ts"
+    },
+    "./SectionTag7": {
+      "import": "./SectionTag7.js",
+      "types": "./SectionTag7.d.ts"
+    },
+    "./BlogCard": {
+      "import": "./BlogCard.js",
+      "types": "./BlogCard.d.ts"
+    },
+    "./PrimaryTravel5": {
+      "import": "./PrimaryTravel5.js",
+      "types": "./PrimaryTravel5.d.ts"
+    },
+    "./SectionTag8": {
+      "import": "./SectionTag8.js",
+      "types": "./SectionTag8.d.ts"
+    },
+    "./Ticker": {
+      "import": "./Ticker.js",
+      "types": "./Ticker.d.ts"
+    },
+    "./Video2": {
+      "import": "./Video2.js",
+      "types": "./Video2.d.ts"
+    },
+    "./PrimaryTravel6": {
+      "import": "./PrimaryTravel6.js",
+      "types": "./PrimaryTravel6.d.ts"
+    },
+    "./Avgdv4pj2": {
+      "import": "./Avgdv4pj2.js",
+      "types": "./Avgdv4pj2.d.ts"
+    },
+    "./Kf85dqox02": {
+      "import": "./Kf85dqox02.js",
+      "types": "./Kf85dqox02.d.ts"
+    },
+    "./Ud0etfbk2": {
+      "import": "./Ud0etfbk2.js",
+      "types": "./Ud0etfbk2.d.ts"
+    },
+    "./PrimaryTravel7": {
+      "import": "./PrimaryTravel7.js",
+      "types": "./PrimaryTravel7.d.ts"
+    },
+    "./PrimaryTravel8": {
+      "import": "./PrimaryTravel8.js",
+      "types": "./PrimaryTravel8.d.ts"
+    },
+    "./PrimaryTravel9": {
+      "import": "./PrimaryTravel9.js",
+      "types": "./PrimaryTravel9.d.ts"
+    },
+    "./PrimaryTravel10": {
+      "import": "./PrimaryTravel10.js",
+      "types": "./PrimaryTravel10.d.ts"
+    },
+    "./Avgdv4pj3": {
+      "import": "./Avgdv4pj3.js",
+      "types": "./Avgdv4pj3.d.ts"
+    },
+    "./Kf85dqox03": {
+      "import": "./Kf85dqox03.js",
+      "types": "./Kf85dqox03.d.ts"
+    },
+    "./Ud0etfbk3": {
+      "import": "./Ud0etfbk3.js",
+      "types": "./Ud0etfbk3.d.ts"
+    },
+    "./Avgdv4pj4": {
+      "import": "./Avgdv4pj4.js",
+      "types": "./Avgdv4pj4.d.ts"
+    },
+    "./Avgdv4pj5": {
+      "import": "./Avgdv4pj5.js",
+      "types": "./Avgdv4pj5.d.ts"
+    },
+    "./Kf85dqox04": {
+      "import": "./Kf85dqox04.js",
+      "types": "./Kf85dqox04.d.ts"
+    },
+    "./Kf85dqox05": {
+      "import": "./Kf85dqox05.js",
+      "types": "./Kf85dqox05.d.ts"
+    },
+    "./Ud0etfbk4": {
+      "import": "./Ud0etfbk4.js",
+      "types": "./Ud0etfbk4.d.ts"
+    },
+    "./Ud0etfbk5": {
+      "import": "./Ud0etfbk5.js",
+      "types": "./Ud0etfbk5.d.ts"
+    },
+    "./SectionTag9": {
+      "import": "./SectionTag9.js",
+      "types": "./SectionTag9.d.ts"
+    },
+    "./PrimaryTravel11": {
+      "import": "./PrimaryTravel11.js",
+      "types": "./PrimaryTravel11.d.ts"
+    },
+    "./ImageLoopCard2": {
+      "import": "./ImageLoopCard2.js",
+      "types": "./ImageLoopCard2.d.ts"
+    },
+    "./SectionTag10": {
+      "import": "./SectionTag10.js",
+      "types": "./SectionTag10.d.ts"
+    },
+    "./PrimaryTravel12": {
+      "import": "./PrimaryTravel12.js",
+      "types": "./PrimaryTravel12.d.ts"
+    },
+    "./ImageLoopCard3": {
+      "import": "./ImageLoopCard3.js",
+      "types": "./ImageLoopCard3.d.ts"
+    },
+    "./SectionTag11": {
+      "import": "./SectionTag11.js",
+      "types": "./SectionTag11.d.ts"
+    },
+    "./PrimaryTravel13": {
+      "import": "./PrimaryTravel13.js",
+      "types": "./PrimaryTravel13.d.ts"
+    },
+    "./SectionTag12": {
+      "import": "./SectionTag12.js",
+      "types": "./SectionTag12.d.ts"
+    },
+    "./PrimaryTravel14": {
+      "import": "./PrimaryTravel14.js",
+      "types": "./PrimaryTravel14.d.ts"
+    },
+    "./SectionTag13": {
+      "import": "./SectionTag13.js",
+      "types": "./SectionTag13.d.ts"
+    },
+    "./PrimaryTravel15": {
+      "import": "./PrimaryTravel15.js",
+      "types": "./PrimaryTravel15.d.ts"
+    },
+    "./PrimaryTravel16": {
+      "import": "./PrimaryTravel16.js",
+      "types": "./PrimaryTravel16.d.ts"
+    },
+    "./ImageLoopCard4": {
+      "import": "./ImageLoopCard4.js",
+      "types": "./ImageLoopCard4.d.ts"
+    },
+    "./ImageLoopCard5": {
+      "import": "./ImageLoopCard5.js",
+      "types": "./ImageLoopCard5.d.ts"
+    },
+    "./SectionTag14": {
+      "import": "./SectionTag14.js",
+      "types": "./SectionTag14.d.ts"
+    },
+    "./ExceptionalCard5": {
+      "import": "./ExceptionalCard5.js",
+      "types": "./ExceptionalCard5.d.ts"
+    },
+    "./ExceptionalCard6": {
+      "import": "./ExceptionalCard6.js",
+      "types": "./ExceptionalCard6.d.ts"
+    },
+    "./ExceptionalCard7": {
+      "import": "./ExceptionalCard7.js",
+      "types": "./ExceptionalCard7.d.ts"
+    },
+    "./ExceptionalCard8": {
+      "import": "./ExceptionalCard8.js",
+      "types": "./ExceptionalCard8.d.ts"
+    },
+    "./PrimaryTravel17": {
+      "import": "./PrimaryTravel17.js",
+      "types": "./PrimaryTravel17.d.ts"
+    },
+    "./SectionTag15": {
+      "import": "./SectionTag15.js",
+      "types": "./SectionTag15.d.ts"
+    },
+    "./ExceptionalCard9": {
+      "import": "./ExceptionalCard9.js",
+      "types": "./ExceptionalCard9.d.ts"
+    },
+    "./ExceptionalCard10": {
+      "import": "./ExceptionalCard10.js",
+      "types": "./ExceptionalCard10.d.ts"
+    },
+    "./ExceptionalCard11": {
+      "import": "./ExceptionalCard11.js",
+      "types": "./ExceptionalCard11.d.ts"
+    },
+    "./ExceptionalCard12": {
+      "import": "./ExceptionalCard12.js",
+      "types": "./ExceptionalCard12.d.ts"
+    },
+    "./PrimaryTravel18": {
+      "import": "./PrimaryTravel18.js",
+      "types": "./PrimaryTravel18.d.ts"
+    },
+    "./SectionTag16": {
+      "import": "./SectionTag16.js",
+      "types": "./SectionTag16.d.ts"
+    },
+    "./SectionTag17": {
+      "import": "./SectionTag17.js",
+      "types": "./SectionTag17.d.ts"
+    },
+    "./ExceptionalCard13": {
+      "import": "./ExceptionalCard13.js",
+      "types": "./ExceptionalCard13.d.ts"
+    },
+    "./ExceptionalCard14": {
+      "import": "./ExceptionalCard14.js",
+      "types": "./ExceptionalCard14.d.ts"
+    },
+    "./ExceptionalCard15": {
+      "import": "./ExceptionalCard15.js",
+      "types": "./ExceptionalCard15.d.ts"
+    },
+    "./ExceptionalCard16": {
+      "import": "./ExceptionalCard16.js",
+      "types": "./ExceptionalCard16.d.ts"
+    },
+    "./PrimaryTravel19": {
+      "import": "./PrimaryTravel19.js",
+      "types": "./PrimaryTravel19.d.ts"
+    },
+    "./ExceptionalCard17": {
+      "import": "./ExceptionalCard17.js",
+      "types": "./ExceptionalCard17.d.ts"
+    },
+    "./ExceptionalCard18": {
+      "import": "./ExceptionalCard18.js",
+      "types": "./ExceptionalCard18.d.ts"
+    },
+    "./ExceptionalCard19": {
+      "import": "./ExceptionalCard19.js",
+      "types": "./ExceptionalCard19.d.ts"
+    },
+    "./ExceptionalCard20": {
+      "import": "./ExceptionalCard20.js",
+      "types": "./ExceptionalCard20.d.ts"
+    },
+    "./ExceptionalCard21": {
+      "import": "./ExceptionalCard21.js",
+      "types": "./ExceptionalCard21.d.ts"
+    },
+    "./ExceptionalCard22": {
+      "import": "./ExceptionalCard22.js",
+      "types": "./ExceptionalCard22.d.ts"
+    },
+    "./ExceptionalCard23": {
+      "import": "./ExceptionalCard23.js",
+      "types": "./ExceptionalCard23.d.ts"
+    },
+    "./ExceptionalCard24": {
+      "import": "./ExceptionalCard24.js",
+      "types": "./ExceptionalCard24.d.ts"
+    },
+    "./PrimaryTravel20": {
+      "import": "./PrimaryTravel20.js",
+      "types": "./PrimaryTravel20.d.ts"
+    },
+    "./PrimaryTravel21": {
+      "import": "./PrimaryTravel21.js",
+      "types": "./PrimaryTravel21.d.ts"
+    },
+    "./SectionTag18": {
+      "import": "./SectionTag18.js",
+      "types": "./SectionTag18.d.ts"
+    },
+    "./DestinationCard2": {
+      "import": "./DestinationCard2.js",
+      "types": "./DestinationCard2.d.ts"
+    },
+    "./RunningText12": {
+      "import": "./RunningText12.js",
+      "types": "./RunningText12.d.ts"
+    },
+    "./RunningText22": {
+      "import": "./RunningText22.js",
+      "types": "./RunningText22.d.ts"
+    },
+    "./RunningText32": {
+      "import": "./RunningText32.js",
+      "types": "./RunningText32.d.ts"
+    },
+    "./RunningText42": {
+      "import": "./RunningText42.js",
+      "types": "./RunningText42.d.ts"
+    },
+    "./DestinationBgImage2": {
+      "import": "./DestinationBgImage2.js",
+      "types": "./DestinationBgImage2.d.ts"
+    },
+    "./SectionTag19": {
+      "import": "./SectionTag19.js",
+      "types": "./SectionTag19.d.ts"
+    },
+    "./DestinationCard3": {
+      "import": "./DestinationCard3.js",
+      "types": "./DestinationCard3.d.ts"
+    },
+    "./RunningText13": {
+      "import": "./RunningText13.js",
+      "types": "./RunningText13.d.ts"
+    },
+    "./RunningText23": {
+      "import": "./RunningText23.js",
+      "types": "./RunningText23.d.ts"
+    },
+    "./RunningText33": {
+      "import": "./RunningText33.js",
+      "types": "./RunningText33.d.ts"
+    },
+    "./RunningText43": {
+      "import": "./RunningText43.js",
+      "types": "./RunningText43.d.ts"
+    },
+    "./DestinationBgImage3": {
+      "import": "./DestinationBgImage3.js",
+      "types": "./DestinationBgImage3.d.ts"
+    },
+    "./SectionTag20": {
+      "import": "./SectionTag20.js",
+      "types": "./SectionTag20.d.ts"
+    },
+    "./DestinationCard4": {
+      "import": "./DestinationCard4.js",
+      "types": "./DestinationCard4.d.ts"
+    },
+    "./RunningText14": {
+      "import": "./RunningText14.js",
+      "types": "./RunningText14.d.ts"
+    },
+    "./RunningText24": {
+      "import": "./RunningText24.js",
+      "types": "./RunningText24.d.ts"
+    },
+    "./RunningText34": {
+      "import": "./RunningText34.js",
+      "types": "./RunningText34.d.ts"
+    },
+    "./RunningText44": {
+      "import": "./RunningText44.js",
+      "types": "./RunningText44.d.ts"
+    },
+    "./DestinationBgImage4": {
+      "import": "./DestinationBgImage4.js",
+      "types": "./DestinationBgImage4.d.ts"
+    },
+    "./SectionTag21": {
+      "import": "./SectionTag21.js",
+      "types": "./SectionTag21.d.ts"
+    },
+    "./DestinationCard5": {
+      "import": "./DestinationCard5.js",
+      "types": "./DestinationCard5.d.ts"
+    },
+    "./SectionTag22": {
+      "import": "./SectionTag22.js",
+      "types": "./SectionTag22.d.ts"
+    },
+    "./SectionTag23": {
+      "import": "./SectionTag23.js",
+      "types": "./SectionTag23.d.ts"
+    },
+    "./DestinationCard6": {
+      "import": "./DestinationCard6.js",
+      "types": "./DestinationCard6.d.ts"
+    },
+    "./RunningText15": {
+      "import": "./RunningText15.js",
+      "types": "./RunningText15.d.ts"
+    },
+    "./RunningText25": {
+      "import": "./RunningText25.js",
+      "types": "./RunningText25.d.ts"
+    },
+    "./RunningText35": {
+      "import": "./RunningText35.js",
+      "types": "./RunningText35.d.ts"
+    },
+    "./RunningText45": {
+      "import": "./RunningText45.js",
+      "types": "./RunningText45.d.ts"
+    },
+    "./RunningText16": {
+      "import": "./RunningText16.js",
+      "types": "./RunningText16.d.ts"
+    },
+    "./RunningText26": {
+      "import": "./RunningText26.js",
+      "types": "./RunningText26.d.ts"
+    },
+    "./RunningText36": {
+      "import": "./RunningText36.js",
+      "types": "./RunningText36.d.ts"
+    },
+    "./RunningText46": {
+      "import": "./RunningText46.js",
+      "types": "./RunningText46.d.ts"
+    },
+    "./RunningText17": {
+      "import": "./RunningText17.js",
+      "types": "./RunningText17.d.ts"
+    },
+    "./RunningText27": {
+      "import": "./RunningText27.js",
+      "types": "./RunningText27.d.ts"
+    },
+    "./RunningText37": {
+      "import": "./RunningText37.js",
+      "types": "./RunningText37.d.ts"
+    },
+    "./RunningText47": {
+      "import": "./RunningText47.js",
+      "types": "./RunningText47.d.ts"
+    },
+    "./DestinationBgImage5": {
+      "import": "./DestinationBgImage5.js",
+      "types": "./DestinationBgImage5.d.ts"
+    },
+    "./SectionTag24": {
+      "import": "./SectionTag24.js",
+      "types": "./SectionTag24.d.ts"
+    },
+    "./TourPackageCard2": {
+      "import": "./TourPackageCard2.js",
+      "types": "./TourPackageCard2.d.ts"
+    },
+    "./PrimaryTravel22": {
+      "import": "./PrimaryTravel22.js",
+      "types": "./PrimaryTravel22.d.ts"
+    },
+    "./SectionTag25": {
+      "import": "./SectionTag25.js",
+      "types": "./SectionTag25.d.ts"
+    },
+    "./TourPackageCard3": {
+      "import": "./TourPackageCard3.js",
+      "types": "./TourPackageCard3.d.ts"
+    },
+    "./PrimaryTravel23": {
+      "import": "./PrimaryTravel23.js",
+      "types": "./PrimaryTravel23.d.ts"
+    },
+    "./SectionTag26": {
+      "import": "./SectionTag26.js",
+      "types": "./SectionTag26.d.ts"
+    },
+    "./SectionTag27": {
+      "import": "./SectionTag27.js",
+      "types": "./SectionTag27.d.ts"
+    },
+    "./TourPackageCard4": {
+      "import": "./TourPackageCard4.js",
+      "types": "./TourPackageCard4.d.ts"
+    },
+    "./PrimaryTravel24": {
+      "import": "./PrimaryTravel24.js",
+      "types": "./PrimaryTravel24.d.ts"
+    },
+    "./TourPackageCard5": {
+      "import": "./TourPackageCard5.js",
+      "types": "./TourPackageCard5.d.ts"
+    },
+    "./TourPackageCard6": {
+      "import": "./TourPackageCard6.js",
+      "types": "./TourPackageCard6.d.ts"
+    },
+    "./PrimaryTravel25": {
+      "import": "./PrimaryTravel25.js",
+      "types": "./PrimaryTravel25.d.ts"
+    },
+    "./PrimaryTravel26": {
+      "import": "./PrimaryTravel26.js",
+      "types": "./PrimaryTravel26.d.ts"
+    },
+    "./SnowfallProd2": {
+      "import": "./SnowfallProd2.js",
+      "types": "./SnowfallProd2.d.ts"
+    },
+    "./SectionTag28": {
+      "import": "./SectionTag28.js",
+      "types": "./SectionTag28.d.ts"
+    },
+    "./WhyUsCard2": {
+      "import": "./WhyUsCard2.js",
+      "types": "./WhyUsCard2.d.ts"
+    },
+    "./SectionTag29": {
+      "import": "./SectionTag29.js",
+      "types": "./SectionTag29.d.ts"
+    },
+    "./WhyUsCard3": {
+      "import": "./WhyUsCard3.js",
+      "types": "./WhyUsCard3.d.ts"
+    },
+    "./SectionTag30": {
+      "import": "./SectionTag30.js",
+      "types": "./SectionTag30.d.ts"
+    },
+    "./SectionTag31": {
+      "import": "./SectionTag31.js",
+      "types": "./SectionTag31.d.ts"
+    },
+    "./WhyUsCard4": {
+      "import": "./WhyUsCard4.js",
+      "types": "./WhyUsCard4.d.ts"
+    },
+    "./SectionTag32": {
+      "import": "./SectionTag32.js",
+      "types": "./SectionTag32.d.ts"
+    },
+    "./TestimonialsCarouselCard2": {
+      "import": "./TestimonialsCarouselCard2.js",
+      "types": "./TestimonialsCarouselCard2.d.ts"
+    },
+    "./Pricing2": {
+      "import": "./Pricing2.js",
+      "types": "./Pricing2.d.ts"
+    },
+    "./SectionTag33": {
+      "import": "./SectionTag33.js",
+      "types": "./SectionTag33.d.ts"
+    },
+    "./TestimonialsCarouselCard3": {
+      "import": "./TestimonialsCarouselCard3.js",
+      "types": "./TestimonialsCarouselCard3.d.ts"
+    },
+    "./SectionTag34": {
+      "import": "./SectionTag34.js",
+      "types": "./SectionTag34.d.ts"
+    },
+    "./SectionTag35": {
+      "import": "./SectionTag35.js",
+      "types": "./SectionTag35.d.ts"
+    },
+    "./TestimonialsCarouselCard4": {
+      "import": "./TestimonialsCarouselCard4.js",
+      "types": "./TestimonialsCarouselCard4.d.ts"
+    },
+    "./Pricing3": {
+      "import": "./Pricing3.js",
+      "types": "./Pricing3.d.ts"
+    },
+    "./SectionTag36": {
+      "import": "./SectionTag36.js",
+      "types": "./SectionTag36.d.ts"
+    },
+    "./BlogCard2": {
+      "import": "./BlogCard2.js",
+      "types": "./BlogCard2.d.ts"
+    },
+    "./PrimaryTravel27": {
+      "import": "./PrimaryTravel27.js",
+      "types": "./PrimaryTravel27.d.ts"
+    },
+    "./SectionTag37": {
+      "import": "./SectionTag37.js",
+      "types": "./SectionTag37.d.ts"
+    },
+    "./BlogCard3": {
+      "import": "./BlogCard3.js",
+      "types": "./BlogCard3.d.ts"
+    },
+    "./PrimaryTravel28": {
+      "import": "./PrimaryTravel28.js",
+      "types": "./PrimaryTravel28.d.ts"
+    },
+    "./SectionTag38": {
+      "import": "./SectionTag38.js",
+      "types": "./SectionTag38.d.ts"
+    },
+    "./SectionTag39": {
+      "import": "./SectionTag39.js",
+      "types": "./SectionTag39.d.ts"
+    },
+    "./BlogCard4": {
+      "import": "./BlogCard4.js",
+      "types": "./BlogCard4.d.ts"
+    },
+    "./PrimaryTravel29": {
+      "import": "./PrimaryTravel29.js",
+      "types": "./PrimaryTravel29.d.ts"
+    },
+    "./BlogCard5": {
+      "import": "./BlogCard5.js",
+      "types": "./BlogCard5.d.ts"
+    },
+    "./BlogCard6": {
+      "import": "./BlogCard6.js",
+      "types": "./BlogCard6.d.ts"
+    },
+    "./BlogCard7": {
+      "import": "./BlogCard7.js",
+      "types": "./BlogCard7.d.ts"
+    },
+    "./PrimaryTravel30": {
+      "import": "./PrimaryTravel30.js",
+      "types": "./PrimaryTravel30.d.ts"
+    },
+    "./PrimaryTravel31": {
+      "import": "./PrimaryTravel31.js",
+      "types": "./PrimaryTravel31.d.ts"
+    },
+    "./SectionTag40": {
+      "import": "./SectionTag40.js",
+      "types": "./SectionTag40.d.ts"
+    },
+    "./Ticker2": {
+      "import": "./Ticker2.js",
+      "types": "./Ticker2.d.ts"
+    },
+    "./SectionTag41": {
+      "import": "./SectionTag41.js",
+      "types": "./SectionTag41.d.ts"
+    },
+    "./Ticker3": {
+      "import": "./Ticker3.js",
+      "types": "./Ticker3.d.ts"
+    },
+    "./SectionTag42": {
+      "import": "./SectionTag42.js",
+      "types": "./SectionTag42.d.ts"
+    },
+    "./SectionTag43": {
+      "import": "./SectionTag43.js",
+      "types": "./SectionTag43.d.ts"
+    },
+    "./Ticker4": {
+      "import": "./Ticker4.js",
+      "types": "./Ticker4.d.ts"
+    },
+    "./Ticker5": {
+      "import": "./Ticker5.js",
+      "types": "./Ticker5.d.ts"
+    },
+    "./Video3": {
+      "import": "./Video3.js",
+      "types": "./Video3.d.ts"
+    },
+    "./PrimaryTravel32": {
+      "import": "./PrimaryTravel32.js",
+      "types": "./PrimaryTravel32.d.ts"
+    },
+    "./Avgdv4pj6": {
+      "import": "./Avgdv4pj6.js",
+      "types": "./Avgdv4pj6.d.ts"
+    },
+    "./Kf85dqox06": {
+      "import": "./Kf85dqox06.js",
+      "types": "./Kf85dqox06.d.ts"
+    },
+    "./Ud0etfbk6": {
+      "import": "./Ud0etfbk6.js",
+      "types": "./Ud0etfbk6.d.ts"
+    },
+    "./SectionTag44": {
+      "import": "./SectionTag44.js",
+      "types": "./SectionTag44.d.ts"
+    },
+    "./PrimaryTravel33": {
+      "import": "./PrimaryTravel33.js",
+      "types": "./PrimaryTravel33.d.ts"
+    },
+    "./ImageLoopCard6": {
+      "import": "./ImageLoopCard6.js",
+      "types": "./ImageLoopCard6.d.ts"
+    },
+    "./SectionTag45": {
+      "import": "./SectionTag45.js",
+      "types": "./SectionTag45.d.ts"
+    },
+    "./ExceptionalCard25": {
+      "import": "./ExceptionalCard25.js",
+      "types": "./ExceptionalCard25.d.ts"
+    },
+    "./ExceptionalCard26": {
+      "import": "./ExceptionalCard26.js",
+      "types": "./ExceptionalCard26.d.ts"
+    },
+    "./ExceptionalCard27": {
+      "import": "./ExceptionalCard27.js",
+      "types": "./ExceptionalCard27.d.ts"
+    },
+    "./ExceptionalCard28": {
+      "import": "./ExceptionalCard28.js",
+      "types": "./ExceptionalCard28.d.ts"
+    },
+    "./PrimaryTravel34": {
+      "import": "./PrimaryTravel34.js",
+      "types": "./PrimaryTravel34.d.ts"
+    },
+    "./SectionTag46": {
+      "import": "./SectionTag46.js",
+      "types": "./SectionTag46.d.ts"
+    },
+    "./DestinationCard7": {
+      "import": "./DestinationCard7.js",
+      "types": "./DestinationCard7.d.ts"
+    },
+    "./RunningText18": {
+      "import": "./RunningText18.js",
+      "types": "./RunningText18.d.ts"
+    },
+    "./RunningText28": {
+      "import": "./RunningText28.js",
+      "types": "./RunningText28.d.ts"
+    },
+    "./RunningText38": {
+      "import": "./RunningText38.js",
+      "types": "./RunningText38.d.ts"
+    },
+    "./RunningText48": {
+      "import": "./RunningText48.js",
+      "types": "./RunningText48.d.ts"
+    },
+    "./DestinationBgImage6": {
+      "import": "./DestinationBgImage6.js",
+      "types": "./DestinationBgImage6.d.ts"
+    },
+    "./SectionTag47": {
+      "import": "./SectionTag47.js",
+      "types": "./SectionTag47.d.ts"
+    },
+    "./TourPackageCard7": {
+      "import": "./TourPackageCard7.js",
+      "types": "./TourPackageCard7.d.ts"
+    },
+    "./PrimaryTravel35": {
+      "import": "./PrimaryTravel35.js",
+      "types": "./PrimaryTravel35.d.ts"
+    },
+    "./SnowfallProd3": {
+      "import": "./SnowfallProd3.js",
+      "types": "./SnowfallProd3.d.ts"
+    },
+    "./SectionTag48": {
+      "import": "./SectionTag48.js",
+      "types": "./SectionTag48.d.ts"
+    },
+    "./WhyUsCard5": {
+      "import": "./WhyUsCard5.js",
+      "types": "./WhyUsCard5.d.ts"
+    },
+    "./SectionTag49": {
+      "import": "./SectionTag49.js",
+      "types": "./SectionTag49.d.ts"
+    },
+    "./TestimonialsCarouselCard5": {
+      "import": "./TestimonialsCarouselCard5.js",
+      "types": "./TestimonialsCarouselCard5.d.ts"
+    },
+    "./Pricing4": {
+      "import": "./Pricing4.js",
+      "types": "./Pricing4.d.ts"
+    },
+    "./SectionTag50": {
+      "import": "./SectionTag50.js",
+      "types": "./SectionTag50.d.ts"
+    },
+    "./BlogCard8": {
+      "import": "./BlogCard8.js",
+      "types": "./BlogCard8.d.ts"
+    },
+    "./PrimaryTravel36": {
+      "import": "./PrimaryTravel36.js",
+      "types": "./PrimaryTravel36.d.ts"
+    },
+    "./SectionTag51": {
+      "import": "./SectionTag51.js",
+      "types": "./SectionTag51.d.ts"
+    },
+    "./Ticker6": {
+      "import": "./Ticker6.js",
+      "types": "./Ticker6.d.ts"
+    },
+    "./Video4": {
+      "import": "./Video4.js",
+      "types": "./Video4.d.ts"
+    },
+    "./PrimaryTravel37": {
+      "import": "./PrimaryTravel37.js",
+      "types": "./PrimaryTravel37.d.ts"
+    },
+    "./Avgdv4pj7": {
+      "import": "./Avgdv4pj7.js",
+      "types": "./Avgdv4pj7.d.ts"
+    },
+    "./Kf85dqox07": {
+      "import": "./Kf85dqox07.js",
+      "types": "./Kf85dqox07.d.ts"
+    },
+    "./Ud0etfbk7": {
+      "import": "./Ud0etfbk7.js",
+      "types": "./Ud0etfbk7.d.ts"
+    },
+    "./PrimaryTravel38": {
+      "import": "./PrimaryTravel38.js",
+      "types": "./PrimaryTravel38.d.ts"
+    },
+    "./PrimaryTravel39": {
+      "import": "./PrimaryTravel39.js",
+      "types": "./PrimaryTravel39.d.ts"
+    },
+    "./PrimaryTravel40": {
+      "import": "./PrimaryTravel40.js",
+      "types": "./PrimaryTravel40.d.ts"
+    },
+    "./PrimaryTravel41": {
+      "import": "./PrimaryTravel41.js",
+      "types": "./PrimaryTravel41.d.ts"
+    },
+    "./Avgdv4pj8": {
+      "import": "./Avgdv4pj8.js",
+      "types": "./Avgdv4pj8.d.ts"
+    },
+    "./Kf85dqox08": {
+      "import": "./Kf85dqox08.js",
+      "types": "./Kf85dqox08.d.ts"
+    },
+    "./Ud0etfbk8": {
+      "import": "./Ud0etfbk8.js",
+      "types": "./Ud0etfbk8.d.ts"
+    },
+    "./Avgdv4pj9": {
+      "import": "./Avgdv4pj9.js",
+      "types": "./Avgdv4pj9.d.ts"
+    },
+    "./Avgdv4pj10": {
+      "import": "./Avgdv4pj10.js",
+      "types": "./Avgdv4pj10.d.ts"
+    },
+    "./Kf85dqox09": {
+      "import": "./Kf85dqox09.js",
+      "types": "./Kf85dqox09.d.ts"
+    },
+    "./Kf85dqox010": {
+      "import": "./Kf85dqox010.js",
+      "types": "./Kf85dqox010.d.ts"
+    },
+    "./Ud0etfbk9": {
+      "import": "./Ud0etfbk9.js",
+      "types": "./Ud0etfbk9.d.ts"
+    },
+    "./Ud0etfbk10": {
+      "import": "./Ud0etfbk10.js",
+      "types": "./Ud0etfbk10.d.ts"
+    },
+    "./SectionTag52": {
+      "import": "./SectionTag52.js",
+      "types": "./SectionTag52.d.ts"
+    },
+    "./PrimaryTravel42": {
+      "import": "./PrimaryTravel42.js",
+      "types": "./PrimaryTravel42.d.ts"
+    },
+    "./ImageLoopCard7": {
+      "import": "./ImageLoopCard7.js",
+      "types": "./ImageLoopCard7.d.ts"
+    },
+    "./SectionTag53": {
+      "import": "./SectionTag53.js",
+      "types": "./SectionTag53.d.ts"
+    },
+    "./PrimaryTravel43": {
+      "import": "./PrimaryTravel43.js",
+      "types": "./PrimaryTravel43.d.ts"
+    },
+    "./ImageLoopCard8": {
+      "import": "./ImageLoopCard8.js",
+      "types": "./ImageLoopCard8.d.ts"
+    },
+    "./SectionTag54": {
+      "import": "./SectionTag54.js",
+      "types": "./SectionTag54.d.ts"
+    },
+    "./PrimaryTravel44": {
+      "import": "./PrimaryTravel44.js",
+      "types": "./PrimaryTravel44.d.ts"
+    },
+    "./SectionTag55": {
+      "import": "./SectionTag55.js",
+      "types": "./SectionTag55.d.ts"
+    },
+    "./PrimaryTravel45": {
+      "import": "./PrimaryTravel45.js",
+      "types": "./PrimaryTravel45.d.ts"
+    },
+    "./SectionTag56": {
+      "import": "./SectionTag56.js",
+      "types": "./SectionTag56.d.ts"
+    },
+    "./PrimaryTravel46": {
+      "import": "./PrimaryTravel46.js",
+      "types": "./PrimaryTravel46.d.ts"
+    },
+    "./PrimaryTravel47": {
+      "import": "./PrimaryTravel47.js",
+      "types": "./PrimaryTravel47.d.ts"
+    },
+    "./ImageLoopCard9": {
+      "import": "./ImageLoopCard9.js",
+      "types": "./ImageLoopCard9.d.ts"
+    },
+    "./ImageLoopCard10": {
+      "import": "./ImageLoopCard10.js",
+      "types": "./ImageLoopCard10.d.ts"
+    },
+    "./SectionTag57": {
+      "import": "./SectionTag57.js",
+      "types": "./SectionTag57.d.ts"
+    },
+    "./ExceptionalCard29": {
+      "import": "./ExceptionalCard29.js",
+      "types": "./ExceptionalCard29.d.ts"
+    },
+    "./ExceptionalCard30": {
+      "import": "./ExceptionalCard30.js",
+      "types": "./ExceptionalCard30.d.ts"
+    },
+    "./ExceptionalCard31": {
+      "import": "./ExceptionalCard31.js",
+      "types": "./ExceptionalCard31.d.ts"
+    },
+    "./ExceptionalCard32": {
+      "import": "./ExceptionalCard32.js",
+      "types": "./ExceptionalCard32.d.ts"
+    },
+    "./PrimaryTravel48": {
+      "import": "./PrimaryTravel48.js",
+      "types": "./PrimaryTravel48.d.ts"
+    },
+    "./SectionTag58": {
+      "import": "./SectionTag58.js",
+      "types": "./SectionTag58.d.ts"
+    },
+    "./ExceptionalCard33": {
+      "import": "./ExceptionalCard33.js",
+      "types": "./ExceptionalCard33.d.ts"
+    },
+    "./ExceptionalCard34": {
+      "import": "./ExceptionalCard34.js",
+      "types": "./ExceptionalCard34.d.ts"
+    },
+    "./ExceptionalCard35": {
+      "import": "./ExceptionalCard35.js",
+      "types": "./ExceptionalCard35.d.ts"
+    },
+    "./ExceptionalCard36": {
+      "import": "./ExceptionalCard36.js",
+      "types": "./ExceptionalCard36.d.ts"
+    },
+    "./PrimaryTravel49": {
+      "import": "./PrimaryTravel49.js",
+      "types": "./PrimaryTravel49.d.ts"
+    },
+    "./SectionTag59": {
+      "import": "./SectionTag59.js",
+      "types": "./SectionTag59.d.ts"
+    },
+    "./SectionTag60": {
+      "import": "./SectionTag60.js",
+      "types": "./SectionTag60.d.ts"
+    },
+    "./ExceptionalCard37": {
+      "import": "./ExceptionalCard37.js",
+      "types": "./ExceptionalCard37.d.ts"
+    },
+    "./ExceptionalCard38": {
+      "import": "./ExceptionalCard38.js",
+      "types": "./ExceptionalCard38.d.ts"
+    },
+    "./ExceptionalCard39": {
+      "import": "./ExceptionalCard39.js",
+      "types": "./ExceptionalCard39.d.ts"
+    },
+    "./ExceptionalCard40": {
+      "import": "./ExceptionalCard40.js",
+      "types": "./ExceptionalCard40.d.ts"
+    },
+    "./PrimaryTravel50": {
+      "import": "./PrimaryTravel50.js",
+      "types": "./PrimaryTravel50.d.ts"
+    },
+    "./ExceptionalCard41": {
+      "import": "./ExceptionalCard41.js",
+      "types": "./ExceptionalCard41.d.ts"
+    },
+    "./ExceptionalCard42": {
+      "import": "./ExceptionalCard42.js",
+      "types": "./ExceptionalCard42.d.ts"
+    },
+    "./ExceptionalCard43": {
+      "import": "./ExceptionalCard43.js",
+      "types": "./ExceptionalCard43.d.ts"
+    },
+    "./ExceptionalCard44": {
+      "import": "./ExceptionalCard44.js",
+      "types": "./ExceptionalCard44.d.ts"
+    },
+    "./ExceptionalCard45": {
+      "import": "./ExceptionalCard45.js",
+      "types": "./ExceptionalCard45.d.ts"
+    },
+    "./ExceptionalCard46": {
+      "import": "./ExceptionalCard46.js",
+      "types": "./ExceptionalCard46.d.ts"
+    },
+    "./ExceptionalCard47": {
+      "import": "./ExceptionalCard47.js",
+      "types": "./ExceptionalCard47.d.ts"
+    },
+    "./ExceptionalCard48": {
+      "import": "./ExceptionalCard48.js",
+      "types": "./ExceptionalCard48.d.ts"
+    },
+    "./PrimaryTravel51": {
+      "import": "./PrimaryTravel51.js",
+      "types": "./PrimaryTravel51.d.ts"
+    },
+    "./PrimaryTravel52": {
+      "import": "./PrimaryTravel52.js",
+      "types": "./PrimaryTravel52.d.ts"
+    },
+    "./SectionTag61": {
+      "import": "./SectionTag61.js",
+      "types": "./SectionTag61.d.ts"
+    },
+    "./DestinationCard8": {
+      "import": "./DestinationCard8.js",
+      "types": "./DestinationCard8.d.ts"
+    },
+    "./RunningText19": {
+      "import": "./RunningText19.js",
+      "types": "./RunningText19.d.ts"
+    },
+    "./RunningText29": {
+      "import": "./RunningText29.js",
+      "types": "./RunningText29.d.ts"
+    },
+    "./RunningText39": {
+      "import": "./RunningText39.js",
+      "types": "./RunningText39.d.ts"
+    },
+    "./RunningText49": {
+      "import": "./RunningText49.js",
+      "types": "./RunningText49.d.ts"
+    },
+    "./DestinationBgImage7": {
+      "import": "./DestinationBgImage7.js",
+      "types": "./DestinationBgImage7.d.ts"
+    },
+    "./SectionTag62": {
+      "import": "./SectionTag62.js",
+      "types": "./SectionTag62.d.ts"
+    },
+    "./DestinationCard9": {
+      "import": "./DestinationCard9.js",
+      "types": "./DestinationCard9.d.ts"
+    },
+    "./RunningText110": {
+      "import": "./RunningText110.js",
+      "types": "./RunningText110.d.ts"
+    },
+    "./RunningText210": {
+      "import": "./RunningText210.js",
+      "types": "./RunningText210.d.ts"
+    },
+    "./RunningText310": {
+      "import": "./RunningText310.js",
+      "types": "./RunningText310.d.ts"
+    },
+    "./RunningText410": {
+      "import": "./RunningText410.js",
+      "types": "./RunningText410.d.ts"
+    },
+    "./DestinationBgImage8": {
+      "import": "./DestinationBgImage8.js",
+      "types": "./DestinationBgImage8.d.ts"
+    },
+    "./SectionTag63": {
+      "import": "./SectionTag63.js",
+      "types": "./SectionTag63.d.ts"
+    },
+    "./DestinationCard10": {
+      "import": "./DestinationCard10.js",
+      "types": "./DestinationCard10.d.ts"
+    },
+    "./RunningText111": {
+      "import": "./RunningText111.js",
+      "types": "./RunningText111.d.ts"
+    },
+    "./RunningText211": {
+      "import": "./RunningText211.js",
+      "types": "./RunningText211.d.ts"
+    },
+    "./RunningText311": {
+      "import": "./RunningText311.js",
+      "types": "./RunningText311.d.ts"
+    },
+    "./RunningText411": {
+      "import": "./RunningText411.js",
+      "types": "./RunningText411.d.ts"
+    },
+    "./DestinationBgImage9": {
+      "import": "./DestinationBgImage9.js",
+      "types": "./DestinationBgImage9.d.ts"
+    },
+    "./SectionTag64": {
+      "import": "./SectionTag64.js",
+      "types": "./SectionTag64.d.ts"
+    },
+    "./DestinationCard11": {
+      "import": "./DestinationCard11.js",
+      "types": "./DestinationCard11.d.ts"
+    },
+    "./SectionTag65": {
+      "import": "./SectionTag65.js",
+      "types": "./SectionTag65.d.ts"
+    },
+    "./SectionTag66": {
+      "import": "./SectionTag66.js",
+      "types": "./SectionTag66.d.ts"
+    },
+    "./DestinationCard12": {
+      "import": "./DestinationCard12.js",
+      "types": "./DestinationCard12.d.ts"
+    },
+    "./RunningText112": {
+      "import": "./RunningText112.js",
+      "types": "./RunningText112.d.ts"
+    },
+    "./RunningText212": {
+      "import": "./RunningText212.js",
+      "types": "./RunningText212.d.ts"
+    },
+    "./RunningText312": {
+      "import": "./RunningText312.js",
+      "types": "./RunningText312.d.ts"
+    },
+    "./RunningText412": {
+      "import": "./RunningText412.js",
+      "types": "./RunningText412.d.ts"
+    },
+    "./RunningText113": {
+      "import": "./RunningText113.js",
+      "types": "./RunningText113.d.ts"
+    },
+    "./RunningText213": {
+      "import": "./RunningText213.js",
+      "types": "./RunningText213.d.ts"
+    },
+    "./RunningText313": {
+      "import": "./RunningText313.js",
+      "types": "./RunningText313.d.ts"
+    },
+    "./RunningText413": {
+      "import": "./RunningText413.js",
+      "types": "./RunningText413.d.ts"
+    },
+    "./RunningText114": {
+      "import": "./RunningText114.js",
+      "types": "./RunningText114.d.ts"
+    },
+    "./RunningText214": {
+      "import": "./RunningText214.js",
+      "types": "./RunningText214.d.ts"
+    },
+    "./RunningText314": {
+      "import": "./RunningText314.js",
+      "types": "./RunningText314.d.ts"
+    },
+    "./RunningText414": {
+      "import": "./RunningText414.js",
+      "types": "./RunningText414.d.ts"
+    },
+    "./DestinationBgImage10": {
+      "import": "./DestinationBgImage10.js",
+      "types": "./DestinationBgImage10.d.ts"
+    },
+    "./SectionTag67": {
+      "import": "./SectionTag67.js",
+      "types": "./SectionTag67.d.ts"
+    },
+    "./TourPackageCard8": {
+      "import": "./TourPackageCard8.js",
+      "types": "./TourPackageCard8.d.ts"
+    },
+    "./PrimaryTravel53": {
+      "import": "./PrimaryTravel53.js",
+      "types": "./PrimaryTravel53.d.ts"
+    },
+    "./SectionTag68": {
+      "import": "./SectionTag68.js",
+      "types": "./SectionTag68.d.ts"
+    },
+    "./TourPackageCard9": {
+      "import": "./TourPackageCard9.js",
+      "types": "./TourPackageCard9.d.ts"
+    },
+    "./PrimaryTravel54": {
+      "import": "./PrimaryTravel54.js",
+      "types": "./PrimaryTravel54.d.ts"
+    },
+    "./SectionTag69": {
+      "import": "./SectionTag69.js",
+      "types": "./SectionTag69.d.ts"
+    },
+    "./SectionTag70": {
+      "import": "./SectionTag70.js",
+      "types": "./SectionTag70.d.ts"
+    },
+    "./TourPackageCard10": {
+      "import": "./TourPackageCard10.js",
+      "types": "./TourPackageCard10.d.ts"
+    },
+    "./PrimaryTravel55": {
+      "import": "./PrimaryTravel55.js",
+      "types": "./PrimaryTravel55.d.ts"
+    },
+    "./TourPackageCard11": {
+      "import": "./TourPackageCard11.js",
+      "types": "./TourPackageCard11.d.ts"
+    },
+    "./TourPackageCard12": {
+      "import": "./TourPackageCard12.js",
+      "types": "./TourPackageCard12.d.ts"
+    },
+    "./PrimaryTravel56": {
+      "import": "./PrimaryTravel56.js",
+      "types": "./PrimaryTravel56.d.ts"
+    },
+    "./PrimaryTravel57": {
+      "import": "./PrimaryTravel57.js",
+      "types": "./PrimaryTravel57.d.ts"
+    },
+    "./SnowfallProd4": {
+      "import": "./SnowfallProd4.js",
+      "types": "./SnowfallProd4.d.ts"
+    },
+    "./SectionTag71": {
+      "import": "./SectionTag71.js",
+      "types": "./SectionTag71.d.ts"
+    },
+    "./WhyUsCard6": {
+      "import": "./WhyUsCard6.js",
+      "types": "./WhyUsCard6.d.ts"
+    },
+    "./SectionTag72": {
+      "import": "./SectionTag72.js",
+      "types": "./SectionTag72.d.ts"
+    },
+    "./WhyUsCard7": {
+      "import": "./WhyUsCard7.js",
+      "types": "./WhyUsCard7.d.ts"
+    },
+    "./SectionTag73": {
+      "import": "./SectionTag73.js",
+      "types": "./SectionTag73.d.ts"
+    },
+    "./SectionTag74": {
+      "import": "./SectionTag74.js",
+      "types": "./SectionTag74.d.ts"
+    },
+    "./WhyUsCard8": {
+      "import": "./WhyUsCard8.js",
+      "types": "./WhyUsCard8.d.ts"
+    },
+    "./SectionTag75": {
+      "import": "./SectionTag75.js",
+      "types": "./SectionTag75.d.ts"
+    },
+    "./TestimonialsCarouselCard6": {
+      "import": "./TestimonialsCarouselCard6.js",
+      "types": "./TestimonialsCarouselCard6.d.ts"
+    },
+    "./Pricing5": {
+      "import": "./Pricing5.js",
+      "types": "./Pricing5.d.ts"
+    },
+    "./SectionTag76": {
+      "import": "./SectionTag76.js",
+      "types": "./SectionTag76.d.ts"
+    },
+    "./TestimonialsCarouselCard7": {
+      "import": "./TestimonialsCarouselCard7.js",
+      "types": "./TestimonialsCarouselCard7.d.ts"
+    },
+    "./SectionTag77": {
+      "import": "./SectionTag77.js",
+      "types": "./SectionTag77.d.ts"
+    },
+    "./SectionTag78": {
+      "import": "./SectionTag78.js",
+      "types": "./SectionTag78.d.ts"
+    },
+    "./TestimonialsCarouselCard8": {
+      "import": "./TestimonialsCarouselCard8.js",
+      "types": "./TestimonialsCarouselCard8.d.ts"
+    },
+    "./Pricing6": {
+      "import": "./Pricing6.js",
+      "types": "./Pricing6.d.ts"
+    },
+    "./SectionTag79": {
+      "import": "./SectionTag79.js",
+      "types": "./SectionTag79.d.ts"
+    },
+    "./BlogCard9": {
+      "import": "./BlogCard9.js",
+      "types": "./BlogCard9.d.ts"
+    },
+    "./PrimaryTravel58": {
+      "import": "./PrimaryTravel58.js",
+      "types": "./PrimaryTravel58.d.ts"
+    },
+    "./SectionTag80": {
+      "import": "./SectionTag80.js",
+      "types": "./SectionTag80.d.ts"
+    },
+    "./BlogCard10": {
+      "import": "./BlogCard10.js",
+      "types": "./BlogCard10.d.ts"
+    },
+    "./PrimaryTravel59": {
+      "import": "./PrimaryTravel59.js",
+      "types": "./PrimaryTravel59.d.ts"
+    },
+    "./SectionTag81": {
+      "import": "./SectionTag81.js",
+      "types": "./SectionTag81.d.ts"
+    },
+    "./SectionTag82": {
+      "import": "./SectionTag82.js",
+      "types": "./SectionTag82.d.ts"
+    },
+    "./BlogCard11": {
+      "import": "./BlogCard11.js",
+      "types": "./BlogCard11.d.ts"
+    },
+    "./PrimaryTravel60": {
+      "import": "./PrimaryTravel60.js",
+      "types": "./PrimaryTravel60.d.ts"
+    },
+    "./BlogCard12": {
+      "import": "./BlogCard12.js",
+      "types": "./BlogCard12.d.ts"
+    },
+    "./BlogCard13": {
+      "import": "./BlogCard13.js",
+      "types": "./BlogCard13.d.ts"
+    },
+    "./BlogCard14": {
+      "import": "./BlogCard14.js",
+      "types": "./BlogCard14.d.ts"
+    },
+    "./PrimaryTravel61": {
+      "import": "./PrimaryTravel61.js",
+      "types": "./PrimaryTravel61.d.ts"
+    },
+    "./PrimaryTravel62": {
+      "import": "./PrimaryTravel62.js",
+      "types": "./PrimaryTravel62.d.ts"
+    },
+    "./SectionTag83": {
+      "import": "./SectionTag83.js",
+      "types": "./SectionTag83.d.ts"
+    },
+    "./Ticker7": {
+      "import": "./Ticker7.js",
+      "types": "./Ticker7.d.ts"
+    },
+    "./SectionTag84": {
+      "import": "./SectionTag84.js",
+      "types": "./SectionTag84.d.ts"
+    },
+    "./Ticker8": {
+      "import": "./Ticker8.js",
+      "types": "./Ticker8.d.ts"
+    },
+    "./SectionTag85": {
+      "import": "./SectionTag85.js",
+      "types": "./SectionTag85.d.ts"
+    },
+    "./SectionTag86": {
+      "import": "./SectionTag86.js",
+      "types": "./SectionTag86.d.ts"
+    },
+    "./Ticker9": {
+      "import": "./Ticker9.js",
+      "types": "./Ticker9.d.ts"
+    },
+    "./Ticker10": {
+      "import": "./Ticker10.js",
+      "types": "./Ticker10.d.ts"
+    },
+    "./Video5": {
+      "import": "./Video5.js",
+      "types": "./Video5.d.ts"
+    },
+    "./PrimaryTravel63": {
+      "import": "./PrimaryTravel63.js",
+      "types": "./PrimaryTravel63.d.ts"
+    },
+    "./Avgdv4pj11": {
+      "import": "./Avgdv4pj11.js",
+      "types": "./Avgdv4pj11.d.ts"
+    },
+    "./Kf85dqox011": {
+      "import": "./Kf85dqox011.js",
+      "types": "./Kf85dqox011.d.ts"
+    },
+    "./Ud0etfbk11": {
+      "import": "./Ud0etfbk11.js",
+      "types": "./Ud0etfbk11.d.ts"
+    },
+    "./SectionTag87": {
+      "import": "./SectionTag87.js",
+      "types": "./SectionTag87.d.ts"
+    },
+    "./PrimaryTravel64": {
+      "import": "./PrimaryTravel64.js",
+      "types": "./PrimaryTravel64.d.ts"
+    },
+    "./ImageLoopCard11": {
+      "import": "./ImageLoopCard11.js",
+      "types": "./ImageLoopCard11.d.ts"
+    },
+    "./SectionTag88": {
+      "import": "./SectionTag88.js",
+      "types": "./SectionTag88.d.ts"
+    },
+    "./ExceptionalCard49": {
+      "import": "./ExceptionalCard49.js",
+      "types": "./ExceptionalCard49.d.ts"
+    },
+    "./ExceptionalCard50": {
+      "import": "./ExceptionalCard50.js",
+      "types": "./ExceptionalCard50.d.ts"
+    },
+    "./ExceptionalCard51": {
+      "import": "./ExceptionalCard51.js",
+      "types": "./ExceptionalCard51.d.ts"
+    },
+    "./ExceptionalCard52": {
+      "import": "./ExceptionalCard52.js",
+      "types": "./ExceptionalCard52.d.ts"
+    },
+    "./PrimaryTravel65": {
+      "import": "./PrimaryTravel65.js",
+      "types": "./PrimaryTravel65.d.ts"
+    },
+    "./SectionTag89": {
+      "import": "./SectionTag89.js",
+      "types": "./SectionTag89.d.ts"
+    },
+    "./DestinationCard13": {
+      "import": "./DestinationCard13.js",
+      "types": "./DestinationCard13.d.ts"
+    },
+    "./RunningText115": {
+      "import": "./RunningText115.js",
+      "types": "./RunningText115.d.ts"
+    },
+    "./RunningText215": {
+      "import": "./RunningText215.js",
+      "types": "./RunningText215.d.ts"
+    },
+    "./RunningText315": {
+      "import": "./RunningText315.js",
+      "types": "./RunningText315.d.ts"
+    },
+    "./RunningText415": {
+      "import": "./RunningText415.js",
+      "types": "./RunningText415.d.ts"
+    },
+    "./DestinationBgImage11": {
+      "import": "./DestinationBgImage11.js",
+      "types": "./DestinationBgImage11.d.ts"
+    },
+    "./SectionTag90": {
+      "import": "./SectionTag90.js",
+      "types": "./SectionTag90.d.ts"
+    },
+    "./TourPackageCard13": {
+      "import": "./TourPackageCard13.js",
+      "types": "./TourPackageCard13.d.ts"
+    },
+    "./PrimaryTravel66": {
+      "import": "./PrimaryTravel66.js",
+      "types": "./PrimaryTravel66.d.ts"
+    },
+    "./SnowfallProd5": {
+      "import": "./SnowfallProd5.js",
+      "types": "./SnowfallProd5.d.ts"
+    },
+    "./SectionTag91": {
+      "import": "./SectionTag91.js",
+      "types": "./SectionTag91.d.ts"
+    },
+    "./WhyUsCard9": {
+      "import": "./WhyUsCard9.js",
+      "types": "./WhyUsCard9.d.ts"
+    },
+    "./SectionTag92": {
+      "import": "./SectionTag92.js",
+      "types": "./SectionTag92.d.ts"
+    },
+    "./TestimonialsCarouselCard9": {
+      "import": "./TestimonialsCarouselCard9.js",
+      "types": "./TestimonialsCarouselCard9.d.ts"
+    },
+    "./Pricing7": {
+      "import": "./Pricing7.js",
+      "types": "./Pricing7.d.ts"
+    },
+    "./SectionTag93": {
+      "import": "./SectionTag93.js",
+      "types": "./SectionTag93.d.ts"
+    },
+    "./BlogCard15": {
+      "import": "./BlogCard15.js",
+      "types": "./BlogCard15.d.ts"
+    },
+    "./PrimaryTravel67": {
+      "import": "./PrimaryTravel67.js",
+      "types": "./PrimaryTravel67.d.ts"
+    },
+    "./SectionTag94": {
+      "import": "./SectionTag94.js",
+      "types": "./SectionTag94.d.ts"
+    },
+    "./Ticker11": {
+      "import": "./Ticker11.js",
+      "types": "./Ticker11.d.ts"
+    },
+    "./Video6": {
+      "import": "./Video6.js",
+      "types": "./Video6.d.ts"
+    },
+    "./PrimaryTravel68": {
+      "import": "./PrimaryTravel68.js",
+      "types": "./PrimaryTravel68.d.ts"
+    },
+    "./Avgdv4pj12": {
+      "import": "./Avgdv4pj12.js",
+      "types": "./Avgdv4pj12.d.ts"
+    },
+    "./Kf85dqox012": {
+      "import": "./Kf85dqox012.js",
+      "types": "./Kf85dqox012.d.ts"
+    },
+    "./Ud0etfbk12": {
+      "import": "./Ud0etfbk12.js",
+      "types": "./Ud0etfbk12.d.ts"
+    },
+    "./PrimaryTravel69": {
+      "import": "./PrimaryTravel69.js",
+      "types": "./PrimaryTravel69.d.ts"
+    },
+    "./PrimaryTravel70": {
+      "import": "./PrimaryTravel70.js",
+      "types": "./PrimaryTravel70.d.ts"
+    },
+    "./PrimaryTravel71": {
+      "import": "./PrimaryTravel71.js",
+      "types": "./PrimaryTravel71.d.ts"
+    },
+    "./PrimaryTravel72": {
+      "import": "./PrimaryTravel72.js",
+      "types": "./PrimaryTravel72.d.ts"
+    },
+    "./Avgdv4pj13": {
+      "import": "./Avgdv4pj13.js",
+      "types": "./Avgdv4pj13.d.ts"
+    },
+    "./Kf85dqox013": {
+      "import": "./Kf85dqox013.js",
+      "types": "./Kf85dqox013.d.ts"
+    },
+    "./Ud0etfbk13": {
+      "import": "./Ud0etfbk13.js",
+      "types": "./Ud0etfbk13.d.ts"
+    },
+    "./Avgdv4pj14": {
+      "import": "./Avgdv4pj14.js",
+      "types": "./Avgdv4pj14.d.ts"
+    },
+    "./Avgdv4pj15": {
+      "import": "./Avgdv4pj15.js",
+      "types": "./Avgdv4pj15.d.ts"
+    },
+    "./Kf85dqox014": {
+      "import": "./Kf85dqox014.js",
+      "types": "./Kf85dqox014.d.ts"
+    },
+    "./Kf85dqox015": {
+      "import": "./Kf85dqox015.js",
+      "types": "./Kf85dqox015.d.ts"
+    },
+    "./Ud0etfbk14": {
+      "import": "./Ud0etfbk14.js",
+      "types": "./Ud0etfbk14.d.ts"
+    },
+    "./Ud0etfbk15": {
+      "import": "./Ud0etfbk15.js",
+      "types": "./Ud0etfbk15.d.ts"
+    },
+    "./SectionTag95": {
+      "import": "./SectionTag95.js",
+      "types": "./SectionTag95.d.ts"
+    },
+    "./PrimaryTravel73": {
+      "import": "./PrimaryTravel73.js",
+      "types": "./PrimaryTravel73.d.ts"
+    },
+    "./ImageLoopCard12": {
+      "import": "./ImageLoopCard12.js",
+      "types": "./ImageLoopCard12.d.ts"
+    },
+    "./SectionTag96": {
+      "import": "./SectionTag96.js",
+      "types": "./SectionTag96.d.ts"
+    },
+    "./PrimaryTravel74": {
+      "import": "./PrimaryTravel74.js",
+      "types": "./PrimaryTravel74.d.ts"
+    },
+    "./ImageLoopCard13": {
+      "import": "./ImageLoopCard13.js",
+      "types": "./ImageLoopCard13.d.ts"
+    },
+    "./SectionTag97": {
+      "import": "./SectionTag97.js",
+      "types": "./SectionTag97.d.ts"
+    },
+    "./PrimaryTravel75": {
+      "import": "./PrimaryTravel75.js",
+      "types": "./PrimaryTravel75.d.ts"
+    },
+    "./SectionTag98": {
+      "import": "./SectionTag98.js",
+      "types": "./SectionTag98.d.ts"
+    },
+    "./PrimaryTravel76": {
+      "import": "./PrimaryTravel76.js",
+      "types": "./PrimaryTravel76.d.ts"
+    },
+    "./SectionTag99": {
+      "import": "./SectionTag99.js",
+      "types": "./SectionTag99.d.ts"
+    },
+    "./PrimaryTravel77": {
+      "import": "./PrimaryTravel77.js",
+      "types": "./PrimaryTravel77.d.ts"
+    },
+    "./PrimaryTravel78": {
+      "import": "./PrimaryTravel78.js",
+      "types": "./PrimaryTravel78.d.ts"
+    },
+    "./ImageLoopCard14": {
+      "import": "./ImageLoopCard14.js",
+      "types": "./ImageLoopCard14.d.ts"
+    },
+    "./ImageLoopCard15": {
+      "import": "./ImageLoopCard15.js",
+      "types": "./ImageLoopCard15.d.ts"
+    },
+    "./SectionTag100": {
+      "import": "./SectionTag100.js",
+      "types": "./SectionTag100.d.ts"
+    },
+    "./ExceptionalCard53": {
+      "import": "./ExceptionalCard53.js",
+      "types": "./ExceptionalCard53.d.ts"
+    },
+    "./ExceptionalCard54": {
+      "import": "./ExceptionalCard54.js",
+      "types": "./ExceptionalCard54.d.ts"
+    },
+    "./ExceptionalCard55": {
+      "import": "./ExceptionalCard55.js",
+      "types": "./ExceptionalCard55.d.ts"
+    },
+    "./ExceptionalCard56": {
+      "import": "./ExceptionalCard56.js",
+      "types": "./ExceptionalCard56.d.ts"
+    },
+    "./PrimaryTravel79": {
+      "import": "./PrimaryTravel79.js",
+      "types": "./PrimaryTravel79.d.ts"
+    },
+    "./SectionTag101": {
+      "import": "./SectionTag101.js",
+      "types": "./SectionTag101.d.ts"
+    },
+    "./ExceptionalCard57": {
+      "import": "./ExceptionalCard57.js",
+      "types": "./ExceptionalCard57.d.ts"
+    },
+    "./ExceptionalCard58": {
+      "import": "./ExceptionalCard58.js",
+      "types": "./ExceptionalCard58.d.ts"
+    },
+    "./ExceptionalCard59": {
+      "import": "./ExceptionalCard59.js",
+      "types": "./ExceptionalCard59.d.ts"
+    },
+    "./ExceptionalCard60": {
+      "import": "./ExceptionalCard60.js",
+      "types": "./ExceptionalCard60.d.ts"
+    },
+    "./PrimaryTravel80": {
+      "import": "./PrimaryTravel80.js",
+      "types": "./PrimaryTravel80.d.ts"
+    },
+    "./SectionTag102": {
+      "import": "./SectionTag102.js",
+      "types": "./SectionTag102.d.ts"
+    },
+    "./SectionTag103": {
+      "import": "./SectionTag103.js",
+      "types": "./SectionTag103.d.ts"
+    },
+    "./ExceptionalCard61": {
+      "import": "./ExceptionalCard61.js",
+      "types": "./ExceptionalCard61.d.ts"
+    },
+    "./ExceptionalCard62": {
+      "import": "./ExceptionalCard62.js",
+      "types": "./ExceptionalCard62.d.ts"
+    },
+    "./ExceptionalCard63": {
+      "import": "./ExceptionalCard63.js",
+      "types": "./ExceptionalCard63.d.ts"
+    },
+    "./ExceptionalCard64": {
+      "import": "./ExceptionalCard64.js",
+      "types": "./ExceptionalCard64.d.ts"
+    },
+    "./PrimaryTravel81": {
+      "import": "./PrimaryTravel81.js",
+      "types": "./PrimaryTravel81.d.ts"
+    },
+    "./ExceptionalCard65": {
+      "import": "./ExceptionalCard65.js",
+      "types": "./ExceptionalCard65.d.ts"
+    },
+    "./ExceptionalCard66": {
+      "import": "./ExceptionalCard66.js",
+      "types": "./ExceptionalCard66.d.ts"
+    },
+    "./ExceptionalCard67": {
+      "import": "./ExceptionalCard67.js",
+      "types": "./ExceptionalCard67.d.ts"
+    },
+    "./ExceptionalCard68": {
+      "import": "./ExceptionalCard68.js",
+      "types": "./ExceptionalCard68.d.ts"
+    },
+    "./ExceptionalCard69": {
+      "import": "./ExceptionalCard69.js",
+      "types": "./ExceptionalCard69.d.ts"
+    },
+    "./ExceptionalCard70": {
+      "import": "./ExceptionalCard70.js",
+      "types": "./ExceptionalCard70.d.ts"
+    },
+    "./ExceptionalCard71": {
+      "import": "./ExceptionalCard71.js",
+      "types": "./ExceptionalCard71.d.ts"
+    },
+    "./ExceptionalCard72": {
+      "import": "./ExceptionalCard72.js",
+      "types": "./ExceptionalCard72.d.ts"
+    },
+    "./PrimaryTravel82": {
+      "import": "./PrimaryTravel82.js",
+      "types": "./PrimaryTravel82.d.ts"
+    },
+    "./PrimaryTravel83": {
+      "import": "./PrimaryTravel83.js",
+      "types": "./PrimaryTravel83.d.ts"
+    },
+    "./SectionTag104": {
+      "import": "./SectionTag104.js",
+      "types": "./SectionTag104.d.ts"
+    },
+    "./DestinationCard14": {
+      "import": "./DestinationCard14.js",
+      "types": "./DestinationCard14.d.ts"
+    },
+    "./RunningText116": {
+      "import": "./RunningText116.js",
+      "types": "./RunningText116.d.ts"
+    },
+    "./RunningText216": {
+      "import": "./RunningText216.js",
+      "types": "./RunningText216.d.ts"
+    },
+    "./RunningText316": {
+      "import": "./RunningText316.js",
+      "types": "./RunningText316.d.ts"
+    },
+    "./RunningText416": {
+      "import": "./RunningText416.js",
+      "types": "./RunningText416.d.ts"
+    },
+    "./DestinationBgImage12": {
+      "import": "./DestinationBgImage12.js",
+      "types": "./DestinationBgImage12.d.ts"
+    },
+    "./SectionTag105": {
+      "import": "./SectionTag105.js",
+      "types": "./SectionTag105.d.ts"
+    },
+    "./DestinationCard15": {
+      "import": "./DestinationCard15.js",
+      "types": "./DestinationCard15.d.ts"
+    },
+    "./RunningText117": {
+      "import": "./RunningText117.js",
+      "types": "./RunningText117.d.ts"
+    },
+    "./RunningText217": {
+      "import": "./RunningText217.js",
+      "types": "./RunningText217.d.ts"
+    },
+    "./RunningText317": {
+      "import": "./RunningText317.js",
+      "types": "./RunningText317.d.ts"
+    },
+    "./RunningText417": {
+      "import": "./RunningText417.js",
+      "types": "./RunningText417.d.ts"
+    },
+    "./DestinationBgImage13": {
+      "import": "./DestinationBgImage13.js",
+      "types": "./DestinationBgImage13.d.ts"
+    },
+    "./SectionTag106": {
+      "import": "./SectionTag106.js",
+      "types": "./SectionTag106.d.ts"
+    },
+    "./DestinationCard16": {
+      "import": "./DestinationCard16.js",
+      "types": "./DestinationCard16.d.ts"
+    },
+    "./RunningText118": {
+      "import": "./RunningText118.js",
+      "types": "./RunningText118.d.ts"
+    },
+    "./RunningText218": {
+      "import": "./RunningText218.js",
+      "types": "./RunningText218.d.ts"
+    },
+    "./RunningText318": {
+      "import": "./RunningText318.js",
+      "types": "./RunningText318.d.ts"
+    },
+    "./RunningText418": {
+      "import": "./RunningText418.js",
+      "types": "./RunningText418.d.ts"
+    },
+    "./DestinationBgImage14": {
+      "import": "./DestinationBgImage14.js",
+      "types": "./DestinationBgImage14.d.ts"
+    },
+    "./SectionTag107": {
+      "import": "./SectionTag107.js",
+      "types": "./SectionTag107.d.ts"
+    },
+    "./DestinationCard17": {
+      "import": "./DestinationCard17.js",
+      "types": "./DestinationCard17.d.ts"
+    },
+    "./SectionTag108": {
+      "import": "./SectionTag108.js",
+      "types": "./SectionTag108.d.ts"
+    },
+    "./SectionTag109": {
+      "import": "./SectionTag109.js",
+      "types": "./SectionTag109.d.ts"
+    },
+    "./DestinationCard18": {
+      "import": "./DestinationCard18.js",
+      "types": "./DestinationCard18.d.ts"
+    },
+    "./RunningText119": {
+      "import": "./RunningText119.js",
+      "types": "./RunningText119.d.ts"
+    },
+    "./RunningText219": {
+      "import": "./RunningText219.js",
+      "types": "./RunningText219.d.ts"
+    },
+    "./RunningText319": {
+      "import": "./RunningText319.js",
+      "types": "./RunningText319.d.ts"
+    },
+    "./RunningText419": {
+      "import": "./RunningText419.js",
+      "types": "./RunningText419.d.ts"
+    },
+    "./RunningText120": {
+      "import": "./RunningText120.js",
+      "types": "./RunningText120.d.ts"
+    },
+    "./RunningText220": {
+      "import": "./RunningText220.js",
+      "types": "./RunningText220.d.ts"
+    },
+    "./RunningText320": {
+      "import": "./RunningText320.js",
+      "types": "./RunningText320.d.ts"
+    },
+    "./RunningText420": {
+      "import": "./RunningText420.js",
+      "types": "./RunningText420.d.ts"
+    },
+    "./RunningText121": {
+      "import": "./RunningText121.js",
+      "types": "./RunningText121.d.ts"
+    },
+    "./RunningText221": {
+      "import": "./RunningText221.js",
+      "types": "./RunningText221.d.ts"
+    },
+    "./RunningText321": {
+      "import": "./RunningText321.js",
+      "types": "./RunningText321.d.ts"
+    },
+    "./RunningText421": {
+      "import": "./RunningText421.js",
+      "types": "./RunningText421.d.ts"
+    },
+    "./DestinationBgImage15": {
+      "import": "./DestinationBgImage15.js",
+      "types": "./DestinationBgImage15.d.ts"
+    },
+    "./SectionTag110": {
+      "import": "./SectionTag110.js",
+      "types": "./SectionTag110.d.ts"
+    },
+    "./TourPackageCard14": {
+      "import": "./TourPackageCard14.js",
+      "types": "./TourPackageCard14.d.ts"
+    },
+    "./PrimaryTravel84": {
+      "import": "./PrimaryTravel84.js",
+      "types": "./PrimaryTravel84.d.ts"
+    },
+    "./SectionTag111": {
+      "import": "./SectionTag111.js",
+      "types": "./SectionTag111.d.ts"
+    },
+    "./TourPackageCard15": {
+      "import": "./TourPackageCard15.js",
+      "types": "./TourPackageCard15.d.ts"
+    },
+    "./PrimaryTravel85": {
+      "import": "./PrimaryTravel85.js",
+      "types": "./PrimaryTravel85.d.ts"
+    },
+    "./SectionTag112": {
+      "import": "./SectionTag112.js",
+      "types": "./SectionTag112.d.ts"
+    },
+    "./SectionTag113": {
+      "import": "./SectionTag113.js",
+      "types": "./SectionTag113.d.ts"
+    },
+    "./TourPackageCard16": {
+      "import": "./TourPackageCard16.js",
+      "types": "./TourPackageCard16.d.ts"
+    },
+    "./PrimaryTravel86": {
+      "import": "./PrimaryTravel86.js",
+      "types": "./PrimaryTravel86.d.ts"
+    },
+    "./TourPackageCard17": {
+      "import": "./TourPackageCard17.js",
+      "types": "./TourPackageCard17.d.ts"
+    },
+    "./TourPackageCard18": {
+      "import": "./TourPackageCard18.js",
+      "types": "./TourPackageCard18.d.ts"
+    },
+    "./PrimaryTravel87": {
+      "import": "./PrimaryTravel87.js",
+      "types": "./PrimaryTravel87.d.ts"
+    },
+    "./PrimaryTravel88": {
+      "import": "./PrimaryTravel88.js",
+      "types": "./PrimaryTravel88.d.ts"
+    },
+    "./SnowfallProd6": {
+      "import": "./SnowfallProd6.js",
+      "types": "./SnowfallProd6.d.ts"
+    },
+    "./SectionTag114": {
+      "import": "./SectionTag114.js",
+      "types": "./SectionTag114.d.ts"
+    },
+    "./WhyUsCard10": {
+      "import": "./WhyUsCard10.js",
+      "types": "./WhyUsCard10.d.ts"
+    },
+    "./SectionTag115": {
+      "import": "./SectionTag115.js",
+      "types": "./SectionTag115.d.ts"
+    },
+    "./WhyUsCard11": {
+      "import": "./WhyUsCard11.js",
+      "types": "./WhyUsCard11.d.ts"
+    },
+    "./SectionTag116": {
+      "import": "./SectionTag116.js",
+      "types": "./SectionTag116.d.ts"
+    },
+    "./SectionTag117": {
+      "import": "./SectionTag117.js",
+      "types": "./SectionTag117.d.ts"
+    },
+    "./WhyUsCard12": {
+      "import": "./WhyUsCard12.js",
+      "types": "./WhyUsCard12.d.ts"
+    },
+    "./SectionTag118": {
+      "import": "./SectionTag118.js",
+      "types": "./SectionTag118.d.ts"
+    },
+    "./TestimonialsCarouselCard10": {
+      "import": "./TestimonialsCarouselCard10.js",
+      "types": "./TestimonialsCarouselCard10.d.ts"
+    },
+    "./Pricing8": {
+      "import": "./Pricing8.js",
+      "types": "./Pricing8.d.ts"
+    },
+    "./SectionTag119": {
+      "import": "./SectionTag119.js",
+      "types": "./SectionTag119.d.ts"
+    },
+    "./TestimonialsCarouselCard11": {
+      "import": "./TestimonialsCarouselCard11.js",
+      "types": "./TestimonialsCarouselCard11.d.ts"
+    },
+    "./SectionTag120": {
+      "import": "./SectionTag120.js",
+      "types": "./SectionTag120.d.ts"
+    },
+    "./SectionTag121": {
+      "import": "./SectionTag121.js",
+      "types": "./SectionTag121.d.ts"
+    },
+    "./TestimonialsCarouselCard12": {
+      "import": "./TestimonialsCarouselCard12.js",
+      "types": "./TestimonialsCarouselCard12.d.ts"
+    },
+    "./Pricing9": {
+      "import": "./Pricing9.js",
+      "types": "./Pricing9.d.ts"
+    },
+    "./SectionTag122": {
+      "import": "./SectionTag122.js",
+      "types": "./SectionTag122.d.ts"
+    },
+    "./BlogCard16": {
+      "import": "./BlogCard16.js",
+      "types": "./BlogCard16.d.ts"
+    },
+    "./PrimaryTravel89": {
+      "import": "./PrimaryTravel89.js",
+      "types": "./PrimaryTravel89.d.ts"
+    },
+    "./SectionTag123": {
+      "import": "./SectionTag123.js",
+      "types": "./SectionTag123.d.ts"
+    },
+    "./BlogCard17": {
+      "import": "./BlogCard17.js",
+      "types": "./BlogCard17.d.ts"
+    },
+    "./PrimaryTravel90": {
+      "import": "./PrimaryTravel90.js",
+      "types": "./PrimaryTravel90.d.ts"
+    },
+    "./SectionTag124": {
+      "import": "./SectionTag124.js",
+      "types": "./SectionTag124.d.ts"
+    },
+    "./SectionTag125": {
+      "import": "./SectionTag125.js",
+      "types": "./SectionTag125.d.ts"
+    },
+    "./BlogCard18": {
+      "import": "./BlogCard18.js",
+      "types": "./BlogCard18.d.ts"
+    },
+    "./PrimaryTravel91": {
+      "import": "./PrimaryTravel91.js",
+      "types": "./PrimaryTravel91.d.ts"
+    },
+    "./BlogCard19": {
+      "import": "./BlogCard19.js",
+      "types": "./BlogCard19.d.ts"
+    },
+    "./BlogCard20": {
+      "import": "./BlogCard20.js",
+      "types": "./BlogCard20.d.ts"
+    },
+    "./BlogCard21": {
+      "import": "./BlogCard21.js",
+      "types": "./BlogCard21.d.ts"
+    },
+    "./PrimaryTravel92": {
+      "import": "./PrimaryTravel92.js",
+      "types": "./PrimaryTravel92.d.ts"
+    },
+    "./PrimaryTravel93": {
+      "import": "./PrimaryTravel93.js",
+      "types": "./PrimaryTravel93.d.ts"
+    },
+    "./SectionTag126": {
+      "import": "./SectionTag126.js",
+      "types": "./SectionTag126.d.ts"
+    },
+    "./Ticker12": {
+      "import": "./Ticker12.js",
+      "types": "./Ticker12.d.ts"
+    },
+    "./SectionTag127": {
+      "import": "./SectionTag127.js",
+      "types": "./SectionTag127.d.ts"
+    },
+    "./Ticker13": {
+      "import": "./Ticker13.js",
+      "types": "./Ticker13.d.ts"
+    },
+    "./SectionTag128": {
+      "import": "./SectionTag128.js",
+      "types": "./SectionTag128.d.ts"
+    },
+    "./SectionTag129": {
+      "import": "./SectionTag129.js",
+      "types": "./SectionTag129.d.ts"
+    },
+    "./Ticker14": {
+      "import": "./Ticker14.js",
+      "types": "./Ticker14.d.ts"
+    },
+    "./Ticker15": {
+      "import": "./Ticker15.js",
+      "types": "./Ticker15.d.ts"
+    },
+    "./InstagramStory": {
+      "import": "./InstagramStory.js",
+      "types": "./InstagramStory.d.ts"
+    },
+    "./InstagramStory2": {
+      "import": "./InstagramStory2.js",
+      "types": "./InstagramStory2.d.ts"
+    },
+    "./InstagramStory3": {
+      "import": "./InstagramStory3.js",
+      "types": "./InstagramStory3.d.ts"
+    },
+    "./InstagramStory4": {
+      "import": "./InstagramStory4.js",
+      "types": "./InstagramStory4.d.ts"
+    },
+    "./Cbx0bVr": {
+      "import": "./Cbx0bVr.js",
+      "types": "./Cbx0bVr.d.ts"
+    },
+    "./Cbx0bVr2": {
+      "import": "./Cbx0bVr2.js",
+      "types": "./Cbx0bVr2.d.ts"
+    },
+    "./Cbx0bVr3": {
+      "import": "./Cbx0bVr3.js",
+      "types": "./Cbx0bVr3.d.ts"
+    },
+    "./Cbx0bVr4": {
+      "import": "./Cbx0bVr4.js",
+      "types": "./Cbx0bVr4.d.ts"
+    }
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0",
+    "react-dom": ">=18.0.0",
+    "framer-motion": ">=10.0.0"
+  },
+  "keywords": [
+    "framer",
+    "react",
+    "components",
+    "exported"
+  ],
+  "license": "MIT"
+}

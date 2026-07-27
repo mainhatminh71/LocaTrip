@@ -1,0 +1,878 @@
+{
+  "name": "Stats",
+  "version": "1.0.0",
+  "description": "Exported Framer components: Stats, Stats2, Stats3, Stats4, Stats5, Stats6, SectionTag, SectionTag2, TeamCard, TeamCard2, TeamCard3, TeamCard4, TeamCard5, Stats7, Stats8, Stats9, Stats10, Stats11, Stats12, Stats13, Stats14, Stats15, Stats16, Stats17, Stats18, Stats19, Stats20, Stats21, Stats22, Stats23, Stats24, Stats25, Stats26, Stats27, Stats28, Stats29, Stats30, Stats31, Stats32, Stats33, Stats34, Stats35, Stats36, SectionTag3, SectionTag4, SectionTag5, SectionTag6, SectionTag7, TeamCard6, TeamCard7, TeamCard8, TeamCard9, TeamCard10, SectionTag8, TeamCard11, TeamCard12, TeamCard13, TeamCard14, TeamCard15, SectionTag9, SectionTag10, TeamCard16, TeamCard17, TeamCard18, TeamCard19, TeamCard20, TeamCard21, TeamCard22, TeamCard23, TeamCard24, TeamCard25, Stats37, Stats38, Stats39, Stats40, Stats41, Stats42, SectionTag11, SectionTag12, TeamCard26, TeamCard27, TeamCard28, TeamCard29, TeamCard30, Stats43, Stats44, Stats45, Stats46, Stats47, Stats48, Stats49, Stats50, Stats51, Stats52, Stats53, Stats54, Stats55, Stats56, Stats57, Stats58, Stats59, Stats60, Stats61, Stats62, Stats63, Stats64, Stats65, Stats66, Stats67, Stats68, Stats69, Stats70, Stats71, Stats72, SectionTag13, SectionTag14, SectionTag15, SectionTag16, SectionTag17, TeamCard31, TeamCard32, TeamCard33, TeamCard34, TeamCard35, SectionTag18, TeamCard36, TeamCard37, TeamCard38, TeamCard39, TeamCard40, SectionTag19, SectionTag20, TeamCard41, TeamCard42, TeamCard43, TeamCard44, TeamCard45, TeamCard46, TeamCard47, TeamCard48, TeamCard49, TeamCard50, Stats73, Stats74, Stats75, Stats76, Stats77, Stats78, SectionTag21, SectionTag22, TeamCard51, TeamCard52, TeamCard53, TeamCard54, TeamCard55, Stats79, Stats80, Stats81, Stats82, Stats83, Stats84, Stats85, Stats86, Stats87, Stats88, Stats89, Stats90, Stats91, Stats92, Stats93, Stats94, Stats95, Stats96, Stats97, Stats98, Stats99, Stats100, Stats101, Stats102, Stats103, Stats104, Stats105, Stats106, Stats107, Stats108, SectionTag23, SectionTag24, SectionTag25, SectionTag26, SectionTag27, TeamCard56, TeamCard57, TeamCard58, TeamCard59, TeamCard60, SectionTag28, TeamCard61, TeamCard62, TeamCard63, TeamCard64, TeamCard65, SectionTag29, SectionTag30, TeamCard66, TeamCard67, TeamCard68, TeamCard69, TeamCard70, TeamCard71, TeamCard72, TeamCard73, TeamCard74, TeamCard75",
+  "type": "module",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./index.js",
+      "types": "./index.d.ts"
+    },
+    "./Stats": {
+      "import": "./Stats.js",
+      "types": "./Stats.d.ts"
+    },
+    "./Stats2": {
+      "import": "./Stats2.js",
+      "types": "./Stats2.d.ts"
+    },
+    "./Stats3": {
+      "import": "./Stats3.js",
+      "types": "./Stats3.d.ts"
+    },
+    "./Stats4": {
+      "import": "./Stats4.js",
+      "types": "./Stats4.d.ts"
+    },
+    "./Stats5": {
+      "import": "./Stats5.js",
+      "types": "./Stats5.d.ts"
+    },
+    "./Stats6": {
+      "import": "./Stats6.js",
+      "types": "./Stats6.d.ts"
+    },
+    "./SectionTag": {
+      "import": "./SectionTag.js",
+      "types": "./SectionTag.d.ts"
+    },
+    "./SectionTag2": {
+      "import": "./SectionTag2.js",
+      "types": "./SectionTag2.d.ts"
+    },
+    "./TeamCard": {
+      "import": "./TeamCard.js",
+      "types": "./TeamCard.d.ts"
+    },
+    "./TeamCard2": {
+      "import": "./TeamCard2.js",
+      "types": "./TeamCard2.d.ts"
+    },
+    "./TeamCard3": {
+      "import": "./TeamCard3.js",
+      "types": "./TeamCard3.d.ts"
+    },
+    "./TeamCard4": {
+      "import": "./TeamCard4.js",
+      "types": "./TeamCard4.d.ts"
+    },
+    "./TeamCard5": {
+      "import": "./TeamCard5.js",
+      "types": "./TeamCard5.d.ts"
+    },
+    "./Stats7": {
+      "import": "./Stats7.js",
+      "types": "./Stats7.d.ts"
+    },
+    "./Stats8": {
+      "import": "./Stats8.js",
+      "types": "./Stats8.d.ts"
+    },
+    "./Stats9": {
+      "import": "./Stats9.js",
+      "types": "./Stats9.d.ts"
+    },
+    "./Stats10": {
+      "import": "./Stats10.js",
+      "types": "./Stats10.d.ts"
+    },
+    "./Stats11": {
+      "import": "./Stats11.js",
+      "types": "./Stats11.d.ts"
+    },
+    "./Stats12": {
+      "import": "./Stats12.js",
+      "types": "./Stats12.d.ts"
+    },
+    "./Stats13": {
+      "import": "./Stats13.js",
+      "types": "./Stats13.d.ts"
+    },
+    "./Stats14": {
+      "import": "./Stats14.js",
+      "types": "./Stats14.d.ts"
+    },
+    "./Stats15": {
+      "import": "./Stats15.js",
+      "types": "./Stats15.d.ts"
+    },
+    "./Stats16": {
+      "import": "./Stats16.js",
+      "types": "./Stats16.d.ts"
+    },
+    "./Stats17": {
+      "import": "./Stats17.js",
+      "types": "./Stats17.d.ts"
+    },
+    "./Stats18": {
+      "import": "./Stats18.js",
+      "types": "./Stats18.d.ts"
+    },
+    "./Stats19": {
+      "import": "./Stats19.js",
+      "types": "./Stats19.d.ts"
+    },
+    "./Stats20": {
+      "import": "./Stats20.js",
+      "types": "./Stats20.d.ts"
+    },
+    "./Stats21": {
+      "import": "./Stats21.js",
+      "types": "./Stats21.d.ts"
+    },
+    "./Stats22": {
+      "import": "./Stats22.js",
+      "types": "./Stats22.d.ts"
+    },
+    "./Stats23": {
+      "import": "./Stats23.js",
+      "types": "./Stats23.d.ts"
+    },
+    "./Stats24": {
+      "import": "./Stats24.js",
+      "types": "./Stats24.d.ts"
+    },
+    "./Stats25": {
+      "import": "./Stats25.js",
+      "types": "./Stats25.d.ts"
+    },
+    "./Stats26": {
+      "import": "./Stats26.js",
+      "types": "./Stats26.d.ts"
+    },
+    "./Stats27": {
+      "import": "./Stats27.js",
+      "types": "./Stats27.d.ts"
+    },
+    "./Stats28": {
+      "import": "./Stats28.js",
+      "types": "./Stats28.d.ts"
+    },
+    "./Stats29": {
+      "import": "./Stats29.js",
+      "types": "./Stats29.d.ts"
+    },
+    "./Stats30": {
+      "import": "./Stats30.js",
+      "types": "./Stats30.d.ts"
+    },
+    "./Stats31": {
+      "import": "./Stats31.js",
+      "types": "./Stats31.d.ts"
+    },
+    "./Stats32": {
+      "import": "./Stats32.js",
+      "types": "./Stats32.d.ts"
+    },
+    "./Stats33": {
+      "import": "./Stats33.js",
+      "types": "./Stats33.d.ts"
+    },
+    "./Stats34": {
+      "import": "./Stats34.js",
+      "types": "./Stats34.d.ts"
+    },
+    "./Stats35": {
+      "import": "./Stats35.js",
+      "types": "./Stats35.d.ts"
+    },
+    "./Stats36": {
+      "import": "./Stats36.js",
+      "types": "./Stats36.d.ts"
+    },
+    "./SectionTag3": {
+      "import": "./SectionTag3.js",
+      "types": "./SectionTag3.d.ts"
+    },
+    "./SectionTag4": {
+      "import": "./SectionTag4.js",
+      "types": "./SectionTag4.d.ts"
+    },
+    "./SectionTag5": {
+      "import": "./SectionTag5.js",
+      "types": "./SectionTag5.d.ts"
+    },
+    "./SectionTag6": {
+      "import": "./SectionTag6.js",
+      "types": "./SectionTag6.d.ts"
+    },
+    "./SectionTag7": {
+      "import": "./SectionTag7.js",
+      "types": "./SectionTag7.d.ts"
+    },
+    "./TeamCard6": {
+      "import": "./TeamCard6.js",
+      "types": "./TeamCard6.d.ts"
+    },
+    "./TeamCard7": {
+      "import": "./TeamCard7.js",
+      "types": "./TeamCard7.d.ts"
+    },
+    "./TeamCard8": {
+      "import": "./TeamCard8.js",
+      "types": "./TeamCard8.d.ts"
+    },
+    "./TeamCard9": {
+      "import": "./TeamCard9.js",
+      "types": "./TeamCard9.d.ts"
+    },
+    "./TeamCard10": {
+      "import": "./TeamCard10.js",
+      "types": "./TeamCard10.d.ts"
+    },
+    "./SectionTag8": {
+      "import": "./SectionTag8.js",
+      "types": "./SectionTag8.d.ts"
+    },
+    "./TeamCard11": {
+      "import": "./TeamCard11.js",
+      "types": "./TeamCard11.d.ts"
+    },
+    "./TeamCard12": {
+      "import": "./TeamCard12.js",
+      "types": "./TeamCard12.d.ts"
+    },
+    "./TeamCard13": {
+      "import": "./TeamCard13.js",
+      "types": "./TeamCard13.d.ts"
+    },
+    "./TeamCard14": {
+      "import": "./TeamCard14.js",
+      "types": "./TeamCard14.d.ts"
+    },
+    "./TeamCard15": {
+      "import": "./TeamCard15.js",
+      "types": "./TeamCard15.d.ts"
+    },
+    "./SectionTag9": {
+      "import": "./SectionTag9.js",
+      "types": "./SectionTag9.d.ts"
+    },
+    "./SectionTag10": {
+      "import": "./SectionTag10.js",
+      "types": "./SectionTag10.d.ts"
+    },
+    "./TeamCard16": {
+      "import": "./TeamCard16.js",
+      "types": "./TeamCard16.d.ts"
+    },
+    "./TeamCard17": {
+      "import": "./TeamCard17.js",
+      "types": "./TeamCard17.d.ts"
+    },
+    "./TeamCard18": {
+      "import": "./TeamCard18.js",
+      "types": "./TeamCard18.d.ts"
+    },
+    "./TeamCard19": {
+      "import": "./TeamCard19.js",
+      "types": "./TeamCard19.d.ts"
+    },
+    "./TeamCard20": {
+      "import": "./TeamCard20.js",
+      "types": "./TeamCard20.d.ts"
+    },
+    "./TeamCard21": {
+      "import": "./TeamCard21.js",
+      "types": "./TeamCard21.d.ts"
+    },
+    "./TeamCard22": {
+      "import": "./TeamCard22.js",
+      "types": "./TeamCard22.d.ts"
+    },
+    "./TeamCard23": {
+      "import": "./TeamCard23.js",
+      "types": "./TeamCard23.d.ts"
+    },
+    "./TeamCard24": {
+      "import": "./TeamCard24.js",
+      "types": "./TeamCard24.d.ts"
+    },
+    "./TeamCard25": {
+      "import": "./TeamCard25.js",
+      "types": "./TeamCard25.d.ts"
+    },
+    "./Stats37": {
+      "import": "./Stats37.js",
+      "types": "./Stats37.d.ts"
+    },
+    "./Stats38": {
+      "import": "./Stats38.js",
+      "types": "./Stats38.d.ts"
+    },
+    "./Stats39": {
+      "import": "./Stats39.js",
+      "types": "./Stats39.d.ts"
+    },
+    "./Stats40": {
+      "import": "./Stats40.js",
+      "types": "./Stats40.d.ts"
+    },
+    "./Stats41": {
+      "import": "./Stats41.js",
+      "types": "./Stats41.d.ts"
+    },
+    "./Stats42": {
+      "import": "./Stats42.js",
+      "types": "./Stats42.d.ts"
+    },
+    "./SectionTag11": {
+      "import": "./SectionTag11.js",
+      "types": "./SectionTag11.d.ts"
+    },
+    "./SectionTag12": {
+      "import": "./SectionTag12.js",
+      "types": "./SectionTag12.d.ts"
+    },
+    "./TeamCard26": {
+      "import": "./TeamCard26.js",
+      "types": "./TeamCard26.d.ts"
+    },
+    "./TeamCard27": {
+      "import": "./TeamCard27.js",
+      "types": "./TeamCard27.d.ts"
+    },
+    "./TeamCard28": {
+      "import": "./TeamCard28.js",
+      "types": "./TeamCard28.d.ts"
+    },
+    "./TeamCard29": {
+      "import": "./TeamCard29.js",
+      "types": "./TeamCard29.d.ts"
+    },
+    "./TeamCard30": {
+      "import": "./TeamCard30.js",
+      "types": "./TeamCard30.d.ts"
+    },
+    "./Stats43": {
+      "import": "./Stats43.js",
+      "types": "./Stats43.d.ts"
+    },
+    "./Stats44": {
+      "import": "./Stats44.js",
+      "types": "./Stats44.d.ts"
+    },
+    "./Stats45": {
+      "import": "./Stats45.js",
+      "types": "./Stats45.d.ts"
+    },
+    "./Stats46": {
+      "import": "./Stats46.js",
+      "types": "./Stats46.d.ts"
+    },
+    "./Stats47": {
+      "import": "./Stats47.js",
+      "types": "./Stats47.d.ts"
+    },
+    "./Stats48": {
+      "import": "./Stats48.js",
+      "types": "./Stats48.d.ts"
+    },
+    "./Stats49": {
+      "import": "./Stats49.js",
+      "types": "./Stats49.d.ts"
+    },
+    "./Stats50": {
+      "import": "./Stats50.js",
+      "types": "./Stats50.d.ts"
+    },
+    "./Stats51": {
+      "import": "./Stats51.js",
+      "types": "./Stats51.d.ts"
+    },
+    "./Stats52": {
+      "import": "./Stats52.js",
+      "types": "./Stats52.d.ts"
+    },
+    "./Stats53": {
+      "import": "./Stats53.js",
+      "types": "./Stats53.d.ts"
+    },
+    "./Stats54": {
+      "import": "./Stats54.js",
+      "types": "./Stats54.d.ts"
+    },
+    "./Stats55": {
+      "import": "./Stats55.js",
+      "types": "./Stats55.d.ts"
+    },
+    "./Stats56": {
+      "import": "./Stats56.js",
+      "types": "./Stats56.d.ts"
+    },
+    "./Stats57": {
+      "import": "./Stats57.js",
+      "types": "./Stats57.d.ts"
+    },
+    "./Stats58": {
+      "import": "./Stats58.js",
+      "types": "./Stats58.d.ts"
+    },
+    "./Stats59": {
+      "import": "./Stats59.js",
+      "types": "./Stats59.d.ts"
+    },
+    "./Stats60": {
+      "import": "./Stats60.js",
+      "types": "./Stats60.d.ts"
+    },
+    "./Stats61": {
+      "import": "./Stats61.js",
+      "types": "./Stats61.d.ts"
+    },
+    "./Stats62": {
+      "import": "./Stats62.js",
+      "types": "./Stats62.d.ts"
+    },
+    "./Stats63": {
+      "import": "./Stats63.js",
+      "types": "./Stats63.d.ts"
+    },
+    "./Stats64": {
+      "import": "./Stats64.js",
+      "types": "./Stats64.d.ts"
+    },
+    "./Stats65": {
+      "import": "./Stats65.js",
+      "types": "./Stats65.d.ts"
+    },
+    "./Stats66": {
+      "import": "./Stats66.js",
+      "types": "./Stats66.d.ts"
+    },
+    "./Stats67": {
+      "import": "./Stats67.js",
+      "types": "./Stats67.d.ts"
+    },
+    "./Stats68": {
+      "import": "./Stats68.js",
+      "types": "./Stats68.d.ts"
+    },
+    "./Stats69": {
+      "import": "./Stats69.js",
+      "types": "./Stats69.d.ts"
+    },
+    "./Stats70": {
+      "import": "./Stats70.js",
+      "types": "./Stats70.d.ts"
+    },
+    "./Stats71": {
+      "import": "./Stats71.js",
+      "types": "./Stats71.d.ts"
+    },
+    "./Stats72": {
+      "import": "./Stats72.js",
+      "types": "./Stats72.d.ts"
+    },
+    "./SectionTag13": {
+      "import": "./SectionTag13.js",
+      "types": "./SectionTag13.d.ts"
+    },
+    "./SectionTag14": {
+      "import": "./SectionTag14.js",
+      "types": "./SectionTag14.d.ts"
+    },
+    "./SectionTag15": {
+      "import": "./SectionTag15.js",
+      "types": "./SectionTag15.d.ts"
+    },
+    "./SectionTag16": {
+      "import": "./SectionTag16.js",
+      "types": "./SectionTag16.d.ts"
+    },
+    "./SectionTag17": {
+      "import": "./SectionTag17.js",
+      "types": "./SectionTag17.d.ts"
+    },
+    "./TeamCard31": {
+      "import": "./TeamCard31.js",
+      "types": "./TeamCard31.d.ts"
+    },
+    "./TeamCard32": {
+      "import": "./TeamCard32.js",
+      "types": "./TeamCard32.d.ts"
+    },
+    "./TeamCard33": {
+      "import": "./TeamCard33.js",
+      "types": "./TeamCard33.d.ts"
+    },
+    "./TeamCard34": {
+      "import": "./TeamCard34.js",
+      "types": "./TeamCard34.d.ts"
+    },
+    "./TeamCard35": {
+      "import": "./TeamCard35.js",
+      "types": "./TeamCard35.d.ts"
+    },
+    "./SectionTag18": {
+      "import": "./SectionTag18.js",
+      "types": "./SectionTag18.d.ts"
+    },
+    "./TeamCard36": {
+      "import": "./TeamCard36.js",
+      "types": "./TeamCard36.d.ts"
+    },
+    "./TeamCard37": {
+      "import": "./TeamCard37.js",
+      "types": "./TeamCard37.d.ts"
+    },
+    "./TeamCard38": {
+      "import": "./TeamCard38.js",
+      "types": "./TeamCard38.d.ts"
+    },
+    "./TeamCard39": {
+      "import": "./TeamCard39.js",
+      "types": "./TeamCard39.d.ts"
+    },
+    "./TeamCard40": {
+      "import": "./TeamCard40.js",
+      "types": "./TeamCard40.d.ts"
+    },
+    "./SectionTag19": {
+      "import": "./SectionTag19.js",
+      "types": "./SectionTag19.d.ts"
+    },
+    "./SectionTag20": {
+      "import": "./SectionTag20.js",
+      "types": "./SectionTag20.d.ts"
+    },
+    "./TeamCard41": {
+      "import": "./TeamCard41.js",
+      "types": "./TeamCard41.d.ts"
+    },
+    "./TeamCard42": {
+      "import": "./TeamCard42.js",
+      "types": "./TeamCard42.d.ts"
+    },
+    "./TeamCard43": {
+      "import": "./TeamCard43.js",
+      "types": "./TeamCard43.d.ts"
+    },
+    "./TeamCard44": {
+      "import": "./TeamCard44.js",
+      "types": "./TeamCard44.d.ts"
+    },
+    "./TeamCard45": {
+      "import": "./TeamCard45.js",
+      "types": "./TeamCard45.d.ts"
+    },
+    "./TeamCard46": {
+      "import": "./TeamCard46.js",
+      "types": "./TeamCard46.d.ts"
+    },
+    "./TeamCard47": {
+      "import": "./TeamCard47.js",
+      "types": "./TeamCard47.d.ts"
+    },
+    "./TeamCard48": {
+      "import": "./TeamCard48.js",
+      "types": "./TeamCard48.d.ts"
+    },
+    "./TeamCard49": {
+      "import": "./TeamCard49.js",
+      "types": "./TeamCard49.d.ts"
+    },
+    "./TeamCard50": {
+      "import": "./TeamCard50.js",
+      "types": "./TeamCard50.d.ts"
+    },
+    "./Stats73": {
+      "import": "./Stats73.js",
+      "types": "./Stats73.d.ts"
+    },
+    "./Stats74": {
+      "import": "./Stats74.js",
+      "types": "./Stats74.d.ts"
+    },
+    "./Stats75": {
+      "import": "./Stats75.js",
+      "types": "./Stats75.d.ts"
+    },
+    "./Stats76": {
+      "import": "./Stats76.js",
+      "types": "./Stats76.d.ts"
+    },
+    "./Stats77": {
+      "import": "./Stats77.js",
+      "types": "./Stats77.d.ts"
+    },
+    "./Stats78": {
+      "import": "./Stats78.js",
+      "types": "./Stats78.d.ts"
+    },
+    "./SectionTag21": {
+      "import": "./SectionTag21.js",
+      "types": "./SectionTag21.d.ts"
+    },
+    "./SectionTag22": {
+      "import": "./SectionTag22.js",
+      "types": "./SectionTag22.d.ts"
+    },
+    "./TeamCard51": {
+      "import": "./TeamCard51.js",
+      "types": "./TeamCard51.d.ts"
+    },
+    "./TeamCard52": {
+      "import": "./TeamCard52.js",
+      "types": "./TeamCard52.d.ts"
+    },
+    "./TeamCard53": {
+      "import": "./TeamCard53.js",
+      "types": "./TeamCard53.d.ts"
+    },
+    "./TeamCard54": {
+      "import": "./TeamCard54.js",
+      "types": "./TeamCard54.d.ts"
+    },
+    "./TeamCard55": {
+      "import": "./TeamCard55.js",
+      "types": "./TeamCard55.d.ts"
+    },
+    "./Stats79": {
+      "import": "./Stats79.js",
+      "types": "./Stats79.d.ts"
+    },
+    "./Stats80": {
+      "import": "./Stats80.js",
+      "types": "./Stats80.d.ts"
+    },
+    "./Stats81": {
+      "import": "./Stats81.js",
+      "types": "./Stats81.d.ts"
+    },
+    "./Stats82": {
+      "import": "./Stats82.js",
+      "types": "./Stats82.d.ts"
+    },
+    "./Stats83": {
+      "import": "./Stats83.js",
+      "types": "./Stats83.d.ts"
+    },
+    "./Stats84": {
+      "import": "./Stats84.js",
+      "types": "./Stats84.d.ts"
+    },
+    "./Stats85": {
+      "import": "./Stats85.js",
+      "types": "./Stats85.d.ts"
+    },
+    "./Stats86": {
+      "import": "./Stats86.js",
+      "types": "./Stats86.d.ts"
+    },
+    "./Stats87": {
+      "import": "./Stats87.js",
+      "types": "./Stats87.d.ts"
+    },
+    "./Stats88": {
+      "import": "./Stats88.js",
+      "types": "./Stats88.d.ts"
+    },
+    "./Stats89": {
+      "import": "./Stats89.js",
+      "types": "./Stats89.d.ts"
+    },
+    "./Stats90": {
+      "import": "./Stats90.js",
+      "types": "./Stats90.d.ts"
+    },
+    "./Stats91": {
+      "import": "./Stats91.js",
+      "types": "./Stats91.d.ts"
+    },
+    "./Stats92": {
+      "import": "./Stats92.js",
+      "types": "./Stats92.d.ts"
+    },
+    "./Stats93": {
+      "import": "./Stats93.js",
+      "types": "./Stats93.d.ts"
+    },
+    "./Stats94": {
+      "import": "./Stats94.js",
+      "types": "./Stats94.d.ts"
+    },
+    "./Stats95": {
+      "import": "./Stats95.js",
+      "types": "./Stats95.d.ts"
+    },
+    "./Stats96": {
+      "import": "./Stats96.js",
+      "types": "./Stats96.d.ts"
+    },
+    "./Stats97": {
+      "import": "./Stats97.js",
+      "types": "./Stats97.d.ts"
+    },
+    "./Stats98": {
+      "import": "./Stats98.js",
+      "types": "./Stats98.d.ts"
+    },
+    "./Stats99": {
+      "import": "./Stats99.js",
+      "types": "./Stats99.d.ts"
+    },
+    "./Stats100": {
+      "import": "./Stats100.js",
+      "types": "./Stats100.d.ts"
+    },
+    "./Stats101": {
+      "import": "./Stats101.js",
+      "types": "./Stats101.d.ts"
+    },
+    "./Stats102": {
+      "import": "./Stats102.js",
+      "types": "./Stats102.d.ts"
+    },
+    "./Stats103": {
+      "import": "./Stats103.js",
+      "types": "./Stats103.d.ts"
+    },
+    "./Stats104": {
+      "import": "./Stats104.js",
+      "types": "./Stats104.d.ts"
+    },
+    "./Stats105": {
+      "import": "./Stats105.js",
+      "types": "./Stats105.d.ts"
+    },
+    "./Stats106": {
+      "import": "./Stats106.js",
+      "types": "./Stats106.d.ts"
+    },
+    "./Stats107": {
+      "import": "./Stats107.js",
+      "types": "./Stats107.d.ts"
+    },
+    "./Stats108": {
+      "import": "./Stats108.js",
+      "types": "./Stats108.d.ts"
+    },
+    "./SectionTag23": {
+      "import": "./SectionTag23.js",
+      "types": "./SectionTag23.d.ts"
+    },
+    "./SectionTag24": {
+      "import": "./SectionTag24.js",
+      "types": "./SectionTag24.d.ts"
+    },
+    "./SectionTag25": {
+      "import": "./SectionTag25.js",
+      "types": "./SectionTag25.d.ts"
+    },
+    "./SectionTag26": {
+      "import": "./SectionTag26.js",
+      "types": "./SectionTag26.d.ts"
+    },
+    "./SectionTag27": {
+      "import": "./SectionTag27.js",
+      "types": "./SectionTag27.d.ts"
+    },
+    "./TeamCard56": {
+      "import": "./TeamCard56.js",
+      "types": "./TeamCard56.d.ts"
+    },
+    "./TeamCard57": {
+      "import": "./TeamCard57.js",
+      "types": "./TeamCard57.d.ts"
+    },
+    "./TeamCard58": {
+      "import": "./TeamCard58.js",
+      "types": "./TeamCard58.d.ts"
+    },
+    "./TeamCard59": {
+      "import": "./TeamCard59.js",
+      "types": "./TeamCard59.d.ts"
+    },
+    "./TeamCard60": {
+      "import": "./TeamCard60.js",
+      "types": "./TeamCard60.d.ts"
+    },
+    "./SectionTag28": {
+      "import": "./SectionTag28.js",
+      "types": "./SectionTag28.d.ts"
+    },
+    "./TeamCard61": {
+      "import": "./TeamCard61.js",
+      "types": "./TeamCard61.d.ts"
+    },
+    "./TeamCard62": {
+      "import": "./TeamCard62.js",
+      "types": "./TeamCard62.d.ts"
+    },
+    "./TeamCard63": {
+      "import": "./TeamCard63.js",
+      "types": "./TeamCard63.d.ts"
+    },
+    "./TeamCard64": {
+      "import": "./TeamCard64.js",
+      "types": "./TeamCard64.d.ts"
+    },
+    "./TeamCard65": {
+      "import": "./TeamCard65.js",
+      "types": "./TeamCard65.d.ts"
+    },
+    "./SectionTag29": {
+      "import": "./SectionTag29.js",
+      "types": "./SectionTag29.d.ts"
+    },
+    "./SectionTag30": {
+      "import": "./SectionTag30.js",
+      "types": "./SectionTag30.d.ts"
+    },
+    "./TeamCard66": {
+      "import": "./TeamCard66.js",
+      "types": "./TeamCard66.d.ts"
+    },
+    "./TeamCard67": {
+      "import": "./TeamCard67.js",
+      "types": "./TeamCard67.d.ts"
+    },
+    "./TeamCard68": {
+      "import": "./TeamCard68.js",
+      "types": "./TeamCard68.d.ts"
+    },
+    "./TeamCard69": {
+      "import": "./TeamCard69.js",
+      "types": "./TeamCard69.d.ts"
+    },
+    "./TeamCard70": {
+      "import": "./TeamCard70.js",
+      "types": "./TeamCard70.d.ts"
+    },
+    "./TeamCard71": {
+      "import": "./TeamCard71.js",
+      "types": "./TeamCard71.d.ts"
+    },
+    "./TeamCard72": {
+      "import": "./TeamCard72.js",
+      "types": "./TeamCard72.d.ts"
+    },
+    "./TeamCard73": {
+      "import": "./TeamCard73.js",
+      "types": "./TeamCard73.d.ts"
+    },
+    "./TeamCard74": {
+      "import": "./TeamCard74.js",
+      "types": "./TeamCard74.d.ts"
+    },
+    "./TeamCard75": {
+      "import": "./TeamCard75.js",
+      "types": "./TeamCard75.d.ts"
+    }
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0",
+    "react-dom": ">=18.0.0",
+    "framer-motion": ">=10.0.0"
+  },
+  "keywords": [
+    "framer",
+    "react",
+    "components",
+    "exported"
+  ],
+  "license": "MIT"
+}

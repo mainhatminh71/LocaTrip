@@ -1,0 +1,62 @@
+{
+  "name": "Tour Category Card",
+  "version": "1.0.0",
+  "description": "Exported Framer components: TourCategoryCard, TourCategoryCard2, TourCategoryCard3, TourCategoryCard4, TourCategoryCard5, TourCategoryCard6, TourCategoryCard7, TourCategoryCard8, TourCategoryCard9",
+  "type": "module",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./index.js",
+      "types": "./index.d.ts"
+    },
+    "./TourCategoryCard": {
+      "import": "./TourCategoryCard.js",
+      "types": "./TourCategoryCard.d.ts"
+    },
+    "./TourCategoryCard2": {
+      "import": "./TourCategoryCard2.js",
+      "types": "./TourCategoryCard2.d.ts"
+    },
+    "./TourCategoryCard3": {
+      "import": "./TourCategoryCard3.js",
+      "types": "./TourCategoryCard3.d.ts"
+    },
+    "./TourCategoryCard4": {
+      "import": "./TourCategoryCard4.js",
+      "types": "./TourCategoryCard4.d.ts"
+    },
+    "./TourCategoryCard5": {
+      "import": "./TourCategoryCard5.js",
+      "types": "./TourCategoryCard5.d.ts"
+    },
+    "./TourCategoryCard6": {
+      "import": "./TourCategoryCard6.js",
+      "types": "./TourCategoryCard6.d.ts"
+    },
+    "./TourCategoryCard7": {
+      "import": "./TourCategoryCard7.js",
+      "types": "./TourCategoryCard7.d.ts"
+    },
+    "./TourCategoryCard8": {
+      "import": "./TourCategoryCard8.js",
+      "types": "./TourCategoryCard8.d.ts"
+    },
+    "./TourCategoryCard9": {
+      "import": "./TourCategoryCard9.js",
+      "types": "./TourCategoryCard9.d.ts"
+    }
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0",
+    "react-dom": ">=18.0.0",
+    "framer-motion": ">=10.0.0"
+  },
+  "keywords": [
+    "framer",
+    "react",
+    "components",
+    "exported"
+  ],
+  "license": "MIT"
+}

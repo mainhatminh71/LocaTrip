@@ -1,0 +1,182 @@
+{
+  "name": "Container",
+  "version": "1.0.0",
+  "description": "Exported Framer components: Container, Rj3lr1tc, Zfx1kjuqg, Container2, Rj3lr1tc2, Zfx1kjuqg2, Container3, Rj3lr1tc3, Zfx1kjuqg3, Rj3lr1tc4, Rj3lr1tc5, Zfx1kjuqg4, Zfx1kjuqg5, Container4, Rj3lr1tc6, Zfx1kjuqg6, Container5, Rj3lr1tc7, Zfx1kjuqg7, Container6, Rj3lr1tc8, Zfx1kjuqg8, Rj3lr1tc9, Rj3lr1tc10, Zfx1kjuqg9, Zfx1kjuqg10, Container7, Rj3lr1tc11, Zfx1kjuqg11, Container8, Rj3lr1tc12, Zfx1kjuqg12, Container9, Rj3lr1tc13, Zfx1kjuqg13, Rj3lr1tc14, Rj3lr1tc15, Zfx1kjuqg14, Zfx1kjuqg15",
+  "type": "module",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./index.js",
+      "types": "./index.d.ts"
+    },
+    "./Container": {
+      "import": "./Container.js",
+      "types": "./Container.d.ts"
+    },
+    "./Rj3lr1tc": {
+      "import": "./Rj3lr1tc.js",
+      "types": "./Rj3lr1tc.d.ts"
+    },
+    "./Zfx1kjuqg": {
+      "import": "./Zfx1kjuqg.js",
+      "types": "./Zfx1kjuqg.d.ts"
+    },
+    "./Container2": {
+      "import": "./Container2.js",
+      "types": "./Container2.d.ts"
+    },
+    "./Rj3lr1tc2": {
+      "import": "./Rj3lr1tc2.js",
+      "types": "./Rj3lr1tc2.d.ts"
+    },
+    "./Zfx1kjuqg2": {
+      "import": "./Zfx1kjuqg2.js",
+      "types": "./Zfx1kjuqg2.d.ts"
+    },
+    "./Container3": {
+      "import": "./Container3.js",
+      "types": "./Container3.d.ts"
+    },
+    "./Rj3lr1tc3": {
+      "import": "./Rj3lr1tc3.js",
+      "types": "./Rj3lr1tc3.d.ts"
+    },
+    "./Zfx1kjuqg3": {
+      "import": "./Zfx1kjuqg3.js",
+      "types": "./Zfx1kjuqg3.d.ts"
+    },
+    "./Rj3lr1tc4": {
+      "import": "./Rj3lr1tc4.js",
+      "types": "./Rj3lr1tc4.d.ts"
+    },
+    "./Rj3lr1tc5": {
+      "import": "./Rj3lr1tc5.js",
+      "types": "./Rj3lr1tc5.d.ts"
+    },
+    "./Zfx1kjuqg4": {
+      "import": "./Zfx1kjuqg4.js",
+      "types": "./Zfx1kjuqg4.d.ts"
+    },
+    "./Zfx1kjuqg5": {
+      "import": "./Zfx1kjuqg5.js",
+      "types": "./Zfx1kjuqg5.d.ts"
+    },
+    "./Container4": {
+      "import": "./Container4.js",
+      "types": "./Container4.d.ts"
+    },
+    "./Rj3lr1tc6": {
+      "import": "./Rj3lr1tc6.js",
+      "types": "./Rj3lr1tc6.d.ts"
+    },
+    "./Zfx1kjuqg6": {
+      "import": "./Zfx1kjuqg6.js",
+      "types": "./Zfx1kjuqg6.d.ts"
+    },
+    "./Container5": {
+      "import": "./Container5.js",
+      "types": "./Container5.d.ts"
+    },
+    "./Rj3lr1tc7": {
+      "import": "./Rj3lr1tc7.js",
+      "types": "./Rj3lr1tc7.d.ts"
+    },
+    "./Zfx1kjuqg7": {
+      "import": "./Zfx1kjuqg7.js",
+      "types": "./Zfx1kjuqg7.d.ts"
+    },
+    "./Container6": {
+      "import": "./Container6.js",
+      "types": "./Container6.d.ts"
+    },
+    "./Rj3lr1tc8": {
+      "import": "./Rj3lr1tc8.js",
+      "types": "./Rj3lr1tc8.d.ts"
+    },
+    "./Zfx1kjuqg8": {
+      "import": "./Zfx1kjuqg8.js",
+      "types": "./Zfx1kjuqg8.d.ts"
+    },
+    "./Rj3lr1tc9": {
+      "import": "./Rj3lr1tc9.js",
+      "types": "./Rj3lr1tc9.d.ts"
+    },
+    "./Rj3lr1tc10": {
+      "import": "./Rj3lr1tc10.js",
+      "types": "./Rj3lr1tc10.d.ts"
+    },
+    "./Zfx1kjuqg9": {
+      "import": "./Zfx1kjuqg9.js",
+      "types": "./Zfx1kjuqg9.d.ts"
+    },
+    "./Zfx1kjuqg10": {
+      "import": "./Zfx1kjuqg10.js",
+      "types": "./Zfx1kjuqg10.d.ts"
+    },
+    "./Container7": {
+      "import": "./Container7.js",
+      "types": "./Container7.d.ts"
+    },
+    "./Rj3lr1tc11": {
+      "import": "./Rj3lr1tc11.js",
+      "types": "./Rj3lr1tc11.d.ts"
+    },
+    "./Zfx1kjuqg11": {
+      "import": "./Zfx1kjuqg11.js",
+      "types": "./Zfx1kjuqg11.d.ts"
+    },
+    "./Container8": {
+      "import": "./Container8.js",
+      "types": "./Container8.d.ts"
+    },
+    "./Rj3lr1tc12": {
+      "import": "./Rj3lr1tc12.js",
+      "types": "./Rj3lr1tc12.d.ts"
+    },
+    "./Zfx1kjuqg12": {
+      "import": "./Zfx1kjuqg12.js",
+      "types": "./Zfx1kjuqg12.d.ts"
+    },
+    "./Container9": {
+      "import": "./Container9.js",
+      "types": "./Container9.d.ts"
+    },
+    "./Rj3lr1tc13": {
+      "import": "./Rj3lr1tc13.js",
+      "types": "./Rj3lr1tc13.d.ts"
+    },
+    "./Zfx1kjuqg13": {
+      "import": "./Zfx1kjuqg13.js",
+      "types": "./Zfx1kjuqg13.d.ts"
+    },
+    "./Rj3lr1tc14": {
+      "import": "./Rj3lr1tc14.js",
+      "types": "./Rj3lr1tc14.d.ts"
+    },
+    "./Rj3lr1tc15": {
+      "import": "./Rj3lr1tc15.js",
+      "types": "./Rj3lr1tc15.d.ts"
+    },
+    "./Zfx1kjuqg14": {
+      "import": "./Zfx1kjuqg14.js",
+      "types": "./Zfx1kjuqg14.d.ts"
+    },
+    "./Zfx1kjuqg15": {
+      "import": "./Zfx1kjuqg15.js",
+      "types": "./Zfx1kjuqg15.d.ts"
+    }
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0",
+    "react-dom": ">=18.0.0",
+    "framer-motion": ">=10.0.0"
+  },
+  "keywords": [
+    "framer",
+    "react",
+    "components",
+    "exported"
+  ],
+  "license": "MIT"
+}
