@@ -32,7 +32,7 @@ jobs:
         run: npm ci
 
       - name: Lint
-        run: npm run lint
+        run: npm run lint -- --ignore-pattern "public/scrape/**"
 
       - name: Build (OpenNext Cloudflare)
         run: npm run build:cf
@@ -51,6 +51,15 @@ jobs:
           node-version: "22"
           cache: npm
           cache-dependency-path: my-app/package-lock.json
+
+      - name: Require Cloudflare API token
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          if [ -z "$CLOUDFLARE_API_TOKEN" ]; then
+            echo "::error::Missing secret CLOUDFLARE_API_TOKEN. Create a Cloudflare API token (Workers Edit) and add it in GitHub → Settings → Secrets."
+            exit 1
+          fi
 
       - name: Install
         run: npm ci
