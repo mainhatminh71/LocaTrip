@@ -4,10 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "sync:routes": "node scripts/sync-public-routes.mjs",
+    "build": "npm run sync:routes && next build",
     "start": "next start",
     "lint": "eslint",
-    "build:cf": "opennextjs-cloudflare build",
+    "build:cf": "npm run sync:routes && opennextjs-cloudflare build",
     "deploy:cf": "opennextjs-cloudflare deploy",
     "preview:cf": "opennextjs-cloudflare preview"
   },
