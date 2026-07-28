@@ -4,6 +4,17 @@
   "main": ".open-next/worker.js",
   "compatibility_date": "2026-07-28",
   "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "workers_dev": true,
+  "routes": [
+    {
+      "pattern": "locatrip.app",
+      "custom_domain": true
+    },
+    {
+      "pattern": "www.locatrip.app",
+      "custom_domain": true
+    }
+  ],
   "assets": {
     "directory": ".open-next/assets",
     "binding": "ASSETS"
