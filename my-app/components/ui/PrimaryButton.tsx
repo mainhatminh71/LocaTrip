@@ -21,7 +21,7 @@ export function PrimaryButton({
       className={`group relative inline-flex h-[42px] items-center pr-10 ${className}`}
     >
       <span
-        className={`font-cal inline-flex h-full items-center rounded-full px-6 text-[16px] leading-[1.4] transition-colors ${
+        className={`font-body inline-flex h-full items-center rounded-full px-6 text-[16px] font-medium leading-[1.4] transition-colors ${
           isDark
             ? "bg-lt-teal text-white"
             : "bg-white text-lt-ink"

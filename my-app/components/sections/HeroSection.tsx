@@ -1,97 +1,198 @@
 "use client";
 
 import Image from "next/image";
-import { motion } from "framer-motion";
-import { IMG } from "@/lib/content";
-import { PrimaryButton } from "@/components/ui/PrimaryButton";
+import Link from "next/link";
+import { useRef, useState, type CSSProperties } from "react";
+import { motion, useInView } from "framer-motion";
+import { IMG, heroStats } from "@/lib/content";
+import { SiteNav } from "@/components/layout/SiteNav";
 
-const collage = [
-  { src: IMG.hero1, className: "left-[8%] top-[8%] h-[42%] w-[28%] rotate-[-6deg]" },
-  { src: IMG.hero2, className: "right-[6%] top-[4%] h-[38%] w-[30%] rotate-[5deg]" },
-  { src: IMG.hero3, className: "bottom-[10%] left-[18%] h-[36%] w-[26%] rotate-[3deg]" },
-  { src: IMG.hero4, className: "bottom-[6%] right-[12%] h-[40%] w-[28%] rotate-[-4deg]" },
-];
+type HeroProps = {
+  locationLabel?: string;
+  heading?: string;
+  supportingText?: string;
+  ctaLabel?: string;
+  ctaHref?: string;
+  showTrustRow?: boolean;
+};
 
-export function HeroSection() {
+/**
+ * Port of Framer `LocaTripHeroExport` → Next.
+ * Nav capsule + overlay menu match Framer scrape transitions.
+ */
+export function HeroSection({
+  locationLabel = "Khu vực: Đà Lạt",
+  heading = "Khám phá bản sắc nơi bạn đang đặt chân",
+  supportingText = "Du lịch là để tận hưởng, không phải vội vã",
+  ctaLabel = "Tạo lịch trình ngay",
+  ctaHref = "/book-a-trip/",
+  showTrustRow = true,
+}: HeroProps) {
+  const heroRef = useRef<HTMLElement | null>(null);
+  const inView = useInView(heroRef, { amount: 0.2, once: false });
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  const thumbs = [
+    {
+      src: IMG.hero2,
+      alt: "Da Lat misty hills",
+      style: {
+        left: "clamp(12px, 4vw, 40px)",
+        top: "clamp(88px, 18vh, 150px)",
+        transform: "rotate(-8deg)",
+      } as CSSProperties,
+    },
+    {
+      src: IMG.hero3,
+      alt: "Foggy valley",
+      style: {
+        right: "clamp(12px, 4vw, 40px)",
+        top: "clamp(112px, 22vh, 220px)",
+        transform: "rotate(9deg)",
+      } as CSSProperties,
+    },
+    {
+      src: IMG.hero1,
+      alt: "Lake and park",
+      style: {
+        left: "clamp(16px, 5vw, 68px)",
+        bottom: showTrustRow
+          ? "clamp(80px, 14vh, 128px)"
+          : "clamp(18px, 8vh, 64px)",
+        transform: "rotate(7deg)",
+      } as CSSProperties,
+    },
+    {
+      src: IMG.hero4,
+      alt: "City street Da Lat",
+      style: {
+        right: "clamp(16px, 5vw, 68px)",
+        bottom: showTrustRow
+          ? "clamp(86px, 15vh, 132px)"
+          : "clamp(22px, 8vh, 66px)",
+        transform: "rotate(-7deg)",
+      } as CSSProperties,
+    },
+  ];
+
   return (
-    <section className="hero-grid-bg relative min-h-screen overflow-hidden text-white">
-      <div className="pointer-events-none absolute inset-0 opacity-40">
-        <div className="absolute -left-20 top-24 size-72 rounded-full bg-white/5 blur-3xl" />
-        <div className="absolute bottom-10 right-10 size-96 rounded-full bg-teal-300/10 blur-3xl" />
-      </div>
+    <section
+      ref={heroRef}
+      className="relative isolate flex h-[100svh] min-h-[680px] w-full max-w-full items-stretch justify-center overflow-hidden bg-[#111] text-white"
+    >
+      <Image
+        src={IMG.homeHero}
+        alt="Đà Lạt — hồ và rừng"
+        fill
+        priority
+        sizes="100vw"
+        className={`object-cover object-center transition-transform duration-[1200ms] ease-out ${
+          inView ? "scale-[1.02]" : "scale-100"
+        }`}
+      />
 
-      <div className="relative mx-auto grid min-h-screen max-w-[1280px] items-center gap-10 px-4 pb-16 pt-28 md:px-10 lg:grid-cols-[1.05fr_0.95fr] lg:pt-24">
-        <div className="animate-fade-up z-10 max-w-2xl">
-          <p className="font-cal mb-5 inline-flex rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-sm text-white/90">
-            Khu vực: Đà Lạt
-          </p>
-          <h1 className="font-display text-[40px] font-bold leading-[1.15] tracking-tight md:text-[64px] lg:text-[72px]">
-            Khám phá bản sắc nơi bạn đang đặt chân
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background:
+            "linear-gradient(180deg, rgba(0,0,0,0.45) 0%, rgba(10,19,18,0.38) 42%, rgba(8,14,16,0.58) 100%)",
+        }}
+      />
+
+      {thumbs.map((t) => (
+        <div
+          key={t.src}
+          className="pointer-events-none absolute z-[1] hidden overflow-hidden rounded-2xl border border-white/25 bg-white/10 shadow-[0_10px_28px_rgba(0,0,0,0.25)] sm:block"
+          style={{
+            ...t.style,
+            width: "clamp(70px, 12vw, 122px)",
+            aspectRatio: "4 / 5",
+          }}
+        >
+          <Image src={t.src} alt={t.alt} fill className="object-cover" sizes="130px" />
+        </div>
+      ))}
+
+      <motion.div
+        initial={inView ? { opacity: 0, y: 18 } : false}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.7 }}
+        className="relative z-[2] flex w-full max-w-[980px] flex-col justify-between gap-6 p-[clamp(16px,3vw,28px)]"
+      >
+        <SiteNav open={menuOpen} onOpenChange={setMenuOpen} />
+
+        <div className="mx-auto my-auto flex w-[min(100%,760px)] flex-col items-center gap-3.5 px-[clamp(6px,2vw,20px)] py-[clamp(8px,1vw,14px)] text-center">
+          <span className="font-body rounded-full border border-white/25 bg-[rgba(12,20,22,0.42)] px-3.5 py-2 text-[15px] font-semibold leading-none tracking-[-0.01em] text-white/92">
+            {locationLabel}
+          </span>
+
+          <h1 className="m-0 max-w-[15ch] text-balance font-display text-[clamp(36px,6vw,56px)] font-bold leading-[1.03] tracking-[-0.03em] text-white">
+            {heading}
           </h1>
-          <p className="mt-5 max-w-md text-lg text-white/75">
-            Du lịch là để tận hưởng, không phải vội vã
+
+          <p className="m-0 max-w-[560px] text-balance font-body text-[clamp(16px,2.2vw,18px)] font-medium leading-[1.35] tracking-[-0.01em] text-white/92">
+            {supportingText}
           </p>
-          <div className="mt-8">
-            <PrimaryButton href="/book-a-trip">Tạo lịch trình ngay</PrimaryButton>
-          </div>
 
-          <div className="mt-12 flex flex-wrap items-center gap-6 text-sm text-white/80">
-            <div className="flex items-center gap-3">
-              <div className="flex -space-x-2">
-                {[IMG.avatar1, IMG.avatar2, IMG.avatar3].map((src) => (
-                  <Image
-                    key={src}
-                    src={src}
-                    alt=""
-                    width={36}
-                    height={36}
-                    className="size-9 rounded-full border-2 border-lt-teal-deep object-cover"
-                  />
-                ))}
-              </div>
-              <div>
-                <p className="font-cal text-white">4.9 sao (124k Reviews)</p>
-                <p className="text-white/60">50k travellers · 15k followers</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="relative mx-auto hidden h-[560px] w-full max-w-[540px] lg:block">
-          {collage.map((item, i) => (
-            <motion.div
-              key={item.src}
-              className={`absolute overflow-hidden rounded-3xl shadow-2xl ${item.className}`}
-              initial={{ opacity: 0, y: 24 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.15 * i, duration: 0.7 }}
-              style={{ animationDelay: `${i * 0.4}s` }}
+          <Link href={ctaHref} className="mt-1.5">
+            <motion.span
+              role="button"
+              whileTap={{ scale: 0.97 }}
+              whileHover={{ y: -1 }}
+              transition={{ type: "spring", stiffness: 450, damping: 30 }}
+              className="font-body inline-flex cursor-pointer items-center gap-2 rounded-full border border-black/10 bg-white px-[18px] py-3 text-[15px] font-semibold leading-none tracking-[-0.01em] text-[#111] shadow-[0_8px_22px_rgba(0,0,0,0.2)]"
             >
-              <div className={`relative h-full w-full animate-float`}>
-                <Image
-                  src={item.src}
-                  alt=""
-                  fill
-                  className="object-cover"
-                  sizes="280px"
-                  priority={i < 2}
-                />
-              </div>
-            </motion.div>
-          ))}
+              <span>{ctaLabel}</span>
+              <span aria-hidden>→</span>
+            </motion.span>
+          </Link>
         </div>
 
-        <div className="grid grid-cols-2 gap-3 lg:hidden">
-          {collage.map((item) => (
-            <div
-              key={item.src}
-              className="relative aspect-[4/5] overflow-hidden rounded-3xl"
-            >
-              <Image src={item.src} alt="" fill className="object-cover" sizes="50vw" />
-            </div>
-          ))}
-        </div>
-      </div>
+        {showTrustRow ? (
+          <div className="mx-auto flex min-h-[42px] w-[min(94%,640px)] flex-wrap items-center justify-center gap-x-5 gap-y-2 rounded-full border border-black/5 bg-white/96 px-3.5 py-2.5 text-[#111] shadow-[0_6px_20px_rgba(0,0,0,0.1)]">
+            {heroStats.map((s) => (
+              <span
+                key={s.text}
+                className="font-body inline-flex items-center gap-1.5 text-[13px] font-semibold tracking-[-0.01em] md:text-[14px]"
+              >
+                <TrustIcon kind={s.kind} />
+                {s.text}
+              </span>
+            ))}
+          </div>
+        ) : null}
+      </motion.div>
     </section>
+  );
+}
+
+function TrustIcon({ kind }: { kind: "google" | "people" | "ig" }) {
+  if (kind === "google") {
+    return (
+      <svg width="14" height="14" viewBox="0 0 24 24" aria-hidden>
+        <path
+          fill="#111"
+          d="M12 17.3 18.2 21l-1.6-7.1L22 9.2l-7.2-.6L12 2 9.2 8.6 2 9.2l5.4 4.7L5.8 21z"
+        />
+      </svg>
+    );
+  }
+  if (kind === "people") {
+    return (
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden>
+        <path
+          d="M16 11a3 3 0 1 0-3-3 3 3 0 0 0 3 3ZM8 11a3 3 0 1 0-3-3 3 3 0 0 0 3 3ZM8.2 13C5.4 13 2 14.2 2 16.5V18h8.5v-1.5c0-.9.4-1.7 1.1-2.3A7.4 7.4 0 0 0 8.2 13Zm7.3 0c-.5 0-1 .05-1.4.14A4.2 4.2 0 0 1 16.5 16.5V18H22v-1.5C22 14.2 18.6 13 15.5 13Z"
+          fill="#111"
+        />
+      </svg>
+    );
+  }
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden>
+      <rect x="3" y="3" width="18" height="18" rx="5" stroke="#111" strokeWidth="1.6" />
+      <circle cx="12" cy="12" r="3.5" stroke="#111" strokeWidth="1.6" />
+      <circle cx="17.2" cy="6.8" r="1" fill="#111" />
+    </svg>
   );
 }

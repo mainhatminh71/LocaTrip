@@ -1,0 +1,38 @@
+/**
+ * LocaTrip design tokens — single source for React marketing UI.
+ * Aligned to Framer scrape (Plus Jakarta Sans + Wix Madefor Display).
+ */
+:root {
+  /* Fonts */
+  --lt-font-body: "Plus Jakarta Sans", system-ui, sans-serif;
+  --lt-font-display: "Wix Madefor Display", "Plus Jakarta Sans", system-ui,
+    sans-serif;
+  --lt-font-brand: "Cal Sans", "Plus Jakarta Sans", system-ui, sans-serif;
+
+  /* Ink / neutrals (Framer) */
+  --lt-ink: #191919;
+  --lt-muted: #545454;
+  --lt-section: #9c9c9c;
+  --lt-field: #f5f5f5;
+  --lt-line: #ebebeb;
+  --lt-white: #ffffff;
+  --lt-black: #0b0b0b;
+
+  /* Brand / deep (Framer teal-black) */
+  --lt-deep: #012830;
+  --lt-teal: #0a6b7c;
+  --lt-teal-deep: #033d4a;
+  --lt-mint: #3ddc97;
+
+  /* Radii */
+  --lt-radius-sm: 12px;
+  --lt-radius-md: 16px;
+  --lt-radius-lg: 24px;
+  --lt-radius-xl: 28px;
+  --lt-radius-2xl: 48px;
+  --lt-radius-pill: 999px;
+
+  /* Layout */
+  --lt-max: 1180px;
+  --lt-pad: 20px;
+}

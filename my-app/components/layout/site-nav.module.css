@@ -1,0 +1,520 @@
+/* Framer qWghg Black-dekstop / overlay — exact values from scrape + script_main */
+
+.root {
+  position: fixed;
+  /* Above every page section (sticky Destinations, sheets, conversion, etc.) */
+  z-index: 10000;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  height: auto;
+  flex: none;
+  order: -1000;
+}
+
+.bar {
+  width: 1200px;
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 8px 40px;
+  display: flex;
+  flex-flow: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  height: min-content;
+  position: relative;
+  overflow: visible;
+}
+
+.capsule {
+  display: flex;
+  flex-flow: row;
+  flex: none;
+  place-content: center;
+  align-items: center;
+  gap: 28px;
+  width: min-content;
+  max-width: 1200px;
+  height: min-content;
+  padding: 12px 16px;
+  position: relative;
+  overflow: visible;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 60px;
+  box-shadow:
+    0px 0.5175247177903657px 0.5175247177903657px -0.9375px rgba(0, 0, 0, 0.18),
+    0px 1.5694289930179366px 1.5694289930179366px -1.875px rgba(0, 0, 0, 0.17),
+    0px 4.1487247889649px 4.1487247889649px -2.8125px rgba(0, 0, 0, 0.15),
+    0px 13px 13px -3.75px rgba(0, 0, 0, 0.06);
+  /* Framer appear mddu0p: delay 0.2, duration 0.4, ease [0.12,0.23,0.5,1], y -40 → 0 */
+  animation: capsuleAppear 0.4s cubic-bezier(0.12, 0.23, 0.5, 1) 0.2s both;
+}
+
+@keyframes capsuleAppear {
+  from {
+    opacity: 0.001;
+    transform: translateY(-40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.logo {
+  display: flex;
+  flex-flow: row;
+  flex: none;
+  place-content: center;
+  align-items: center;
+  gap: 9px;
+  width: min-content;
+  height: min-content;
+  padding: 0;
+  text-decoration: none;
+  position: relative;
+  overflow: visible;
+}
+
+.logoImgWrap {
+  display: block;
+  width: 46px;
+  height: 46px;
+  flex: none;
+  position: relative;
+  overflow: visible;
+}
+
+.logoImg {
+  width: 46px !important;
+  height: 46px !important;
+  aspect-ratio: 1;
+  display: block;
+  position: relative;
+  overflow: visible;
+  object-fit: cover;
+  object-position: center;
+}
+
+.logoText {
+  margin: 0;
+  white-space: pre;
+  font-family: "Manrope", "Manrope Placeholder", sans-serif;
+  font-size: 36px;
+  font-weight: 600;
+  color: rgb(255, 255, 255);
+  /* Framer Logo text sits in 46px row with the mark */
+  line-height: 46px;
+  height: 46px;
+}
+
+.logoTextLight {
+  font-weight: 400;
+}
+
+.menuBtn {
+  cursor: pointer;
+  display: flex;
+  flex-flow: row;
+  flex: none;
+  place-content: center;
+  align-items: center;
+  gap: 8px;
+  width: min-content;
+  height: min-content;
+  padding: 6px;
+  border: 0;
+  background: transparent;
+  position: relative;
+  overflow: visible;
+}
+
+/* Hamburger-menu framer-5PiIZ — Close variant (2 lines) / Open variant (X) */
+.burger {
+  width: 20px;
+  height: 20px;
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.line {
+  width: 20px;
+  height: 2px;
+  position: absolute;
+  left: 0;
+  background: rgb(255, 255, 255);
+  display: block;
+  transform-origin: center;
+  transition:
+    top 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+    left 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+    transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.lineTop {
+  top: 4px;
+}
+
+.lineBottom {
+  top: 14px;
+}
+
+.lineTopOpen {
+  top: 7px;
+  left: -2px;
+  transform: rotate(-45deg);
+}
+
+.lineBottomOpen {
+  top: 7px;
+  left: -2px;
+  transform: rotate(45deg);
+}
+
+/* —— Open overlay (Nav Background Active + menu content) —— */
+.overlay {
+  position: fixed;
+  inset: 0;
+  /* Just under capsule so LOCATRIP pill stays visible when menu is open */
+  z-index: 9990;
+  display: flex;
+  /* Framer Nav Background: 800px tall, top-aligned in viewport */
+  align-items: flex-start;
+  justify-content: center;
+  overflow: visible;
+  animation: overlayFade 0.35s cubic-bezier(0.12, 0.23, 0.5, 1) both;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  background-color: rgba(5, 5, 5, 0.55);
+}
+
+.overlayBlur {
+  display: none;
+}
+
+@keyframes overlayFade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.navLinkWrap {
+  animation: linkIn 0.4s cubic-bezier(0.12, 0.23, 0.5, 1) both;
+}
+
+@keyframes linkIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.overlayInner {
+  position: relative;
+  z-index: 1;
+  width: 1200px;
+  max-width: calc(100% - 80px);
+  /* Framer: top 64 + nav-menu 588 → bottom y:752; Bottom-menu h:68 → frame 820 */
+  height: 820px;
+  max-height: 100%;
+  margin: 0 auto;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+/* Dekstop Transparent — padding 16px 0 (overlay override) */
+.overlayTop {
+  display: flex;
+  flex-direction: row;
+  flex: none;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: 64px;
+  padding: 16px 0;
+  box-sizing: border-box;
+}
+
+.overlayLogo {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 8px;
+  min-width: 173px;
+  min-height: 32px;
+  text-decoration: none;
+  color: #fff;
+}
+
+.overlayLogoImg {
+  width: 28px;
+  height: 28px;
+  object-fit: cover;
+  flex: none;
+}
+
+.overlayLogoText {
+  margin: 0;
+  font-family: "Manrope", "Manrope Placeholder", sans-serif;
+  font-size: 22px;
+  font-weight: 600;
+  color: rgb(255, 255, 255);
+  line-height: 32px;
+  white-space: pre;
+}
+
+.overlayClose {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 6px;
+  border: 0;
+  background: transparent;
+  flex: none;
+}
+
+.overlayMain {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 100%;
+  gap: 0;
+  flex: 1 0 auto;
+  min-height: 0;
+  /* Framer: Nav-menu y=164 with top bar ending ~64 → ~100px offset */
+  padding-top: 100px;
+  box-sizing: border-box;
+}
+
+.featureCol {
+  display: flex;
+  flex-direction: column;
+  flex: none;
+  gap: 16px;
+  width: 273px;
+  height: min-content;
+  overflow: hidden;
+  border-radius: 24px;
+}
+
+.featureImg {
+  position: relative;
+  width: 100%;
+  height: 320px;
+  flex: none;
+  border-radius: 24px;
+  overflow: hidden;
+}
+
+.featureImg img {
+  object-fit: cover;
+  object-position: center;
+}
+
+.linksCol {
+  display: flex;
+  flex-direction: column;
+  flex: none;
+  gap: 0;
+  align-items: flex-start;
+  max-width: 248px;
+  width: 248px;
+  margin-left: auto;
+}
+
+.navLink {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0;
+  height: min-content;
+  min-height: 42px;
+  text-decoration: none;
+  cursor: pointer;
+  padding: 0;
+  margin: 0;
+}
+
+.navLinkText {
+  margin: 0;
+  font-family: "Cal Sans", "Cal Sans Placeholder", sans-serif;
+  font-size: 32px;
+  font-weight: 400;
+  font-style: normal;
+  letter-spacing: 0em;
+  line-height: 1.3em;
+  color: rgb(255, 255, 255);
+  text-decoration: none;
+  white-space: pre;
+}
+
+.navLinkLine {
+  flex: none;
+  height: 1px;
+  width: 1px;
+  background: rgb(255, 255, 255);
+  opacity: 0;
+  transition:
+    width 0.4s cubic-bezier(0.12, 0.23, 0.5, 1),
+    opacity 0.4s cubic-bezier(0.12, 0.23, 0.5, 1);
+}
+
+.navLink:hover {
+  gap: 8px;
+}
+
+.navLink:hover .navLinkLine {
+  width: 12px;
+  opacity: 1;
+}
+
+.bottomMenu {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 100%;
+  min-height: 68px;
+  padding: 0;
+  gap: 0;
+  margin-top: auto;
+}
+
+.contactBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  width: min-content;
+  /* Framer Get In Touch block aligns to social (48) within 68px row */
+  min-height: 48px;
+  justify-content: center;
+}
+
+.contactLabel {
+  margin: 0;
+  font-family: "Inter", "Inter Placeholder", system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: rgb(204, 204, 204);
+}
+
+.contactEmail {
+  margin: 0;
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  color: rgb(250, 248, 240);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.socialRow {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: min-content;
+  height: 48px;
+}
+
+.socialBtn {
+  width: 48px;
+  height: 48px;
+  border-radius: 999px;
+  border: 1px solid rgb(255, 255, 255);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgb(255, 255, 255);
+  text-decoration: none;
+  background: rgba(255, 255, 255, 0.1);
+  box-sizing: border-box;
+}
+
+.ctaPill {
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  height: 48px;
+  padding: 0 18px;
+  border-radius: 999px;
+  background: rgb(255, 255, 255);
+  color: rgb(17, 17, 17);
+  text-decoration: none;
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  border: 1px solid #7d7d7d;
+}
+
+.ctaIcon {
+  width: 31px;
+  height: 31px;
+  border-radius: 6px;
+  object-fit: cover;
+}
+
+@media (min-width: 810px) and (max-width: 1199.98px) {
+  .bar {
+    width: 810px;
+    padding: 8px 40px;
+  }
+}
+
+@media (max-width: 809.98px) {
+  .bar {
+    width: 390px;
+    max-width: 100%;
+    padding: 16px 20px;
+  }
+
+  .overlayInner {
+    max-width: calc(100% - 40px);
+    padding: 0 0 24px;
+  }
+
+  .overlayMain {
+    flex-direction: column;
+    gap: 32px;
+    padding-top: 48px;
+  }
+
+  .featureCol {
+    display: none;
+  }
+
+  .linksCol {
+    margin-left: 0;
+    max-width: none;
+    width: 100%;
+    align-items: flex-start;
+  }
+
+  .bottomMenu {
+    flex-direction: column;
+    gap: 24px;
+    align-items: flex-start;
+  }
+}

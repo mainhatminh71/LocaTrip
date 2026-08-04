@@ -1,13 +1,24 @@
 @import "tailwindcss";
+@import "../styles/tokens.css";
+@import "../styles/framer-fonts.css";
+@import "../styles/manrope.css";
 
 @theme {
-  --color-lt-teal: #0a6b7c;
-  --color-lt-teal-deep: #033d4a;
+  --color-lt-teal: var(--lt-teal);
+  --color-lt-teal-deep: var(--lt-teal-deep);
   --color-lt-cream: #f4f1ea;
-  --color-lt-black: #0f1416;
-  --color-lt-ink: #1a2428;
-  --font-display: "Cal Sans", "Segoe UI", system-ui, sans-serif;
-  --font-cal: "Cal Sans", "Segoe UI", system-ui, sans-serif;
+  --color-lt-black: var(--lt-black);
+  --color-lt-ink: var(--lt-ink);
+  --color-lt-muted: var(--lt-muted);
+  --color-lt-field: var(--lt-field);
+  --color-lt-deep: var(--lt-deep);
+  --color-lt-mint: var(--lt-mint);
+
+  --font-sans: var(--lt-font-body);
+  --font-display: var(--lt-font-display);
+  --font-cal: var(--lt-font-brand);
+  --font-body: var(--lt-font-body);
+  --font-brand: var(--lt-font-brand);
 }
 
 html,
@@ -15,6 +26,25 @@ body {
   margin: 0;
   padding: 0;
   min-height: 100%;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+body {
+  background: var(--lt-white);
+  color: var(--lt-ink);
+  font-family: var(--lt-font-body);
+  font-weight: 500;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#__next,
+body > div {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: clip;
 }
 
 .section-pad {
@@ -31,7 +61,7 @@ body {
 .hero-grid-bg {
   background:
     radial-gradient(ellipse at 20% 20%, rgba(255, 255, 255, 0.08), transparent 50%),
-    linear-gradient(160deg, #033d4a 0%, #0a6b7c 55%, #045465 100%);
+    linear-gradient(160deg, var(--lt-teal-deep) 0%, var(--lt-teal) 55%, #045465 100%);
 }
 
 @keyframes fade-up {

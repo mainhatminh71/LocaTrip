@@ -1,0 +1,78 @@
+.hero {
+  position: relative;
+  display: flex;
+  flex-flow: column;
+  align-items: center;
+  justify-content: flex-end;
+  width: 100%;
+  min-height: 420px;
+  padding: 200px 40px 100px;
+  background: #000;
+  color: #fff;
+  overflow: hidden;
+}
+
+.bg {
+  object-fit: cover;
+  object-position: center;
+  opacity: 0.45;
+  transform: scale(1.08);
+}
+
+.copy {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  max-width: 760px;
+  text-align: center;
+}
+
+.copy h1 {
+  margin: 0;
+  font-family: "Manrope", "Manrope Placeholder", sans-serif;
+  font-size: 64px;
+  font-weight: 600;
+  line-height: 1.2em;
+  letter-spacing: -0.01em;
+}
+
+.copy p {
+  margin: 0;
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 1.4em;
+  letter-spacing: -0.02em;
+  color: #fff;
+}
+
+.curve {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+  height: 26px;
+  background: #fff;
+  border-top-left-radius: 222px;
+  border-top-right-radius: 222px;
+}
+
+@media (max-width: 809.98px) {
+  .hero {
+    min-height: 320px;
+    padding: 140px 20px 72px;
+  }
+
+  .copy h1 {
+    font-size: 40px;
+  }
+
+  .copy p {
+    font-size: 16px;
+  }
+}

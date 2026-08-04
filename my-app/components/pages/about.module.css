@@ -1,0 +1,159 @@
+.section {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 100px 40px;
+}
+
+.split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 64px;
+  align-items: center;
+}
+
+.tag {
+  margin: 0 0 12px;
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: rgb(125, 125, 125);
+}
+
+.h2 {
+  margin: 0;
+  font-family: "Manrope", "Manrope Placeholder", sans-serif;
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.2em;
+  letter-spacing: -0.01em;
+  color: #012830;
+  text-transform: capitalize;
+}
+
+.body {
+  margin: 16px 0 0;
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.6em;
+  color: #5c5c5c;
+}
+
+.photo {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  border-radius: 24px;
+  background: #eee;
+}
+
+.photoImg {
+  object-fit: cover;
+}
+
+.milestone {
+  width: 100%;
+  background: #012830;
+  color: #fff;
+  padding: 100px 40px;
+}
+
+.milestoneInner {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 32px;
+  margin-top: 48px;
+}
+
+.stat {
+  padding: 24px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.stat strong {
+  display: block;
+  font-family: "Manrope", sans-serif;
+  font-size: 40px;
+  font-weight: 600;
+}
+
+.stat span {
+  display: block;
+  margin-top: 8px;
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.journeyList {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  margin-top: 32px;
+}
+
+.journeyItem h3 {
+  margin: 0;
+  font-family: "Manrope", sans-serif;
+  font-size: 22px;
+  font-weight: 600;
+  color: #012830;
+}
+
+.teamGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+  margin-top: 40px;
+}
+
+.card {
+  padding: 28px 24px;
+  border-radius: 24px;
+  background: #f5f5f5;
+}
+
+.card h3 {
+  margin: 0;
+  font-family: "Manrope", sans-serif;
+  font-size: 20px;
+  font-weight: 600;
+  color: #012830;
+}
+
+.card p {
+  margin: 8px 0 0;
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 14px;
+  color: #666;
+}
+
+@media (max-width: 809.98px) {
+  .section {
+    padding: 72px 20px;
+  }
+
+  .split {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+
+  .milestone {
+    padding: 72px 20px;
+  }
+
+  .stats {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .teamGrid {
+    grid-template-columns: 1fr;
+  }
+}

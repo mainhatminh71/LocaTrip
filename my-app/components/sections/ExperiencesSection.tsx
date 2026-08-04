@@ -1,16 +1,17 @@
-import Image from "next/image";
 import Link from "next/link";
 import { experiences } from "@/lib/content";
 import { PrimaryButton } from "@/components/ui/PrimaryButton";
 import { SectionTag } from "@/components/ui/SectionTag";
+import { ImageCrossfade } from "@/components/ui/ImageCrossfade";
 
+/** Ported from Framer experiences + destinations CTA strip. */
 export function ExperiencesSection() {
   return (
-    <section className="section-pad bg-white">
-      <div className="mx-auto max-w-[1280px]">
+    <section className="w-full bg-white px-4 pb-16 md:px-10 md:pb-20">
+      <div className="mx-auto max-w-[1200px]">
         <div className="mb-10 max-w-2xl">
           <SectionTag>Khám phá nhanh gọn</SectionTag>
-          <h2 className="font-display mt-4 text-[32px] font-bold leading-[1.2] text-lt-teal-deep md:text-4xl">
+          <h2 className="mt-4 font-display text-[32px] font-bold leading-[1.2] tracking-[-0.02em] text-[#111] md:text-[40px]">
             Trải nghiệm đa cảm xúc tại nơi bạn đang đặt chân
           </h2>
         </div>
@@ -22,25 +23,25 @@ export function ExperiencesSection() {
               href="/tours"
               className="group flex flex-col gap-3"
             >
-              <div className="relative aspect-[256/411] overflow-hidden rounded-3xl">
-                <Image
-                  src={item.image}
+              <div className="relative aspect-[256/411] overflow-hidden rounded-[22px]">
+                <ImageCrossfade
+                  images={item.images}
                   alt={item.title}
-                  fill
-                  className="object-cover transition-transform duration-700 group-hover:scale-105"
+                  intervalMs={4000}
+                  className="absolute inset-0 h-full w-full"
                   sizes="(max-width:1280px) 50vw, 25vw"
                 />
               </div>
-              <h3 className="font-display text-xl font-semibold text-lt-ink">
+              <h3 className="font-display text-xl font-semibold text-[#111]">
                 {item.title}
               </h3>
-              <p className="text-sm leading-relaxed text-lt-body">{item.desc}</p>
+              <p className="text-sm leading-relaxed text-[#5c5c5c]">{item.desc}</p>
             </Link>
           ))}
         </div>
 
         <div className="mt-12 flex flex-col items-start justify-between gap-4 border-t border-black/5 pt-8 md:flex-row md:items-center">
-          <p className="font-cal text-lt-ink">
+          <p className="font-body text-[18px] text-[#111]">
             Khám phá nhiều địa điểm đang chờ bạn
           </p>
           <PrimaryButton href="/tours" variant="dark">

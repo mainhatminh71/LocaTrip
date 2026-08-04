@@ -1,0 +1,172 @@
+/* Framer Destinations — black sticky scroll + Lined Up marquee */
+
+.section {
+  width: 100%;
+  background: #000;
+  color: #fff;
+  overflow: hidden;
+}
+
+.intro {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 100px 40px 40px;
+}
+
+.heading {
+  margin: 16px 0 0;
+  max-width: 18ch;
+  font-family: "Manrope", "Manrope Placeholder", sans-serif;
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.2em;
+  letter-spacing: -0.01em;
+  text-transform: capitalize;
+  color: #fff;
+}
+
+.scrollTrack {
+  position: relative;
+  width: 100%;
+}
+
+.sticky {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  width: 100%;
+  overflow: hidden;
+}
+
+.stage {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.stageImg {
+  object-fit: cover;
+  object-position: center;
+}
+
+.stageShade {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.15) 0%,
+    rgba(0, 0, 0, 0.2) 40%,
+    rgba(0, 0, 0, 0.75) 100%
+  );
+  pointer-events: none;
+}
+
+.stageCopy {
+  position: absolute;
+  z-index: 2;
+  left: 40px;
+  right: 40px;
+  bottom: 64px;
+  max-width: 520px;
+}
+
+.stageIndex {
+  margin: 0 0 12px;
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.stageCopy h3 {
+  margin: 0;
+  font-family: "Manrope", "Manrope Placeholder", sans-serif;
+  font-size: 40px;
+  font-weight: 600;
+  line-height: 1.15em;
+  letter-spacing: -0.01em;
+}
+
+.stageCopy p:last-child {
+  margin: 12px 0 0;
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.5em;
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.stripe {
+  width: 100%;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  background: #000;
+}
+
+.stripeTrack {
+  display: flex;
+  width: max-content;
+  animation: dest-marquee 32s linear infinite;
+}
+
+.stripeRow {
+  display: flex;
+  align-items: center;
+  gap: 100px;
+  padding-right: 100px;
+  white-space: nowrap;
+  font-family: "Manrope", "Manrope Placeholder", sans-serif;
+  font-size: 48px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.stripeRow em {
+  font-style: normal;
+  margin-left: 100px;
+  opacity: 0.35;
+}
+
+@keyframes dest-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@media (max-width: 809.98px) {
+  .intro {
+    padding: 80px 20px 24px;
+  }
+
+  .heading {
+    font-size: 24px;
+  }
+
+  .stageCopy {
+    left: 20px;
+    right: 20px;
+    bottom: 40px;
+  }
+
+  .stageCopy h3 {
+    font-size: 28px;
+  }
+
+  .stripeRow {
+    font-size: 32px;
+    gap: 48px;
+    padding-right: 48px;
+  }
+
+  .stripeRow em {
+    margin-left: 48px;
+  }
+}

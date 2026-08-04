@@ -1,14 +1,11 @@
 import type { NextConfig } from "next";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
-
-const projectRoot = path.dirname(fileURLToPath(import.meta.url));
 
 const nextConfig: NextConfig = {
   trailingSlash: true,
-  // Avoid Turbopack mis-detecting workspace root (crash on env reload).
+  allowedDevOrigins: ["127.0.0.1", "localhost"],
+  // Avoid Turbopack mis-detecting monorepo root.
   turbopack: {
-    root: projectRoot,
+    root: process.cwd(),
   },
   images: {
     remotePatterns: [

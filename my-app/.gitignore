@@ -32,6 +32,8 @@
 /public/framerusercontent.com/
 /public/fonts.gstatic.com/
 /public/index.html
+# Chrome-saved exact homepage (regenerate: node scripts/import-saved-homepage.mjs)
+/public/homepage-exact/
 
 # production
 /build

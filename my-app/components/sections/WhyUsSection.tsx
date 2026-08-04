@@ -5,70 +5,75 @@ import { useState } from "react";
 import { IMG, whyUs } from "@/lib/content";
 import { SectionTag } from "@/components/ui/SectionTag";
 
+/** Ported from Framer “Lý do chọn LocaTrip”. */
 export function WhyUsSection() {
   const [active, setActive] = useState(0);
   const images = [IMG.why1, IMG.why2, IMG.why3, IMG.why4];
 
   return (
-    <section className="relative overflow-hidden bg-lt-teal-deep text-white">
-      <div className="absolute inset-0">
+    <section
+      className="relative w-full overflow-hidden bg-[#033d4a] px-5 py-[100px] text-white md:px-10"
+      data-framer-name="Why Us"
+    >
+      <div className="pointer-events-none absolute inset-0 opacity-35">
         <Image
-          src={IMG.aurora}
+          src={IMG.whyBg}
           alt=""
           fill
-          className="object-cover opacity-30"
+          className="object-cover"
           sizes="100vw"
         />
-        <div className="absolute inset-0 bg-lt-teal-deep/75" />
       </div>
-
-      <div className="section-pad relative mx-auto max-w-[1280px]">
-        <div className="mb-10 max-w-2xl">
-          <SectionTag tone="light">Lý do chọn LocaTrip</SectionTag>
-          <h2 className="font-display mt-4 text-[32px] font-bold leading-[1.2] md:text-4xl">
-            Lên kế hoạch với một nút bấm, Du lịch với tâm trí thư thái
-          </h2>
+      <div className="relative z-[1] mx-auto grid w-full max-w-[1200px] items-center gap-9 lg:grid-cols-2 lg:gap-16">
+        <div className="relative min-h-[360px] overflow-hidden rounded-[24px] lg:min-h-[480px]">
+          <Image
+            src={images[active] ?? images[0]}
+            alt=""
+            fill
+            className="object-cover transition-opacity duration-500"
+            sizes="(max-width:1024px) 100vw, 50vw"
+          />
         </div>
 
-        <div className="grid items-stretch gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-          <div className="relative min-h-[360px] overflow-hidden rounded-3xl lg:min-h-[520px]">
-            <Image
-              src={images[active] ?? images[0]}
-              alt=""
-              fill
-              className="object-cover transition-opacity duration-500"
-              sizes="(max-width:1024px) 100vw, 55vw"
-            />
-          </div>
-
-          <div className="flex flex-col justify-center gap-3 rounded-md">
+        <div>
+          <SectionTag tone="light">Lý do chọn LocaTrip</SectionTag>
+          <h2 className="mt-4 font-['Manrope','Manrope_Placeholder',sans-serif] text-[32px] font-bold leading-[1.2] tracking-[-0.01em] capitalize">
+            Lên kế hoạch với một nút bấm, Du lịch với tâm trí thư thái
+          </h2>
+          <ul className="mt-8 space-y-5">
             {whyUs.map((item, index) => {
-              const isActive = active === index;
+              const on = active === index;
               return (
-                <button
-                  key={item.title}
-                  type="button"
-                  onMouseEnter={() => setActive(index)}
-                  onFocus={() => setActive(index)}
-                  onClick={() => setActive(index)}
-                  className={`rounded-3xl p-5 text-left transition-colors ${
-                    isActive ? "bg-white/10" : "bg-transparent hover:bg-white/5"
-                  }`}
-                >
-                  <h3 className="font-cal text-[24px] leading-tight md:text-[28px]">
-                    {item.title}
-                  </h3>
-                  <p
-                    className={`mt-2 text-sm text-white/70 transition-all ${
-                      isActive ? "max-h-20 opacity-100" : "max-h-0 overflow-hidden opacity-0 md:max-h-20 md:opacity-100"
+                <li key={item.title}>
+                  <button
+                    type="button"
+                    onMouseEnter={() => setActive(index)}
+                    onFocus={() => setActive(index)}
+                    onClick={() => setActive(index)}
+                    className={`w-full rounded-2xl border px-4 py-4 text-left transition ${
+                      on
+                        ? "border-white/20 bg-white/10"
+                        : "border-transparent hover:bg-white/5"
                     }`}
                   >
-                    {item.desc}
-                  </p>
-                </button>
+                    <div className="flex items-start gap-3">
+                      <span className="mt-0.5 inline-flex size-6 shrink-0 items-center justify-center rounded-full bg-[#3DDC97] text-[12px] font-bold text-[#0b0b0b]">
+                        ✓
+                      </span>
+                      <div>
+                        <h3 className="font-body text-[18px] md:text-[20px]">
+                          {item.title}
+                        </h3>
+                        <p className="mt-1 text-[14px] leading-relaxed text-white/65">
+                          {item.desc}
+                        </p>
+                      </div>
+                    </div>
+                  </button>
+                </li>
               );
             })}
-          </div>
+          </ul>
         </div>
       </div>
     </section>

@@ -1,53 +1,102 @@
 "use client";
 
 import Image from "next/image";
-import { destinations, IMG } from "@/lib/content";
+import { useEffect, useRef, useState } from "react";
+import { destinations } from "@/lib/content";
 import { SectionTag } from "@/components/ui/SectionTag";
+import styles from "./destinations.module.css";
 
+const MARQUEE_NAMES = [
+  "Hồ Tuyền Lâm",
+  "Đồi Chè Cầu Đất",
+  "LangBiang",
+  "Trung tâm Đà Lạt",
+  "Hồ Xuân Hương",
+  "Đà Lạt",
+];
+
+/**
+ * Framer Destinations: black sticky viewport stages + Lined Up name marquee.
+ */
 export function DestinationsSection() {
-  return (
-    <section className="section-pad bg-lt-black text-white">
-      <div className="mx-auto max-w-[1280px]">
-        <div className="mb-10 max-w-2xl">
-          <SectionTag tone="light">Địa điểm được yêu thích nhất</SectionTag>
-          <h2 className="font-display mt-4 text-[32px] font-bold leading-[1.2] md:text-4xl">
-            Khám phá những địa điểm được nhiều người lựa chọn
-          </h2>
-        </div>
+  const trackRef = useRef<HTMLDivElement | null>(null);
+  const [active, setActive] = useState(0);
 
-        <div className="flex gap-5 overflow-x-auto pb-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          {destinations.map((dest) => (
-            <article
-              key={dest.title}
-              className="group relative min-w-[280px] flex-1 overflow-hidden rounded-3xl bg-[#111] sm:min-w-[320px] lg:min-w-0"
-            >
-              <div className="relative aspect-[460/347]">
-                <Image
-                  src={dest.image}
-                  alt={dest.title}
-                  fill
-                  className="object-cover transition-transform duration-700 group-hover:scale-105"
-                  sizes="320px"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-              </div>
-              <div className="absolute inset-x-0 bottom-0 p-5">
-                <div className="mb-3 flex -space-x-2">
-                  {[IMG.dest1, IMG.dest2, IMG.dest3].map((src) => (
-                    <Image
-                      key={src}
-                      src={src}
-                      alt=""
-                      width={36}
-                      height={36}
-                      className="size-9 rounded-full border-2 border-black object-cover"
-                    />
-                  ))}
-                </div>
-                <h3 className="font-display text-2xl font-bold">{dest.title}</h3>
-                <p className="mt-1 text-sm text-white/70">{dest.subtitle}</p>
-              </div>
-            </article>
+  useEffect(() => {
+    const el = trackRef.current;
+    if (!el) return;
+
+    const onScroll = () => {
+      const rect = el.getBoundingClientRect();
+      const total = Math.max(1, el.offsetHeight - window.innerHeight);
+      const progressed = Math.min(total, Math.max(0, -rect.top));
+      const idx = Math.min(
+        destinations.length - 1,
+        Math.floor((progressed / total) * destinations.length),
+      );
+      setActive(idx);
+    };
+
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+    };
+  }, []);
+
+  const current = destinations[active] ?? destinations[0];
+
+  return (
+    <section className={styles.section} data-framer-name="Destinations">
+      <div className={styles.intro}>
+        <SectionTag tone="light">Địa điểm được yêu thích nhất</SectionTag>
+        <h2 className={styles.heading}>
+          Khám phá những địa điểm được nhiều người lựa chọn
+        </h2>
+      </div>
+
+      <div
+        ref={trackRef}
+        className={styles.scrollTrack}
+        style={{ height: `${destinations.length * 100}vh` }}
+      >
+        <div className={styles.sticky} data-framer-name="Sticky">
+          <div className={styles.stage}>
+            <Image
+              key={current.title}
+              src={current.image}
+              alt={current.title}
+              fill
+              className={styles.stageImg}
+              sizes="100vw"
+              priority={active === 0}
+            />
+            <div className={styles.stageShade} />
+            <div className={styles.stageCopy}>
+              <p className={styles.stageIndex}>
+                {String(active + 1).padStart(2, "0")} /{" "}
+                {String(destinations.length).padStart(2, "0")}
+              </p>
+              <h3>{current.title}</h3>
+              <p>{current.subtitle}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className={styles.stripe} data-framer-name="Text Stripe">
+        <div className={styles.stripeTrack} data-framer-name="Lined Up">
+          {[0, 1].map((copy) => (
+            <div key={copy} className={styles.stripeRow}>
+              {MARQUEE_NAMES.map((name) => (
+                <span key={`${copy}-${name}`}>
+                  {name}
+                  <em>•</em>
+                </span>
+              ))}
+            </div>
           ))}
         </div>
       </div>

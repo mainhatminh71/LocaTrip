@@ -15,7 +15,7 @@ export function SectionTag({
     <div className={`inline-flex items-center gap-2 ${className}`}>
       <span
         className={`flex size-6 items-center justify-center opacity-65 ${
-          isLight ? "text-lt-soft" : "text-lt-muted"
+          isLight ? "text-white/65" : "text-[#6b6b6b]"
         }`}
       >
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
@@ -28,7 +28,7 @@ export function SectionTag({
         </svg>
       </span>
       <span
-        className={`font-cal text-[16px] leading-[1.4] ${
+        className={`font-body text-[16px] font-medium leading-[1.4] ${
           isLight ? "text-[#f0f0f0]" : "text-lt-muted"
         }`}
       >

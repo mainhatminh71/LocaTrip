@@ -1,18 +1,26 @@
 import Image from "next/image";
 import Link from "next/link";
 import { blogs } from "@/lib/content";
-import { PrimaryButton } from "@/components/ui/PrimaryButton";
 import { SectionTag } from "@/components/ui/SectionTag";
 
+/** Ported from Framer blogs section. */
 export function BlogsSection() {
   return (
-    <section className="section-pad bg-lt-cream">
-      <div className="mx-auto max-w-[1280px]">
-        <div className="mb-10 max-w-2xl">
-          <SectionTag>Blogs</SectionTag>
-          <h2 className="font-display mt-4 text-[32px] font-bold leading-[1.2] text-lt-teal-deep md:text-4xl">
-            Cảm hứng và mẹo cho chuyến đi sắp tới của bạn
-          </h2>
+    <section className="w-full bg-white px-4 py-16 md:px-10 md:py-24">
+      <div className="mx-auto w-full max-w-[1200px]">
+        <div className="mb-10 flex items-end justify-between gap-4">
+          <div>
+            <SectionTag>Blogs</SectionTag>
+            <h2 className="mt-4 max-w-[22ch] font-display text-[28px] font-bold tracking-[-0.02em] text-[#111] md:text-[36px]">
+              Cảm hứng và mẹo cho chuyến đi sắp tới của bạn
+            </h2>
+          </div>
+          <Link
+            href="/blogs"
+            className="shrink-0 text-sm text-[#111] underline-offset-4 hover:underline"
+          >
+            Xem tất cả
+          </Link>
         </div>
 
         <div className="grid gap-6 md:grid-cols-2">
@@ -20,9 +28,9 @@ export function BlogsSection() {
             <Link
               key={blog.title}
               href="/blogs"
-              className="group flex flex-col gap-3"
+              className="group overflow-hidden rounded-[20px] border border-[#efefef] bg-white"
             >
-              <div className="relative aspect-[607/386] overflow-hidden rounded-3xl">
+              <div className="relative aspect-[16/10] overflow-hidden">
                 <Image
                   src={blog.image}
                   alt={blog.title}
@@ -31,25 +39,16 @@ export function BlogsSection() {
                   sizes="(max-width:768px) 100vw, 50vw"
                 />
               </div>
-              <div className="flex items-center gap-2 text-sm text-lt-muted">
-                <span>{blog.author}</span>
-                <span>·</span>
-                <span>{blog.date}</span>
+              <div className="p-5">
+                <p className="text-xs text-[#888]">
+                  {blog.author} · {blog.date}
+                </p>
+                <h3 className="mt-2 font-display text-[20px] font-semibold text-[#111]">
+                  {blog.title}
+                </h3>
               </div>
-              <h3 className="font-display text-xl font-semibold text-lt-ink transition-colors group-hover:text-lt-teal">
-                {blog.title}
-              </h3>
             </Link>
           ))}
-        </div>
-
-        <div className="mt-12 flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
-          <p className="font-cal text-lt-ink">
-            Khám phá những câu chuyện từ những khách hàng sử dụng LocalTrip
-          </p>
-          <PrimaryButton href="/blogs" variant="dark">
-            Xem tất cả
-          </PrimaryButton>
         </div>
       </div>
     </section>

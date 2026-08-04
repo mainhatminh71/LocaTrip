@@ -5,109 +5,115 @@ import { useState } from "react";
 import { IMG } from "@/lib/content";
 import { SectionTag } from "@/components/ui/SectionTag";
 
-const reviews = [
+const SLIDES = [
   {
     quote:
-      "Traveling with this team completely changed how I see group travel. Everything was thoughtfully planned",
-    author: "Emily Carter, Solo Traveler",
-    image: IMG.testimonial,
+      "“Lên kế hoạch với một nút bấm — chuyến đi Đà Lạt của mình mượt mà hơn rất nhiều.”",
+    name: "Emily Carter",
+    role: "Solo Traveler",
     avatar: IMG.avatar1,
+    image: IMG.tour4,
   },
   {
     quote:
-      "LocaTrip giúp mình tiết kiệm cả tuần nghiên cứu. Lịch trình Đà Lạt rất mượt và đúng gu.",
-    author: "Minh Anh, Weekend Explorer",
-    image: IMG.nature,
+      "“Lịch trình khớp sở thích, không phải ngồi nghiên cứu cả đêm trước khi đi.”",
+    name: "Minh Anh",
+    role: "Couple Traveler",
     avatar: IMG.avatar2,
+    image: IMG.tour1,
   },
   {
     quote:
-      "Từ ngân sách đến điểm check-in đều được cá nhân hóa. Trải nghiệm cực kỳ thư thái.",
-    author: "Hoàng Nam, Photographer",
-    image: IMG.fog,
+      "“Từ điểm bắt đầu đến quán ăn đều hợp lý — đúng vibe thư thái mình muốn.”",
+    name: "Hoàng Nam",
+    role: "Family Trip",
     avatar: IMG.avatar3,
+    image: IMG.testimonial,
   },
-];
+] as const;
 
+/** Framer Testimonials — Desktop Preview 1/2/3 carousel. */
 export function TestimonialsSection() {
   const [index, setIndex] = useState(0);
-  const current = reviews[index]!;
+  const slide = SLIDES[index] ?? SLIDES[0];
 
   return (
-    <section className="section-pad bg-white">
-      <div className="mx-auto max-w-[1280px]">
-        <div className="mb-10 max-w-2xl">
-          <SectionTag>Cảm nhận</SectionTag>
-          <h2 className="font-display mt-4 text-[32px] font-bold leading-[1.2] text-lt-teal-deep md:text-4xl">
-            Đánh giá từ du khách trải nghiệm locaTrip
-          </h2>
-        </div>
+    <section
+      className="w-full bg-white px-5 py-[100px] md:px-10"
+      data-framer-name="Testimonials"
+    >
+      <div className="mx-auto mb-10 max-w-[1200px]">
+        <SectionTag>Cảm nhận</SectionTag>
+        <h2 className="mt-4 max-w-[20ch] font-['Manrope','Manrope_Placeholder',sans-serif] text-[32px] font-bold leading-[1.2] tracking-[-0.01em] text-[#012830] capitalize">
+          Đánh giá từ du khách trải nghiệm locaTrip
+        </h2>
+      </div>
 
-        <div className="overflow-hidden rounded-3xl bg-lt-soft">
-          <div className="grid lg:grid-cols-2">
-            <div className="relative min-h-[320px] lg:min-h-[520px]">
+      <div className="relative mx-auto min-h-[420px] w-full max-w-[1200px] overflow-hidden rounded-[28px] md:min-h-[480px]">
+        <Image
+          key={slide.image}
+          src={slide.image}
+          alt=""
+          fill
+          className="object-cover transition-opacity duration-500"
+          sizes="1200px"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-transparent" />
+        <div className="relative z-[1] flex h-full min-h-[420px] flex-col justify-end p-8 text-white md:min-h-[480px] md:p-12">
+          <p className="text-[18px] tracking-wide">★★★★★</p>
+          <p className="mt-4 max-w-[36ch] font-['Inter',system-ui,sans-serif] text-[18px] font-medium leading-relaxed text-white/90 md:text-[20px]">
+            {slide.quote}
+          </p>
+          <div className="mt-6 flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
               <Image
-                src={current.image}
+                src={slide.avatar}
                 alt=""
-                fill
-                className="object-cover"
-                sizes="(max-width:1024px) 100vw, 50vw"
+                width={48}
+                height={48}
+                className="size-12 rounded-full border-2 border-white object-cover"
               />
-            </div>
-            <div className="flex flex-col justify-between gap-8 p-8 md:p-10">
               <div>
-                <p className="mb-4 text-amber-500">★★★★★</p>
-                <blockquote className="font-display text-2xl font-semibold leading-snug text-lt-ink md:text-3xl">
-                  {current.quote}
-                </blockquote>
-                <p className="mt-6 text-lt-muted">— {current.author}</p>
-              </div>
-
-              <div className="flex items-center justify-between gap-4">
-                <div className="flex gap-2">
-                  {reviews.map((r, i) => (
-                    <button
-                      key={r.author}
-                      type="button"
-                      onClick={() => setIndex(i)}
-                      className={`overflow-hidden rounded-full border-2 transition ${
-                        i === index
-                          ? "border-lt-teal"
-                          : "border-transparent opacity-70"
-                      }`}
-                    >
-                      <Image
-                        src={r.avatar}
-                        alt=""
-                        width={44}
-                        height={44}
-                        className="size-11 object-cover"
-                      />
-                    </button>
-                  ))}
-                </div>
-                <div className="flex gap-2">
-                  <button
-                    type="button"
-                    aria-label="Previous"
-                    className="flex size-10 items-center justify-center rounded-full border border-black/10 bg-white"
-                    onClick={() =>
-                      setIndex((v) => (v - 1 + reviews.length) % reviews.length)
-                    }
-                  >
-                    ←
-                  </button>
-                  <button
-                    type="button"
-                    aria-label="Next"
-                    className="flex size-10 items-center justify-center rounded-full border border-black/10 bg-white"
-                    onClick={() => setIndex((v) => (v + 1) % reviews.length)}
-                  >
-                    →
-                  </button>
-                </div>
+                <p className="font-['Inter',system-ui,sans-serif] text-[16px] font-semibold">
+                  {slide.name}
+                </p>
+                <p className="text-sm text-white/70">{slide.role}</p>
               </div>
             </div>
+            <div className="flex gap-2" data-framer-name="Mobile Arrows">
+              <button
+                type="button"
+                aria-label="Previous"
+                className="flex size-11 items-center justify-center rounded-full border border-white/40 bg-white/10 backdrop-blur-sm"
+                onClick={() =>
+                  setIndex((i) => (i - 1 + SLIDES.length) % SLIDES.length)
+                }
+              >
+                ←
+              </button>
+              <button
+                type="button"
+                aria-label="Next"
+                className="flex size-11 items-center justify-center rounded-full border border-white/40 bg-white/10 backdrop-blur-sm"
+                onClick={() => setIndex((i) => (i + 1) % SLIDES.length)}
+              >
+                →
+              </button>
+            </div>
+          </div>
+          <div className="mt-5 flex gap-2">
+            {SLIDES.map((_, i) => (
+              <button
+                key={i}
+                type="button"
+                aria-label={`Preview ${i + 1}`}
+                data-framer-name={`Preview`}
+                className={`h-1.5 rounded-full transition-all ${
+                  i === index ? "w-8 bg-white" : "w-3 bg-white/40"
+                }`}
+                onClick={() => setIndex(i)}
+              />
+            ))}
           </div>
         </div>
       </div>

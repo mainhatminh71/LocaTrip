@@ -1,0 +1,126 @@
+.section {
+  width: 100%;
+  background: #fff;
+  padding: 100px 0;
+  overflow: hidden;
+}
+
+.intro {
+  max-width: 1200px;
+  margin: 0 auto 40px;
+  padding: 0 40px;
+}
+
+.heading {
+  margin: 16px 0 0;
+  max-width: 22ch;
+  font-family: "Manrope", "Manrope Placeholder", sans-serif;
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.2em;
+  letter-spacing: -0.01em;
+  color: #012830;
+  text-transform: capitalize;
+}
+
+.sub {
+  margin: 12px 0 0;
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  color: #666;
+}
+
+.ticker {
+  width: 100%;
+  overflow: hidden;
+}
+
+.track {
+  display: flex;
+  width: max-content;
+  animation: stories-marquee 40s linear infinite;
+}
+
+.row {
+  display: flex;
+  gap: 24px;
+  padding-right: 24px;
+}
+
+.card {
+  position: relative;
+  flex: none;
+  width: 200px;
+  height: 320px;
+  overflow: hidden;
+  border-radius: 24px;
+  background: #111;
+}
+
+.progress {
+  position: absolute;
+  z-index: 2;
+  top: 12px;
+  left: 12px;
+  right: 12px;
+  display: flex;
+  gap: 4px;
+}
+
+.progress span {
+  flex: 1;
+  height: 2px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.35);
+}
+
+.progress span:first-child {
+  background: #fff;
+}
+
+.img {
+  object-fit: cover;
+}
+
+.cardLabel {
+  position: absolute;
+  z-index: 2;
+  left: 14px;
+  bottom: 14px;
+  margin: 0;
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.45);
+}
+
+@keyframes stories-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@media (max-width: 809.98px) {
+  .section {
+    padding: 80px 0;
+  }
+
+  .intro {
+    padding: 0 20px;
+    margin-bottom: 28px;
+  }
+
+  .heading {
+    font-size: 24px;
+  }
+
+  .card {
+    width: 160px;
+    height: 260px;
+  }
+}

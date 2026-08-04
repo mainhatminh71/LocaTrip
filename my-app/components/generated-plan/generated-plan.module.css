@@ -1,0 +1,199 @@
+.page {
+  width: 100%;
+  min-height: 60vh;
+  padding: 120px 40px 80px;
+  background: #fff;
+}
+
+.hero {
+  max-width: 1200px;
+  margin: 0 auto 40px;
+  text-align: center;
+}
+
+.hero h1 {
+  margin: 0;
+  font-family: "Manrope", sans-serif;
+  font-size: 48px;
+  font-weight: 600;
+  color: #012830;
+}
+
+.hero p {
+  margin: 12px 0 0;
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 18px;
+  color: #5c5c5c;
+}
+
+.shell {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.top {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.top h2 {
+  margin: 0;
+  font-family: "Manrope", sans-serif;
+  font-size: 28px;
+  color: #012830;
+}
+
+.summary {
+  margin: 8px 0 0;
+  max-width: 52ch;
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 15px;
+  color: #5c5c5c;
+}
+
+.cost {
+  margin: 0;
+  font-family: "Manrope", sans-serif;
+  font-size: 20px;
+  font-weight: 600;
+  color: #012830;
+}
+
+.tabs {
+  display: flex;
+  gap: 8px;
+  margin: 28px 0 20px;
+}
+
+.tab,
+.tabOn {
+  height: 40px;
+  padding: 0 18px;
+  border-radius: 999px;
+  border: 1px solid #e2e2e2;
+  background: #f5f5f5;
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.tabOn {
+  background: #012830;
+  border-color: #012830;
+  color: #fff;
+}
+
+.map {
+  margin-top: 8px;
+}
+
+.days {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.day {
+  padding: 24px;
+  border-radius: 24px;
+  background: #f7f7f7;
+}
+
+.day h3 {
+  margin: 0 0 16px;
+  font-family: "Manrope", sans-serif;
+  font-size: 20px;
+  color: #012830;
+}
+
+.day ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.day li {
+  display: grid;
+  grid-template-columns: 64px 1fr;
+  gap: 12px;
+}
+
+.time {
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: #7d7d7d;
+}
+
+.day strong {
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 15px;
+  color: #191919;
+}
+
+.day p {
+  margin: 4px 0 0;
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 13px;
+  color: #666;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 32px;
+}
+
+.cta,
+.ctaGhost {
+  display: inline-flex;
+  height: 48px;
+  align-items: center;
+  padding: 0 22px;
+  border-radius: 999px;
+  text-decoration: none;
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.cta {
+  background: #012830;
+  color: #fff;
+}
+
+.ctaGhost {
+  background: #fff;
+  color: #012830;
+  border: 1px solid #d0d0d0;
+}
+
+.empty {
+  max-width: 480px;
+  margin: 40px auto;
+  text-align: center;
+  font-family: "Inter", system-ui, sans-serif;
+}
+
+.empty h2 {
+  font-family: "Manrope", sans-serif;
+  color: #012830;
+}
+
+@media (max-width: 809.98px) {
+  .page {
+    padding: 100px 20px 60px;
+  }
+
+  .hero h1 {
+    font-size: 32px;
+  }
+}

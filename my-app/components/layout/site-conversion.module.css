@@ -1,0 +1,190 @@
+/* Framer Conversion framer-1iiyss1 — shared homepage + book-a-trip */
+
+.conversion {
+  position: relative;
+  display: flex;
+  flex-flow: column;
+  flex: none;
+  place-content: center;
+  align-items: center;
+  gap: 222px;
+  width: 100%;
+  height: min-content;
+  padding: 200px 0 80px;
+  background: #fff;
+  overflow: hidden;
+}
+
+.ctaBanner {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-flow: column;
+  flex: none;
+  place-content: center;
+  align-items: center;
+  gap: 40px;
+  width: 100%;
+  max-width: 1200px;
+  height: min-content;
+  padding: 0 40px;
+  color: #fff;
+}
+
+.ctaOverlay {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  -webkit-mask: linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0) 0%,
+    rgba(0, 0, 0, 0.36) 52%,
+    rgba(0, 0, 0, 0.57) 62%,
+    rgba(0, 0, 0, 0.835) 75.6%,
+    rgb(0, 0, 0) 86%
+  );
+  mask: linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0) 0%,
+    rgba(0, 0, 0, 0.36) 52%,
+    rgba(0, 0, 0, 0.57) 62%,
+    rgba(0, 0, 0, 0.835) 75.6%,
+    rgb(0, 0, 0) 86%
+  );
+}
+
+.ctaBg {
+  object-fit: cover;
+  object-position: center;
+  transform: scale(1.2);
+}
+
+.ctaInner {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-flow: column;
+  flex: none;
+  place-content: center;
+  align-items: center;
+  gap: 24px;
+  width: 100%;
+  max-width: 520px;
+  height: min-content;
+  padding: 0;
+  text-align: center;
+}
+
+.ctaInner h2 {
+  margin: 0;
+  font-family: "Manrope", "Manrope Placeholder", sans-serif;
+  font-size: 40px;
+  font-weight: 600;
+  line-height: 1.2em;
+  letter-spacing: -0.01em;
+  color: #fff;
+}
+
+.ctaInner p {
+  margin: 0;
+  font-family: "Inter", "Inter Placeholder", system-ui, sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.5em;
+  letter-spacing: -0.02em;
+  color: #f7f7f7;
+}
+
+.ctaBtn {
+  position: relative;
+  z-index: 2;
+  display: inline-flex;
+  flex-flow: row;
+  place-content: center;
+  align-items: center;
+  gap: 10px;
+  width: min-content;
+  height: min-content;
+  padding: 10px 24px;
+  text-decoration: none;
+  color: rgb(25, 25, 25);
+  background: #fff;
+  border-radius: 48px;
+}
+
+.ctaBtn span {
+  display: inline-flex;
+  align-items: center;
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.ctaBtn i {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background: transparent;
+}
+
+.marquee {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  overflow: hidden;
+  background: transparent;
+  color: rgb(125, 125, 125);
+  padding: 0;
+}
+
+.marqueeTrack {
+  display: flex;
+  width: max-content;
+  animation: conversion-marquee 28s linear infinite;
+}
+
+.marqueeRow {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  padding-right: 28px;
+  white-space: nowrap;
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.marqueeRow em {
+  font-style: normal;
+  opacity: 0.55;
+  margin-left: 28px;
+}
+
+@keyframes conversion-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@media (max-width: 809.98px) {
+  .conversion {
+    padding: 120px 0 60px;
+    gap: 80px;
+  }
+
+  .ctaBanner {
+    padding: 0 20px;
+  }
+
+  .ctaInner h2 {
+    font-size: 28px;
+  }
+}

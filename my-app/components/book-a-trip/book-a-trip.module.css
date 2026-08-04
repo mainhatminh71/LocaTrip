@@ -1,0 +1,448 @@
+.page {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: clip;
+  min-height: 100vh;
+  background: var(--lt-white);
+  color: var(--lt-ink);
+  font-family: var(--lt-font-body);
+  font-weight: 500;
+}
+
+/* —— Hero (Framer Header framer-1wpwdg2) —— */
+.hero {
+  position: relative;
+  display: flex;
+  flex-flow: column;
+  flex: none;
+  place-content: center flex-start;
+  align-items: center;
+  gap: 0;
+  width: 100%;
+  height: min-content;
+  padding: 200px 0 0;
+  background-color: #000;
+  color: #fff;
+  overflow: hidden;
+}
+
+.heroBgWrap {
+  position: absolute;
+  inset: 0 0 -1px;
+  z-index: 0;
+  display: flex;
+  flex-flow: row;
+  place-content: center flex-start;
+  align-items: center;
+  background-color: #000;
+  overflow: hidden;
+}
+
+.heroBg {
+  object-fit: cover;
+  object-position: center;
+  /* Framer framer-lfaxst mask */
+  -webkit-mask: linear-gradient(#000 41%, #00000080 61%, #00000038 100%);
+  mask: linear-gradient(#000 41%, #00000080 61%, #00000038 100%);
+}
+
+.heroInner {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-flow: row;
+  flex: none;
+  place-content: flex-end space-between;
+  align-items: flex-end;
+  width: 100%;
+  max-width: 1200px;
+  height: min-content;
+  padding: 0 0 100px;
+  overflow: visible;
+}
+
+.heroCopy {
+  display: flex;
+  flex-flow: column;
+  flex: 1 0 0;
+  place-content: center;
+  align-items: center;
+  gap: 12px;
+  width: 1px;
+  height: min-content;
+  padding: 0;
+  text-align: center;
+}
+
+.heroCopy h1 {
+  margin: 0;
+  width: 100%;
+  max-width: 760px;
+  font-family: "Manrope", "Manrope Placeholder", sans-serif;
+  font-size: 64px;
+  font-weight: 600;
+  font-style: normal;
+  line-height: 1.2em;
+  letter-spacing: -0.01em;
+  color: #fff;
+  text-align: center;
+  white-space: pre-wrap;
+  word-break: break-word;
+  /* Approximate Framer char appear (blur/y) as block fade-up */
+  animation: heroTitleIn 0.7s cubic-bezier(0.12, 0.23, 0.5, 1) 0.15s both;
+}
+
+.heroCopy p {
+  margin: 0;
+  width: 100%;
+  max-width: 760px;
+  font-family: "Inter", "Inter Placeholder", system-ui, sans-serif;
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 1.4em;
+  letter-spacing: -0.02em;
+  color: #fff;
+  text-align: center;
+  text-transform: capitalize;
+  animation: heroTitleIn 0.7s cubic-bezier(0.12, 0.23, 0.5, 1) 0.35s both;
+}
+
+@keyframes heroTitleIn {
+  from {
+    opacity: 0.001;
+    filter: blur(10px);
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateY(0);
+  }
+}
+
+/* Framer .framer-1qubwfb */
+.heroCurve {
+  flex: none;
+  width: 100%;
+  height: 26px;
+  position: relative;
+  z-index: 1;
+  background-color: #fff;
+  border-top-left-radius: 222px;
+  border-top-right-radius: 222px;
+  overflow: clip;
+}
+
+/* —— Form sheet (Framer section Form: padding 100px 40px) —— */
+.sheet {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  flex-flow: row;
+  place-content: center;
+  align-items: center;
+  width: 100%;
+  height: min-content;
+  margin: 0;
+  padding: 100px 40px;
+}
+
+.card {
+  /* Framer Form Container: row, gap 64, max-width 1200 */
+  display: flex;
+  flex-flow: row;
+  flex: 1 0 0;
+  place-content: center;
+  align-items: center;
+  gap: 64px;
+  width: 100%;
+  max-width: 1200px;
+  height: min-content;
+  padding: 0;
+  background: transparent;
+  border-radius: 0;
+}
+
+.card > .left,
+.card > .formShell {
+  flex: 1 0 0;
+  width: 1px;
+  min-width: 0;
+}
+
+.left {
+  display: flex;
+  flex-flow: column;
+  flex: 1 0 0;
+  place-content: center flex-start;
+  align-self: stretch;
+  align-items: center;
+  gap: 40px;
+  width: 1px;
+  height: auto;
+  padding: 0;
+}
+
+.leftTitle {
+  margin: 0;
+  font-family: "Manrope", "Manrope Placeholder", sans-serif;
+  font-size: 40px;
+  line-height: 1.2em;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  text-align: left;
+  color: rgb(25, 25, 25);
+}
+
+.leftSub {
+  margin: 14px 0 0;
+  max-width: 38ch;
+  font-family: "Inter", "Inter Placeholder", system-ui, sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.5em;
+  letter-spacing: -0.02em;
+  color: var(--lt-muted);
+}
+
+.photoWrap {
+  margin-top: 22px;
+  border-radius: 24px;
+  overflow: hidden;
+  background: var(--lt-field);
+}
+
+.photo {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 3 / 2;
+  object-fit: cover;
+}
+
+.supportTitle {
+  margin: 26px 0 12px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--lt-deep);
+}
+
+.supportGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.supportItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 92px;
+  padding: 14px 8px;
+  border-radius: 16px;
+  background: var(--lt-field);
+  text-align: center;
+  font-size: 12.5px;
+  line-height: 1.35;
+  word-break: break-word;
+}
+
+.supportItem span {
+  display: inline-flex;
+  width: 36px;
+  height: 36px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: #fff;
+  color: var(--lt-deep);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.formShell {
+  display: flex;
+  flex-flow: column;
+  flex: 1 0 0;
+  place-content: flex-start center;
+  align-items: flex-start;
+  gap: 40px;
+  width: 1px;
+  max-width: 1200px;
+  height: min-content;
+  padding: 0;
+  border: 0;
+  border-radius: 24px;
+  background: transparent;
+  box-shadow: none;
+}
+
+.secTitle {
+  margin: 0 0 14px;
+  font-family: "Cal Sans", "Cal Sans Placeholder", sans-serif;
+  font-size: 24px;
+  line-height: 1.4em;
+  font-weight: 400;
+  text-align: left;
+  color: rgb(156, 156, 156);
+}
+
+.secBlock {
+  margin-bottom: 0;
+  width: 100%;
+}
+
+.fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px 18px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  font-family: "Cal Sans", "Cal Sans Placeholder", sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.4em;
+  color: rgb(25, 25, 25);
+}
+
+.fieldWide {
+  grid-column: 1 / -1;
+}
+
+.field select,
+.field input[type="date"],
+.field input[type="number"],
+.field input[type="text"] {
+  width: 100%;
+  box-sizing: border-box;
+  appearance: none;
+  border: 0;
+  border-radius: 12px;
+  background-color: var(--lt-field);
+  padding: 14px 40px 14px 14px;
+  font-family: "Inter", "Inter Placeholder", system-ui, sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--lt-ink);
+  outline: none;
+  min-height: 48px;
+}
+
+.field select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='none' stroke='%23191919' stroke-width='1.5' d='M1.5 1.5 6 6 10.5 1.5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-size: 12px;
+}
+
+.field select:focus,
+.field input[type="date"]:focus,
+.field input[type="number"]:focus,
+.field input[type="text"]:focus {
+  background-color: #fff;
+  box-shadow: inset 0 0 0 1px var(--lt-ink);
+}
+
+.agree {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 4px 0 16px;
+  font-size: 14px;
+  color: var(--lt-muted);
+}
+
+.agree input {
+  width: 16px;
+  height: 16px;
+  accent-color: #2563eb;
+}
+
+.submit {
+  width: 100%;
+  height: 52px;
+  border: 1px solid var(--lt-ink);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--lt-ink);
+  font-family: var(--lt-font-body);
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.submit:hover:not(:disabled) {
+  background: var(--lt-ink);
+  color: #fff;
+}
+
+.submit:disabled {
+  opacity: 0.55;
+  cursor: wait;
+}
+
+.error {
+  margin: 12px 0 0;
+  font-size: 14px;
+  color: #b00020;
+}
+
+/* Framer breakpoints: 1200+ / 810–1199.98 / ≤809.98 */
+@media (min-width: 810px) and (max-width: 1199.98px) {
+  .heroCopy h1 {
+    font-size: 56px;
+  }
+
+  .heroInner {
+    max-width: 810px;
+    padding: 0 40px 80px;
+  }
+}
+
+@media (max-width: 809.98px) {
+  .hero {
+    padding: 140px 0 0;
+  }
+
+  .heroInner {
+    padding: 0 20px 72px;
+  }
+
+  .heroCopy h1 {
+    font-size: 48px;
+  }
+
+  .heroCopy p {
+    font-size: 16px;
+  }
+
+  .card {
+    grid-template-columns: 1fr;
+    gap: 8px;
+    border-radius: 32px;
+  }
+
+  .left {
+    padding: 20px 12px 8px;
+  }
+
+  .fields {
+    grid-template-columns: 1fr;
+  }
+
+  .supportGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 980px) and (min-width: 810px) {
+  .card {
+    grid-template-columns: 1fr;
+  }
+}

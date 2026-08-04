@@ -1,0 +1,93 @@
+/* —— Footer (Framer framer-nvn3xc, light theme on white) —— */
+.footer {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-flow: column;
+  flex: none;
+  place-content: center;
+  align-items: center;
+  gap: 56px;
+  width: 100%;
+  height: min-content;
+  padding: 0 40px;
+  background: transparent;
+  color: rgb(25, 25, 25);
+  overflow: hidden;
+}
+
+.footerGrid {
+  display: flex;
+  flex-flow: row;
+  flex: none;
+  place-content: flex-start center;
+  align-items: flex-start;
+  gap: 72px;
+  width: 100%;
+  max-width: 1200px;
+  height: min-content;
+  padding: 0;
+}
+
+.footerGrid > div {
+  flex: 1 0 0;
+  min-width: 0;
+}
+
+.footerHead {
+  margin: 0 0 14px;
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: rgb(125, 125, 125);
+}
+
+.footerGrid a {
+  display: block;
+  margin-bottom: 8px;
+  color: rgb(25, 25, 25);
+  text-decoration: none;
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.footerGrid a:hover {
+  opacity: 0.7;
+}
+
+.socialRow {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: rgb(25, 25, 25);
+}
+
+.footerBottom {
+  display: flex;
+  flex-flow: row;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0;
+  padding: 0;
+  border-top: 0;
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 13px;
+  color: rgb(125, 125, 125);
+}
+
+@media (max-width: 809.98px) {
+  .footerGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 980px) and (min-width: 810px) {
+  .footerGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
