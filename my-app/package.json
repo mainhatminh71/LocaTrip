@@ -3,11 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "npm run sync:routes && next dev",
+    "lint": "eslint app components lib next.config.ts open-next.config.ts --max-warnings 0",
+    "dev": "next dev",
+    "dev:sync": "npm run sync:routes && next dev",
     "sync:routes": "node scripts/sync-public-routes.mjs",
     "build": "npm run sync:routes && next build",
     "start": "next start",
-    "lint": "eslint app lib next.config.ts open-next.config.ts --max-warnings 0",
     "build:cf": "npm run sync:routes && opennextjs-cloudflare build",
     "deploy:cf": "opennextjs-cloudflare deploy",
     "preview:cf": "opennextjs-cloudflare preview"

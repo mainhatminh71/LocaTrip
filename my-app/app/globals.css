@@ -1,8 +1,79 @@
 @import "tailwindcss";
 
+@theme {
+  --color-lt-teal: #0a6b7c;
+  --color-lt-teal-deep: #033d4a;
+  --color-lt-cream: #f4f1ea;
+  --color-lt-black: #0f1416;
+  --color-lt-ink: #1a2428;
+  --font-display: "Cal Sans", "Segoe UI", system-ui, sans-serif;
+  --font-cal: "Cal Sans", "Segoe UI", system-ui, sans-serif;
+}
+
 html,
 body {
   margin: 0;
   padding: 0;
   min-height: 100%;
+}
+
+.section-pad {
+  padding: 4.5rem 1rem;
+}
+
+@media (min-width: 768px) {
+  .section-pad {
+    padding-left: 2.5rem;
+    padding-right: 2.5rem;
+  }
+}
+
+.hero-grid-bg {
+  background:
+    radial-gradient(ellipse at 20% 20%, rgba(255, 255, 255, 0.08), transparent 50%),
+    linear-gradient(160deg, #033d4a 0%, #0a6b7c 55%, #045465 100%);
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+.animate-fade-up {
+  animation: fade-up 0.7s ease-out both;
+}
+
+.animate-float {
+  animation: float 5s ease-in-out infinite;
+}
+
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee 28s linear infinite;
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
 }

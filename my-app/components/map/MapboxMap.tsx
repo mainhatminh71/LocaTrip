@@ -3,11 +3,7 @@
 import { useEffect, useRef } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
-
-const TOKEN = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN ?? "";
-const STYLE =
-  process.env.NEXT_PUBLIC_MAPBOX_STYLE ??
-  "mapbox://styles/mapbox/outdoors-v12";
+import { DALAT_CENTER, mapboxStyle, mapboxToken } from "@/lib/mapbox";
 
 type MapboxMapProps = {
   className?: string;
@@ -16,9 +12,9 @@ type MapboxMapProps = {
 };
 
 /** Interactive Mapbox map (Đà Lạt by default). */
-export default function MapboxMap({
+export function MapboxMap({
   className,
-  center = [108.44, 11.94],
+  center = DALAT_CENTER,
   zoom = 12,
 }: MapboxMapProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -26,12 +22,12 @@ export default function MapboxMap({
 
   useEffect(() => {
     if (!containerRef.current || mapRef.current) return;
-    if (!TOKEN) return;
+    if (!mapboxToken) return;
 
-    mapboxgl.accessToken = TOKEN;
+    mapboxgl.accessToken = mapboxToken;
     const map = new mapboxgl.Map({
       container: containerRef.current,
-      style: STYLE,
+      style: mapboxStyle,
       center,
       zoom,
       attributionControl: true,
@@ -45,7 +41,7 @@ export default function MapboxMap({
     };
   }, [center, zoom]);
 
-  if (!TOKEN) {
+  if (!mapboxToken) {
     return (
       <div
         className={className}
@@ -57,6 +53,7 @@ export default function MapboxMap({
           fontFamily: "system-ui, sans-serif",
           padding: 24,
           textAlign: "center",
+          minHeight: 320,
         }}
       >
         Thiếu NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN trong .env.local

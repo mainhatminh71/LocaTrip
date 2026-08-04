@@ -1,4 +1,4 @@
-import MapboxMap from "@/components/MapboxMap";
+import { MapboxMap } from "@/components/map";
 
 export const metadata = {
   title: "Bản đồ | LocaTrip",
@@ -7,7 +7,7 @@ export const metadata = {
 
 export default function MapPage() {
   return (
-    <main style={{ height: "100vh", width: "100%", margin: 0 }}>
+    <main className="h-screen w-full">
       <MapboxMap className="h-full w-full" />
     </main>
   );
