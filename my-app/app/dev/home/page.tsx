@@ -13,7 +13,11 @@ import { PricingSection } from "@/components/sections/PricingSection";
 import { BlogsSection } from "@/components/sections/BlogsSection";
 import { StoriesSection } from "@/components/sections/StoriesSection";
 
-export default function HomePage() {
+/**
+ * React rebuild of the marketing homepage — WIP / preview only.
+ * Production `/` still serves the Framer scrape.
+ */
+export default function HomePreviewPage() {
   return (
     <SiteShell>
       <Header />

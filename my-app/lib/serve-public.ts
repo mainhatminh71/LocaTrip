@@ -1,8 +1,36 @@
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 
 const publicDir = path.join(process.cwd(), "public");
+
+function readEnvLocal(key: string): string {
+  const fromProcess = process.env[key]?.trim();
+  if (fromProcess) return fromProcess;
+
+  const candidates = [
+    path.join(process.cwd(), ".env.local"),
+    path.join(process.cwd(), "my-app", ".env.local"),
+    path.join(publicDir, "..", ".env.local"),
+  ];
+
+  for (const envPath of candidates) {
+    try {
+      if (!existsSync(envPath)) continue;
+      const text = readFileSync(envPath, "utf8");
+      const line = text.split(/\r?\n/).find((l) => l.startsWith(`${key}=`));
+      if (!line) continue;
+      const value = line
+        .slice(key.length + 1)
+        .trim()
+        .replace(/^["']|["']$/g, "");
+      if (value) return value;
+    } catch {
+      /* try next */
+    }
+  }
+  return "";
+}
 
 function safeJoin(...parts: string[]): string | null {
   const resolved = path.resolve(publicDir, ...parts);
@@ -27,6 +55,116 @@ function contentType(filePath: string): string {
   return "application/octet-stream";
 }
 
+/**
+ * Replace Framer map placeholder Image on /generated-plan with Mapbox
+ * (same box: .framer-1uenxnk[data-framer-name="Image"]).
+ */
+function generatedPlanMapboxSnippet(): string {
+  const token = readEnvLocal("NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN");
+  const style =
+    readEnvLocal("NEXT_PUBLIC_MAPBOX_STYLE") ||
+    "mapbox://styles/mapbox/outdoors-v12";
+  if (!token) return "";
+
+  const safeToken = token.replace(/\\/g, "\\\\").replace(/'/g, "\\'");
+  const safeStyle = style.replace(/\\/g, "\\\\").replace(/'/g, "\\'");
+
+  return `
+<link href="https://api.mapbox.com/mapbox-gl-js/v3.9.4/mapbox-gl.css" rel="stylesheet" />
+<script src="https://api.mapbox.com/mapbox-gl-js/v3.9.4/mapbox-gl.js"></script>
+<script>
+(function () {
+  var TOKEN = '${safeToken}';
+  var STYLE = '${safeStyle}';
+  var PLACEHOLDER = 'r06DmcDyolPjHV06YcJ62GTWIOA';
+  if (!window.mapboxgl || !TOKEN) return;
+  mapboxgl.accessToken = TOKEN;
+
+  var replaced = new WeakSet();
+
+  function findHosts(scope) {
+    var root = scope && scope.querySelectorAll ? scope : document;
+    var hosts = [];
+    root.querySelectorAll('.framer-1uenxnk[data-framer-name="Image"]').forEach(function (el) {
+      hosts.push(el);
+    });
+    root.querySelectorAll('img[src*="' + PLACEHOLDER + '"], img[srcset*="' + PLACEHOLDER + '"]').forEach(function (img) {
+      var host = img.closest('[data-framer-name="Image"]') || img.parentElement;
+      if (host) hosts.push(host);
+    });
+    return hosts;
+  }
+
+  function mountMapbox(host) {
+    if (!host || replaced.has(host)) return;
+    replaced.add(host);
+
+    var w = host.offsetWidth || host.getBoundingClientRect().width;
+    var h = host.offsetHeight || host.getBoundingClientRect().height;
+    if (w < 40 || h < 40) {
+      replaced.delete(host);
+      setTimeout(scan, 200);
+      return;
+    }
+
+    var cs = window.getComputedStyle(host);
+    if (cs.position === 'static') host.style.position = 'relative';
+    host.style.overflow = 'hidden';
+    host.innerHTML = '';
+
+    var el = document.createElement('div');
+    el.setAttribute('data-locatrip-mapbox', '1');
+    el.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;';
+    host.appendChild(el);
+
+    var map = new mapboxgl.Map({
+      container: el,
+      style: STYLE,
+      center: [108.44, 11.94],
+      zoom: 12
+    });
+    map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'top-right');
+    map.once('load', function () { map.resize(); });
+  }
+
+  function scan(scope) {
+    findHosts(scope).forEach(mountMapbox);
+  }
+
+  scan();
+  var obs = new MutationObserver(function (mutations) {
+    mutations.forEach(function (m) {
+      m.addedNodes && m.addedNodes.forEach(function (n) {
+        if (n.nodeType === 1) scan(n);
+      });
+    });
+  });
+  obs.observe(document.documentElement, { childList: true, subtree: true });
+  setTimeout(scan, 300);
+  setTimeout(scan, 1000);
+  setTimeout(scan, 2500);
+})();
+</script>`;
+}
+
+function maybeInjectGeneratedPlanMapbox(
+  html: Buffer,
+  filePath: string,
+): Buffer {
+  const normalized = filePath.replace(/\\/g, "/");
+  if (!normalized.includes("/generated-plan/")) return html;
+
+  const snippet = generatedPlanMapboxSnippet();
+  if (!snippet) return html;
+
+  const text = html.toString("utf8");
+  if (text.includes("data-locatrip-mapbox")) return html;
+  if (/<\/body>/i.test(text)) {
+    return Buffer.from(text.replace(/<\/body>/i, `${snippet}</body>`), "utf8");
+  }
+  return Buffer.from(text + snippet, "utf8");
+}
+
 /** Read first existing candidate under public/, safely. */
 export async function servePublicFile(
   candidates: string[][],
@@ -34,11 +172,15 @@ export async function servePublicFile(
   for (const parts of candidates) {
     const filePath = safeJoin(...parts);
     if (!filePath || !existsSync(filePath)) continue;
-    const body = await readFile(filePath);
+    let body = await readFile(filePath);
+    const type = contentType(filePath);
+    if (type.startsWith("text/html")) {
+      body = maybeInjectGeneratedPlanMapbox(body, filePath);
+    }
     return new Response(body, {
       status: 200,
       headers: {
-        "content-type": contentType(filePath),
+        "content-type": type,
         "cache-control": "public, max-age=60",
       },
     });

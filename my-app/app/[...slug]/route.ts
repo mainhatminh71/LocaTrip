@@ -7,7 +7,8 @@ type Ctx = { params: Promise<{ slug: string[] }> };
 /**
  * Fallback for marketing routes not yet ported to React pages
  * (/about, /tours, …) — serve scraped Framer HTML from disk.
- * React routes (/, /generated-plan, /map) take precedence via App Router.
+ * React routes (/generated-plan, /map, /dev/home) take precedence via App Router.
+ * `/` is served by app/route.ts (Framer scrape).
  */
 export async function GET(_request: Request, context: Ctx) {
   const { slug } = await context.params;
