@@ -1,10 +1,15 @@
 import type { NextConfig } from "next";
-import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 
-initOpenNextCloudflareForDev();
+const projectRoot = path.dirname(fileURLToPath(import.meta.url));
 
 const nextConfig: NextConfig = {
   trailingSlash: true,
+  // Avoid Turbopack mis-detecting workspace root (crash on env reload).
+  turbopack: {
+    root: projectRoot,
+  },
   images: {
     remotePatterns: [
       {

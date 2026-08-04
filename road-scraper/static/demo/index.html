@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>LocaTrip — Scenic Demo Đà Lạt</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="/demo/styles.css?v=24" />
+</head>
+<body>
+  <div id="app">
+    <aside class="panel">
+      <header class="brand">
+        <p class="brand-mark">LocaTrip</p>
+        <h1>Đà Lạt Scenic</h1>
+        <p class="lede">
+          Tick loại cảnh (vd. <strong>Hồ</strong>) → route phải đi gần tag đó trên bundle.
+          Đường vẽ bằng OSRM (đi trên đường). Không khớp thì hỏi bạn chọn option.
+        </p>
+        <p class="network-status" id="network-status">Chưa load bundle</p>
+      </header>
+
+      <section class="trip-summary">
+        <div class="trip-endpoint">
+          <span class="field-label">Điểm A</span>
+          <div class="trip-chip" id="origin-chip">
+            <strong id="origin-name">Chưa chọn</strong>
+            <em id="origin-type">—</em>
+          </div>
+          <input type="hidden" id="origin-id" />
+        </div>
+        <div class="trip-endpoint">
+          <span class="field-label">Điểm B</span>
+          <div class="trip-chip" id="destination-chip">
+            <strong id="destination-name">Chưa chọn</strong>
+            <em id="destination-type">—</em>
+          </div>
+          <input type="hidden" id="destination-id" />
+        </div>
+      </section>
+
+      <section class="place-browser" aria-label="Chọn điểm đến">
+        <div class="browser-head">
+          <div>
+            <p class="opt-label">Chọn điểm A / B</p>
+            <p class="browser-sub" id="browser-note">Lọc loại → tìm tên → bấm A hoặc B</p>
+          </div>
+          <span class="place-count" id="place-count">0</span>
+        </div>
+
+        <div class="filter-bar">
+          <label class="filter-search-wrap">
+            <span class="sr-only">Tìm địa điểm</span>
+            <input
+              type="search"
+              id="place-filter-q"
+              class="place-search"
+              placeholder="Tìm tên địa điểm…"
+              autocomplete="off"
+              spellcheck="false"
+            />
+          </label>
+          <button type="button" class="ghost-btn filter-clear" id="filter-clear-q" title="Xóa tìm kiếm">
+            Xóa
+          </button>
+        </div>
+
+        <div class="filter-block">
+          <p class="filter-caption">Loại địa điểm</p>
+          <div class="type-filters" id="type-filters" role="group" aria-label="Lọc theo loại"></div>
+        </div>
+
+        <ul class="place-list" id="place-list"></ul>
+      </section>
+
+      <section class="controls">
+        <div class="mode" role="group" aria-label="Chế độ đi">
+          <button type="button" class="mode-btn" data-mode="fast">Nhanh nhất</button>
+          <button type="button" class="mode-btn is-active" data-mode="scenic">Ngắm cảnh</button>
+        </div>
+
+        <div id="scenic-options" class="scenic-options">
+          <div class="filter-block">
+            <p class="filter-caption">Muốn đi ngang qua (tag trên đường)</p>
+            <div class="prefs chip-prefs" id="prefs" role="group" aria-label="Ưu tiên cảnh">
+              <label class="pref-chip"><input type="checkbox" value="lake" checked /><span>Hồ</span></label>
+              <label class="pref-chip"><input type="checkbox" value="waterfall" checked /><span>Thác</span></label>
+              <label class="pref-chip"><input type="checkbox" value="forest" checked /><span>Rừng</span></label>
+              <label class="pref-chip"><input type="checkbox" value="wood" checked /><span>Rừng cây</span></label>
+              <label class="pref-chip"><input type="checkbox" value="mountain" checked /><span>Núi</span></label>
+              <label class="pref-chip"><input type="checkbox" value="peak" checked /><span>Đỉnh</span></label>
+              <label class="pref-chip"><input type="checkbox" value="viewpoint" checked /><span>Viewpoint</span></label>
+              <label class="pref-chip"><input type="checkbox" value="stream" checked /><span>Suối</span></label>
+              <label class="pref-chip"><input type="checkbox" value="park" /><span>Công viên</span></label>
+              <label class="pref-chip"><input type="checkbox" value="garden" /><span>Vườn</span></label>
+              <label class="pref-chip"><input type="checkbox" value="river" /><span>Sông</span></label>
+              <label class="pref-chip"><input type="checkbox" value="village" /><span>Làng</span></label>
+              <label class="pref-chip"><input type="checkbox" value="cliff" /><span>Vách đá</span></label>
+              <label class="pref-chip"><input type="checkbox" value="national_park" /><span>Vườn QG</span></label>
+            </div>
+          </div>
+
+          <div class="detour-budget" id="detour-budget">
+            <div class="detour-budget-head">
+              <p class="opt-label">Lệch tối đa so với đường nhanh</p>
+              <strong id="detour-budget-label">+8 km</strong>
+            </div>
+            <input
+              type="range"
+              id="detour-budget-range"
+              min="0"
+              max="25"
+              step="0.5"
+              value="8"
+              aria-label="Giới hạn lệch so với đường nhanh nhất"
+            />
+            <div class="detour-budget-row">
+              <input
+                type="number"
+                id="detour-budget-input"
+                min="0"
+                max="40"
+                step="0.5"
+                value="8"
+                aria-label="Số km lệch tối đa"
+              />
+              <span class="detour-unit">km</span>
+              <div class="detour-presets" role="group" aria-label="Preset lệch">
+                <button type="button" class="preset detour-preset" data-km="3">+3</button>
+                <button type="button" class="preset detour-preset" data-km="5">+5</button>
+                <button type="button" class="preset detour-preset" data-km="8">+8</button>
+                <button type="button" class="preset detour-preset" data-km="12">+12</button>
+              </div>
+            </div>
+            <p class="detour-hint">Ngắm cảnh chỉ được dài hơn đường nhanh nhất trong giới hạn này.</p>
+          </div>
+        </div>
+
+        <button type="button" id="go" class="cta">Vẽ hành trình</button>
+      </section>
+
+      <section id="stats" class="stats is-empty">
+        <p class="hint">Ngắm cảnh: hiện tag quanh đường. Nhanh nhất: chỉ đường A→B, không hiện tag.</p>
+      </section>
+
+      <section class="legend">
+        <h2>Legend</h2>
+        <ul>
+          <li><span class="dot lake"></span> Hồ</li>
+          <li><span class="dot waterfall"></span> Thác</li>
+          <li><span class="dot forest"></span> Rừng</li>
+          <li><span class="dot peak"></span> Núi / đỉnh</li>
+          <li><span class="dot viewpoint"></span> Viewpoint</li>
+        </ul>
+      </section>
+    </aside>
+    <main id="map" aria-label="Bản đồ Đà Lạt"></main>
+  </div>
+
+  <div id="scenic-modal" class="modal" hidden>
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="scenic-modal-title">
+      <h2 id="scenic-modal-title">Chưa có cảnh đã chọn trên đường</h2>
+      <p id="scenic-modal-body">
+        Không tìm được đoạn gần loại cảnh bạn tick trong giới hạn hiện tại.
+      </p>
+      <div class="modal-actions">
+        <button type="button" class="cta modal-primary" id="scenic-go-fast">
+          Đi đường thường (bỏ ưu tiên cảnh)
+        </button>
+        <div class="modal-expand">
+          <label>
+            Nới thêm (km)
+            <input type="number" id="scenic-expand-km" min="1" max="30" step="1" value="5" />
+          </label>
+          <button type="button" class="preset" id="scenic-expand-go">Thử lại với giới hạn mới</button>
+        </div>
+        <button type="button" class="ghost-btn" id="scenic-modal-close">Đóng</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="/demo/tag_router.js?v=25"></script>
+  <script src="/demo/app.js?v=25"></script>
+</body>
+</html>
