@@ -34,6 +34,15 @@ jobs:
       - name: Lint
         run: npm run lint -- --ignore-pattern "public/scrape/**"
 
+      - name: Require Mapbox public token
+        env:
+          NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN: ${{ secrets.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN }}
+        run: |
+          if [ -z "$NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN" ]; then
+            echo "::error::Missing secret NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN (Mapbox pk.*). Add it in GitHub → Settings → Secrets."
+            exit 1
+          fi
+
       - name: Build (OpenNext Cloudflare)
         run: npm run build:cf
         env:
@@ -71,6 +80,15 @@ jobs:
 
       - name: Install
         run: npm ci
+
+      - name: Require Mapbox public token
+        env:
+          NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN: ${{ secrets.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN }}
+        run: |
+          if [ -z "$NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN" ]; then
+            echo "::error::Missing secret NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN (Mapbox pk.*). Add it in GitHub → Settings → Secrets."
+            exit 1
+          fi
 
       - name: Build
         run: npm run build:cf

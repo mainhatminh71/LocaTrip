@@ -99,8 +99,9 @@ export function ItineraryMap({
   const onSelectRef = useRef(onSelectStop);
   onSelectRef.current = onSelectStop;
   const [mapReady, setMapReady] = useState(false);
+  const [mapError, setMapError] = useState<string | null>(null);
 
-  const showOverlay = !mapReady || busy;
+  const showOverlay = (!mapReady || busy) && !mapError;
   const overlayLabel = !mapReady
     ? "Đang tải bản đồ…"
     : busyLabel;
@@ -122,10 +123,17 @@ export function ItineraryMap({
 
     const onReady = () => {
       map.resize();
+      setMapError(null);
       setMapReady(true);
+    };
+    const onError = (ev: { error?: Error }) => {
+      const msg = ev?.error?.message || "Không tải được Mapbox";
+      setMapError(msg);
+      console.error("[ItineraryMap]", msg, ev);
     };
     if (map.isStyleLoaded()) onReady();
     else map.once("load", onReady);
+    map.on("error", onError);
 
     // Pane can mount at 0 size then expand — keep canvas sized.
     const ro =
@@ -136,6 +144,7 @@ export function ItineraryMap({
 
     return () => {
       ro?.disconnect();
+      map.off("error", onError);
       markersRef.current.forEach((m) => m.remove());
       markersRef.current = [];
       map.remove();
@@ -222,6 +231,13 @@ export function ItineraryMap({
   return (
     <div className={`${styles.mapShell} ${className ?? ""}`}>
       <div ref={containerRef} className={styles.mapCanvas} />
+      {mapError ? (
+        <div className={styles.mapLoadingOverlay}>
+          <div className={styles.mapLoadingCard}>
+            <p className={styles.mapMissing}>{mapError}</p>
+          </div>
+        </div>
+      ) : null}
       {showOverlay ? (
         <div className={styles.mapLoadingOverlay}>
           <div className={styles.mapLoadingCard}>

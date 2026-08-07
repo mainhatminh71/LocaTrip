@@ -1,6 +1,14 @@
 import type { NextConfig } from "next";
 
+/** Helps Next define-plugin inline public Mapbox config when OpenNext allows it. */
 const nextConfig: NextConfig = {
+  env: {
+    NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN:
+      process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN ?? "",
+    NEXT_PUBLIC_MAPBOX_STYLE:
+      process.env.NEXT_PUBLIC_MAPBOX_STYLE ??
+      "mapbox://styles/mapbox/outdoors-v12",
+  },
   trailingSlash: true,
   allowedDevOrigins: ["127.0.0.1", "localhost"],
   // Avoid Turbopack mis-detecting monorepo root.

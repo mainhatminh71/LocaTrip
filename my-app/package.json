@@ -7,9 +7,13 @@
   },
   "scripts": {
     "lint": "eslint app components lib next.config.ts open-next.config.ts --max-warnings 0",
+    "embed:mapbox": "node scripts/embed-mapbox.mjs",
+    "predev": "node scripts/embed-mapbox.mjs",
     "dev": "next dev",
+    "prebuild": "node scripts/embed-mapbox.mjs",
     "build": "next build",
     "start": "next start",
+    "prebuild:cf": "node scripts/embed-mapbox.mjs",
     "build:cf": "opennextjs-cloudflare build",
     "deploy:cf": "opennextjs-cloudflare deploy",
     "preview:cf": "opennextjs-cloudflare preview"
