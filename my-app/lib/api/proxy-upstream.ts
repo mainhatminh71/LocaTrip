@@ -1,9 +1,49 @@
 import { NextResponse } from "next/server";
 
-const DEFAULT_API = "http://localhost:5000";
+/** Default when developing against a local LocalTrip process. */
+export const LOCALTRIP_LOCAL_API_DEFAULT = "http://localhost:5000";
+
+/**
+ * Public Railway production API (CORS `*`).
+ * Toggle with `LOCALTRIP_USE_PUBLIC_API=true`.
+ */
+export const LOCALTRIP_PUBLIC_API_DEFAULT =
+  "https://localtrip-production.up.railway.app";
+
+function truthy(value: string | undefined): boolean {
+  if (!value) return false;
+  return ["1", "true", "yes", "on"].includes(value.trim().toLowerCase());
+}
+
+function stripTrailingSlash(url: string): string {
+  return url.replace(/\/$/, "");
+}
+
+/**
+ * Resolve LocalTrip upstream base from env.
+ *
+ * Priority:
+ * 1. `LOCALTRIP_USE_PUBLIC_API` truthy → `LOCALTRIP_PUBLIC_API_URL` or Railway default
+ * 2. `LOCALTRIP_API_URL` (explicit override for local/custom hosts)
+ * 3. `http://localhost:5000`
+ */
+export function resolveUpstreamBase(
+  env: NodeJS.ProcessEnv = process.env,
+): string {
+  if (truthy(env.LOCALTRIP_USE_PUBLIC_API)) {
+    const pub =
+      env.LOCALTRIP_PUBLIC_API_URL?.trim() || LOCALTRIP_PUBLIC_API_DEFAULT;
+    return stripTrailingSlash(pub);
+  }
+
+  const explicit = env.LOCALTRIP_API_URL?.trim();
+  if (explicit) return stripTrailingSlash(explicit);
+
+  return LOCALTRIP_LOCAL_API_DEFAULT;
+}
 
 export function getUpstreamBase(): string {
-  return (process.env.LOCALTRIP_API_URL || DEFAULT_API).replace(/\/$/, "");
+  return resolveUpstreamBase(process.env);
 }
 
 /** Forward Authorization (and content-type when present) to LocalTrip. */

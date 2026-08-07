@@ -43,6 +43,7 @@ jobs:
           NEXT_PUBLIC_KEYCLOAK_CLIENT_ID: localtrip-app
           NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN: ${{ secrets.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN }}
           NEXT_PUBLIC_MAPBOX_STYLE: mapbox://styles/mapbox/outdoors-v12
+          LOCALTRIP_USE_PUBLIC_API: "true"
 
   deploy:
     name: Deploy to Cloudflare Workers
@@ -80,6 +81,7 @@ jobs:
           NEXT_PUBLIC_KEYCLOAK_CLIENT_ID: localtrip-app
           NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN: ${{ secrets.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN }}
           NEXT_PUBLIC_MAPBOX_STYLE: mapbox://styles/mapbox/outdoors-v12
+          LOCALTRIP_USE_PUBLIC_API: "true"
 
       - name: Deploy
         run: npm run deploy:cf
@@ -92,3 +94,4 @@ jobs:
           NEXT_PUBLIC_KEYCLOAK_CLIENT_ID: localtrip-app
           NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN: ${{ secrets.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN }}
           NEXT_PUBLIC_MAPBOX_STYLE: mapbox://styles/mapbox/outdoors-v12
+          LOCALTRIP_USE_PUBLIC_API: "true"

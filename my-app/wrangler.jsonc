@@ -19,6 +19,10 @@
     "directory": ".open-next/assets",
     "binding": "ASSETS"
   },
+  "vars": {
+    // Toggle: public Railway LocalTrip API for locatrip.app Workers
+    "LOCALTRIP_USE_PUBLIC_API": "true"
+  },
   "services": [
     {
       "binding": "WORKER_SELF_REFERENCE",
