@@ -205,7 +205,7 @@ export function BookATripView({
         setSavedTripId(null);
         setEditingTrip(trip.id);
         setEditingTripStatus(
-          resolveTripProgressStatus(trip) || trip.tripStatus || "OnGoing",
+          resolveTripProgressStatus(trip) || trip.tripStatus || "Pending",
         );
         setEditingPrefsId(trip.prefsId || null);
 
@@ -628,8 +628,7 @@ export function BookATripView({
         o.value ===
         (isTripDone
           ? "Done"
-          : editingTripStatus ||
-            (activeTripId ? "OnGoing" : "Pending")),
+          : editingTripStatus || "Pending"),
     )?.label || "Đề xuất";
 
   function applyReplace(alt: AlternativePlaceSuggestion) {
@@ -880,7 +879,7 @@ export function BookATripView({
     }
 
     const statusForBody: TripProgressStatus | undefined =
-      mode === "createPending"
+      mode === "createPending" || mode === "updatePending"
         ? "Pending"
         : mode === "confirmOnGoing"
           ? "OnGoing"
@@ -916,7 +915,10 @@ export function BookATripView({
           ...d,
           tripStatus: trip.tripStatus || "OnGoing",
         }));
-        toastSuccess("Đã lưu chính thức.");
+        toastSuccess("Đã lưu chuyến đi.");
+      } else if (mode === "updatePending") {
+        setEditingTripStatus(trip.tripStatus || "Pending");
+        toastSuccess("Đã cập nhật nháp.");
       } else {
         setEditingTripStatus(trip.tripStatus || editingTripStatus);
         toastSuccess("Đã cập nhật chuyến đi.");
@@ -1549,7 +1551,7 @@ export function BookATripView({
                         {saving ? (
                           <LtButtonLoading label="Đang lưu…" />
                         ) : (
-                          "Lưu chính thức"
+                          "Lưu"
                         )}
                       </button>
                       <button
@@ -1591,7 +1593,7 @@ export function BookATripView({
                       {saving ? (
                         <LtButtonLoading label="Đang lưu…" />
                       ) : (
-                        "Lưu chính thức"
+                        "Lưu"
                       )}
                     </button>
                   ) : selectedOption ? (

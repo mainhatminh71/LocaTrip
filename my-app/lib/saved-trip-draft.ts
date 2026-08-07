@@ -167,7 +167,7 @@ export function draftFromSavedTrip(trip: SavedTrip): {
     trip.title.replace(/^Lộ trình\s+\d+:\s*/i, "").trim() || trip.title;
 
   const tripStatus: TripProgressStatus =
-    resolveTripProgressStatus(trip) || "OnGoing";
+    resolveTripProgressStatus(trip) || "Pending";
 
   const draft: AutoTripDraft = {
     ...DEFAULT_AUTO_TRIP_DRAFT,
