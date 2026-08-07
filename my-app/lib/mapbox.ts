@@ -6,21 +6,23 @@ import {
 /**
  * Shared Mapbox public config (client-safe pk.* token).
  *
- * Prefer build-embedded values: on Cloudflare/OpenNext, `process.env.NEXT_PUBLIC_*`
- * is often empty in the browser even when set at build time.
+ * Prefer the embedded public token: on Cloudflare/OpenNext,
+ * `process.env.NEXT_PUBLIC_*` is often empty in the browser.
  */
+function readPublicEnv(name: string): string {
+  if (typeof process === "undefined") return "";
+  const v = process.env[name];
+  return typeof v === "string" ? v.trim() : "";
+}
+
 export const mapboxToken =
-  (typeof process !== "undefined"
-    ? process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN
-    : undefined)?.trim() ||
   embeddedMapboxToken ||
+  readPublicEnv("NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN") ||
   "";
 
 export const mapboxStyle =
-  (typeof process !== "undefined"
-    ? process.env.NEXT_PUBLIC_MAPBOX_STYLE
-    : undefined)?.trim() ||
   embeddedMapboxStyle ||
+  readPublicEnv("NEXT_PUBLIC_MAPBOX_STYLE") ||
   "mapbox://styles/mapbox/outdoors-v12";
 
 /** Default map center: Đà Lạt */

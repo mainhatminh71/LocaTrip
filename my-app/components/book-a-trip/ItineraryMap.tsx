@@ -223,7 +223,7 @@ export function ItineraryMap({
   if (!mapboxToken) {
     return (
       <div className={`${styles.mapMissing} ${className ?? ""}`}>
-        Thiếu NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN trong .env.local
+        Thiếu cấu hình Mapbox (NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN).
       </div>
     );
   }
