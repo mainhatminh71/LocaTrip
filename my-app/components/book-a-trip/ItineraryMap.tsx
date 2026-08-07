@@ -3,7 +3,12 @@
 import { useEffect, useRef, useState } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
-import { DALAT_CENTER, mapboxStyle, mapboxToken } from "@/lib/mapbox";
+import {
+  DALAT_CENTER,
+  mapboxStyle,
+  mapboxToken,
+  suppressBlockedSeaLabels,
+} from "@/lib/mapbox";
 import type { RouteFeatureCollection } from "@/lib/itinerary-map";
 import { LtBrandLoader } from "./LtBrandLoader";
 import styles from "./book-a-trip.module.css";
@@ -122,9 +127,13 @@ export function ItineraryMap({
     mapRef.current = map;
 
     const onReady = () => {
+      suppressBlockedSeaLabels(map);
       map.resize();
       setMapError(null);
       setMapReady(true);
+    };
+    const onStyleData = () => {
+      if (map.isStyleLoaded()) suppressBlockedSeaLabels(map);
     };
     const onError = (ev: { error?: Error }) => {
       const msg = ev?.error?.message || "Không tải được Mapbox";
@@ -133,6 +142,7 @@ export function ItineraryMap({
     };
     if (map.isStyleLoaded()) onReady();
     else map.once("load", onReady);
+    map.on("styledata", onStyleData);
     map.on("error", onError);
 
     // Pane can mount at 0 size then expand — keep canvas sized.
@@ -144,6 +154,7 @@ export function ItineraryMap({
 
     return () => {
       ro?.disconnect();
+      map.off("styledata", onStyleData);
       map.off("error", onError);
       markersRef.current.forEach((m) => m.remove());
       markersRef.current = [];

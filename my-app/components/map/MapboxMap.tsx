@@ -3,7 +3,12 @@
 import { useEffect, useRef } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
-import { DALAT_CENTER, mapboxStyle, mapboxToken } from "@/lib/mapbox";
+import {
+  DALAT_CENTER,
+  mapboxStyle,
+  mapboxToken,
+  suppressBlockedSeaLabels,
+} from "@/lib/mapbox";
 
 export type MapMarker = {
   id: string;
@@ -47,7 +52,15 @@ export function MapboxMap({
     map.addControl(new mapboxgl.NavigationControl(), "top-right");
     mapRef.current = map;
 
+    const applyLabelPolicy = () => {
+      if (map.isStyleLoaded()) suppressBlockedSeaLabels(map);
+    };
+    if (map.isStyleLoaded()) applyLabelPolicy();
+    else map.once("load", applyLabelPolicy);
+    map.on("styledata", applyLabelPolicy);
+
     return () => {
+      map.off("styledata", applyLabelPolicy);
       for (const m of markersRef.current) m.remove();
       markersRef.current = [];
       map.remove();
