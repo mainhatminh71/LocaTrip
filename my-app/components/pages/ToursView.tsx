@@ -46,7 +46,7 @@ export function ToursView() {
           {cards.map((tour) => (
             <Link
               key={tour.slug}
-              href={`/tours/${tour.slug}/`}
+              href={`/map/?tour=${encodeURIComponent(tour.slug)}`}
               className={styles.card}
             >
               <div className={styles.thumb}>

@@ -15,6 +15,8 @@ export type MapStop = {
   order: number;
   label: string;
   category?: string;
+  /** Start / hotel point — distinct pin, not a numbered visit. */
+  kind?: "start" | "stop";
 };
 
 type ItineraryMapProps = {
@@ -42,27 +44,42 @@ function createMarkerElement(
   selected: boolean,
   onSelect: (key: string) => void,
 ): HTMLElement {
+  const isStart = stop.kind === "start";
   const wrap = document.createElement("div");
-  wrap.className = selected ? styles.mapPinSelected : styles.mapPin;
+  wrap.className = isStart
+    ? styles.mapPinStart
+    : selected
+      ? styles.mapPinSelected
+      : styles.mapPin;
 
   const badge = document.createElement("button");
   badge.type = "button";
-  badge.className = selected ? styles.mapMarkerSelected : styles.mapMarker;
-  badge.textContent = String(stop.order);
+  badge.className = isStart
+    ? styles.mapMarkerStart
+    : selected
+      ? styles.mapMarkerSelected
+      : styles.mapMarker;
+  badge.textContent = isStart ? "★" : String(stop.order);
   badge.setAttribute("aria-label", stop.label);
 
   const tag = document.createElement("span");
-  tag.className = selected ? styles.mapPlaceTagSelected : styles.mapPlaceTag;
+  tag.className = isStart
+    ? styles.mapPlaceTagStart
+    : selected
+      ? styles.mapPlaceTagSelected
+      : styles.mapPlaceTag;
   tag.textContent = truncateLabel(stop.label);
 
   wrap.append(badge, tag);
 
-  const handle = (e: Event) => {
-    e.stopPropagation();
-    onSelect(stop.key);
-  };
-  wrap.addEventListener("click", handle);
-  badge.addEventListener("click", handle);
+  if (!isStart) {
+    const handle = (e: Event) => {
+      e.stopPropagation();
+      onSelect(stop.key);
+    };
+    wrap.addEventListener("click", handle);
+    badge.addEventListener("click", handle);
+  }
 
   return wrap;
 }

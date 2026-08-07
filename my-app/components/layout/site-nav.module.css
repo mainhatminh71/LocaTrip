@@ -34,16 +34,17 @@
   flex: none;
   place-content: center;
   align-items: center;
-  gap: 28px;
-  width: min-content;
-  max-width: 1200px;
+  gap: 20px;
+  width: auto;
+  max-width: min(1100px, calc(100vw - 32px));
   height: min-content;
-  padding: 12px 16px;
+  padding: 10px 14px 10px 16px;
   position: relative;
   overflow: visible;
-  backdrop-filter: blur(5px);
-  -webkit-backdrop-filter: blur(5px);
-  background-color: rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  background-color: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: 60px;
   box-shadow:
     0px 0.5175247177903657px 0.5175247177903657px -0.9375px rgba(0, 0, 0, 0.18),
@@ -52,6 +53,79 @@
     0px 13px 13px -3.75px rgba(0, 0, 0, 0.06);
   /* Framer appear mddu0p: delay 0.2, duration 0.4, ease [0.12,0.23,0.5,1], y -40 → 0 */
   animation: capsuleAppear 0.4s cubic-bezier(0.12, 0.23, 0.5, 1) 0.2s both;
+}
+
+/* Desktop: primary destinations visible without opening the overlay */
+.inlineNav {
+  display: none;
+  flex-flow: row;
+  align-items: center;
+  gap: 4px;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.inlineLink {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.92);
+  text-decoration: none;
+  font-family: "Manrope", "Manrope Placeholder", sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background 0.18s ease,
+    color 0.18s ease;
+}
+
+.inlineLink:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+}
+
+.inlineCta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  margin-left: 4px;
+  padding: 0 14px;
+  border-radius: 999px;
+  background: #fff;
+  color: #111;
+  text-decoration: none;
+  font-family: "Manrope", "Manrope Placeholder", sans-serif;
+  font-size: 13.5px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  transition:
+    filter 0.18s ease,
+    transform 0.18s ease;
+}
+
+.inlineCta:hover {
+  filter: brightness(0.96);
+}
+
+.menuLabel {
+  display: none;
+  font-family: "Manrope", "Manrope Placeholder", sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: #fff;
+  line-height: 1;
 }
 
 @keyframes capsuleAppear {
@@ -126,11 +200,17 @@
   gap: 8px;
   width: min-content;
   height: min-content;
-  padding: 6px;
+  padding: 8px 10px;
   border: 0;
-  background: transparent;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
   position: relative;
   overflow: visible;
+  transition: background 0.18s ease;
+}
+
+.menuBtn:hover {
+  background: rgba(255, 255, 255, 0.18);
 }
 
 /* Hamburger-menu framer-5PiIZ — Close variant (2 lines) / Open variant (X) */
@@ -440,6 +520,42 @@
   object-fit: cover;
 }
 
+/* Desktop / large tablet: show inline links; burger stays for auth + full menu */
+@media (min-width: 900px) {
+  .inlineNav {
+    display: flex;
+  }
+
+  .menuLabel {
+    display: none;
+  }
+
+  .capsule {
+    gap: 16px;
+    padding: 8px 10px 8px 14px;
+  }
+
+  .logoText {
+    font-size: 30px;
+  }
+}
+
+@media (min-width: 1100px) {
+  .inlineLink {
+    padding: 0 14px;
+    font-size: 15px;
+  }
+
+  .inlineCta {
+    padding: 0 16px;
+    font-size: 14px;
+  }
+
+  .logoText {
+    font-size: 34px;
+  }
+}
+
 /* Tablet */
 @media (max-width: 1024px) {
   .bar {
@@ -460,6 +576,21 @@
 
   .navLinkText {
     font-size: clamp(20px, 3.6vw, 28px);
+  }
+}
+
+/* Mobile / narrow: hide inline links; show “Menu” label next to burger */
+@media (max-width: 899.98px) {
+  .inlineNav {
+    display: none;
+  }
+
+  .menuLabel {
+    display: inline;
+  }
+
+  .menuBtn {
+    padding: 8px 12px 8px 14px;
   }
 }
 

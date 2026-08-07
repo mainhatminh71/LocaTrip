@@ -41,6 +41,7 @@ export function useAuthActions() {
     await clearOidcStaleState();
     const cfg = getOidcConfig();
     const store = window.localStorage;
+    // Same stateStore as UserManager so /auth/callback/ can finish PKCE.
     const client = new OidcClient({
       ...cfg,
       stateStore: new WebStorageStateStore({ store }),

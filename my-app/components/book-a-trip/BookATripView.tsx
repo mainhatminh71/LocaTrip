@@ -2,20 +2,36 @@
 
 import Image from "next/image";
 import { LT_IMAGE_QUALITY } from "@/lib/image-quality";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { createSavedTrip, generateAutoTrip } from "@/lib/api/trips";
+import {
+  createSavedTrip,
+  createTripPrefs,
+  generateAutoTrip,
+  getPlaceById,
+  getSavedTrip,
+  updateSavedTrip,
+  updateTripPrefs,
+  type CreateSavedTripBody,
+  type TripPrefsBody,
+} from "@/lib/api/trips";
 import { ApiError } from "@/lib/api/http";
 import { BOOK_TRIP_ASSETS, BOOK_TRIP_COPY } from "@/lib/book-a-trip-assets";
 import {
   DEFAULT_AUTO_TRIP_DRAFT,
+  parseDraftHours,
   previewSoftLabels,
+  todayYmd,
+  validateTripTitleAndDate,
   type AutoTripDraft,
 } from "@/lib/auto-trip-form";
-import { buildAutoTripRequest, getBrowserLocation } from "@/lib/build-auto-trip-request";
+import { draftFromSavedTrip } from "@/lib/saved-trip-draft";
+import { buildAutoTripRequest, buildPreferences, getBrowserLocation } from "@/lib/build-auto-trip-request";
 import {
   START_PRESETS_BY_CITY,
+  loadAutoTrip,
   saveAutoTrip,
+  saveAutoTripSelection,
   type AlternativePlaceSuggestion,
   type AutoTripResult,
   type ItineraryOption,
@@ -23,22 +39,48 @@ import {
 import {
   buildRouteGeoJSON,
   cloneOption,
+  enrichItineraryCoords,
   extractStops,
   stopsForMap,
+  summarizeOptionForCard,
   swapVisitPlace,
   tagChips,
 } from "@/lib/itinerary-map";
+import { visitDisplayTitle, visitKindLabel } from "@/lib/place-type";
 import { useAuthActions } from "@/components/auth/useAuthActions";
 import { useAuthModal } from "@/components/auth/AuthModalProvider";
+import { AccountMenu } from "@/components/auth/AccountFab";
+import { useToast } from "@/components/ui/ToastProvider";
 import { AutoTripPrefsFields } from "./AutoTripPrefsFields";
 import { ItineraryMap } from "./ItineraryMap";
-import { LtButtonLoading } from "./LtBrandLoader";
+import { LtBrandLoader, LtButtonLoading } from "./LtBrandLoader";
 import { ReplacePlaceModal } from "./ReplacePlaceModal";
 import styles from "./book-a-trip.module.css";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 type Phase = "form" | "options" | "itinerary";
 type LeftTab = "itinerary" | "prefs";
+
+const EDITING_TRIP_STORAGE_KEY = "locatrip.editingTripId";
+
+function readStoredEditingTripId(): string | null {
+  if (typeof window === "undefined") return null;
+  try {
+    return sessionStorage.getItem(EDITING_TRIP_STORAGE_KEY)?.trim() || null;
+  } catch {
+    return null;
+  }
+}
+
+function writeStoredEditingTripId(id: string | null) {
+  if (typeof window === "undefined") return;
+  try {
+    if (id) sessionStorage.setItem(EDITING_TRIP_STORAGE_KEY, id);
+    else sessionStorage.removeItem(EDITING_TRIP_STORAGE_KEY);
+  } catch {
+    /* ignore quota / private mode */
+  }
+}
 
 export function BookATripView({
   onImmersiveChange,
@@ -47,7 +89,10 @@ export function BookATripView({
 }) {
   const [phase, setPhase] = useState<Phase>("form");
   const [leftTab, setLeftTab] = useState<LeftTab>("itinerary");
-  const [draft, setDraft] = useState<AutoTripDraft>(DEFAULT_AUTO_TRIP_DRAFT);
+  const [draft, setDraft] = useState<AutoTripDraft>(() => ({
+    ...DEFAULT_AUTO_TRIP_DRAFT,
+    date: todayYmd(),
+  }));
   /** Snapshot of draft used for the last successful generate — prefs reset target. */
   const [committedDraft, setCommittedDraft] = useState<AutoTripDraft | null>(
     null,
@@ -63,18 +108,36 @@ export function BookATripView({
   const [mobileMapOpen, setMobileMapOpen] = useState(false);
   const [routeStale, setRouteStale] = useState(false);
   const [isNarrow, setIsNarrow] = useState(false);
-  const [showLocationPrompt, setShowLocationPrompt] = useState(false);
   const [locating, setLocating] = useState(false);
   const [lastLocationOverride, setLastLocationOverride] = useState<{
     latitude: number;
     longitude: number;
   } | null>(null);
   const [saving, setSaving] = useState(false);
+  const [savingPrefs, setSavingPrefs] = useState(false);
   const [savedTripId, setSavedTripId] = useState<string | null>(null);
-  const [saveMessage, setSaveMessage] = useState<string | null>(null);
+  /** When set (from `?from=` / `?edit=`), user can PATCH this trip after regenerate. */
+  const [editingTripId, setEditingTripId] = useState<string | null>(null);
+  const [editingPrefsId, setEditingPrefsId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const stored = readStoredEditingTripId();
+    if (stored) setEditingTripId(stored);
+  }, []);
+
+  function setEditingTrip(id: string | null) {
+    setEditingTripId(id);
+    writeStoredEditingTripId(id);
+  }
+  const [prefillNotice, setPrefillNotice] = useState<string | null>(null);
   const { isAuthenticated, isLoading: authLoading } = useAuthActions();
   const { openAuth } = useAuthModal();
+  const { toastSuccess } = useToast();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const fromTripId = searchParams.get("from")?.trim() || "";
+  const editTripId = searchParams.get("edit")?.trim() || "";
+  const prefillAppliedRef = useRef<string | null>(null);
 
   const startPresets = START_PRESETS_BY_CITY.dalat;
   const activeStart =
@@ -85,6 +148,121 @@ export function BookATripView({
   useEffect(() => {
     onImmersiveChange?.(immersive);
   }, [immersive, onImmersiveChange]);
+
+  /**
+   * Load a saved trip into book-a-trip:
+   * - `?edit=<id>` → open itinerary split (list + map) for editing
+   * - `?from=<id>` → prefill form prefs only (regenerate)
+   */
+  useEffect(() => {
+    const tripId = editTripId || fromTripId;
+    if (!tripId || authLoading) return;
+    const mode = editTripId ? "edit" : "from";
+    const applyKey = `${mode}:${tripId}`;
+    const nextPath =
+      mode === "edit"
+        ? `/book-a-trip/?edit=${encodeURIComponent(tripId)}`
+        : `/book-a-trip/?from=${encodeURIComponent(tripId)}`;
+
+    if (!isAuthenticated) {
+      if (prefillAppliedRef.current !== `auth:${applyKey}`) {
+        prefillAppliedRef.current = `auth:${applyKey}`;
+        openAuth({ next: nextPath });
+      }
+      return;
+    }
+    if (prefillAppliedRef.current === applyKey) return;
+
+    let cancelled = false;
+    setLoading(true);
+    setError(null);
+
+    void (async () => {
+      try {
+        const trip = await getSavedTrip(tripId);
+        if (cancelled) return;
+        const { draft: nextDraft, locationOverride } = draftFromSavedTrip(trip);
+        setDraft(nextDraft);
+        setLastLocationOverride(locationOverride);
+        setSelectedStopKey(null);
+        setReplaceTargetKey(null);
+        setRouteStale(false);
+        setMobileMapOpen(false);
+        setSavedTripId(null);
+        setEditingTrip(trip.id);
+        setEditingPrefsId(trip.prefsId || null);
+
+        if (mode === "edit") {
+          const enrichedItinerary = await enrichItineraryCoords(
+            trip.itinerary || [],
+            async (placeId) => {
+              const place = await getPlaceById(placeId);
+              return place
+                ? {
+                    latitude: place.latitude,
+                    longitude: place.longitude,
+                  }
+                : null;
+            },
+          );
+          if (cancelled) return;
+          const option: ItineraryOption = {
+            optionId: 1,
+            title: trip.title,
+            totalScore: 0,
+            tripStyle: trip.pace || "",
+            totalEstimatedCost: String(trip.totalEstimatedCost ?? ""),
+            summary: trip.summary || "",
+            itinerary: enrichedItinerary,
+          };
+          setCommittedDraft(structuredClone(nextDraft));
+          setSelectedOption(cloneOption(option));
+          setResult({
+            totalItineraries: 1,
+            itineraries: [option],
+          });
+          setLeftTab("itinerary");
+          setPhase("itinerary");
+          setPrefillNotice(null);
+          // Keep `?edit=` so remount / Strict Mode can re-open the map view.
+        } else {
+          setCommittedDraft(null);
+          setSelectedOption(null);
+          setResult(null);
+          setPhase("form");
+          setPrefillNotice(
+            `Đã nạp tiêu chí từ “${trip.title.slice(0, 80)}”. Chỉnh rồi tạo lịch trình.`,
+          );
+          // Keep `?from=` (like `?edit=`) so remount / Strict Mode keeps
+          // editingTripId and PATCH updates the same trip instead of POST create.
+        }
+        prefillAppliedRef.current = applyKey;
+      } catch (err) {
+        if (cancelled) return;
+        prefillAppliedRef.current = null;
+        setError(
+          err instanceof ApiError
+            ? err.message
+            : err instanceof Error
+              ? err.message
+              : "Không tải được chuyến đi đã lưu",
+        );
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    editTripId,
+    fromTripId,
+    isAuthenticated,
+    authLoading,
+    openAuth,
+    router,
+  ]);
 
   useEffect(() => {
     return () => onImmersiveChange?.(false);
@@ -110,15 +288,48 @@ export function BookATripView({
     [itineraryStops, selectedStopKey],
   );
 
-  const mapStops = useMemo(
-    () => (selectedOption ? stopsForMap(selectedOption.itinerary) : []),
-    [selectedOption],
-  );
+  const mapStops = useMemo(() => {
+    if (!selectedOption) return [];
+    const visits = stopsForMap(selectedOption.itinerary);
+    const start =
+      lastLocationOverride ??
+      ({
+        latitude: activeStart.latitude,
+        longitude: activeStart.longitude,
+      } as const);
+    if (
+      !Number.isFinite(start.latitude) ||
+      !Number.isFinite(start.longitude)
+    ) {
+      return visits;
+    }
+    const startLabel =
+      (draft.startMode ?? "preset") === "gps"
+        ? "Điểm bắt đầu (GPS)"
+        : activeStart.label || "Điểm bắt đầu";
+    return [
+      {
+        key: "__start__",
+        lat: start.latitude,
+        lng: start.longitude,
+        order: 0,
+        label: startLabel,
+        kind: "start" as const,
+      },
+      ...visits,
+    ];
+  }, [selectedOption, lastLocationOverride, activeStart, draft.startMode]);
 
   const routeGeoJSON = useMemo(() => {
     if (!selectedOption || routeStale) return null;
-    return buildRouteGeoJSON(selectedOption.itinerary);
-  }, [selectedOption, routeStale]);
+    const start =
+      lastLocationOverride ??
+      ({
+        latitude: activeStart.latitude,
+        longitude: activeStart.longitude,
+      } as const);
+    return buildRouteGeoJSON(selectedOption.itinerary, start);
+  }, [selectedOption, routeStale, lastLocationOverride, activeStart]);
 
   const replaceStop = useMemo(
     () => itineraryStops.find((s) => s.key === replaceTargetKey) ?? null,
@@ -127,6 +338,41 @@ export function BookATripView({
 
   function patchDraft(partial: Partial<AutoTripDraft>) {
     setDraft((d) => ({ ...d, ...partial }));
+    setPrefillNotice(null);
+  }
+
+  /** tripType OR ≥1 soft preference — matches LocalTrip auto generate contract. */
+  function assertPrefsOrTripType(): boolean {
+    const identityErr = validateTripTitleAndDate(draft, {
+      allowPast: Boolean(editingTripId),
+    });
+    if (identityErr) {
+      setError(identityErr);
+      return false;
+    }
+    const prefs = buildPreferences(draft);
+    if (!draft.tripType && prefs.length === 0) {
+      setError(
+        "Bạn phải chọn ít nhất 1 Chủ đề chuyến đi hoặc 1 Sở thích.",
+      );
+      return false;
+    }
+    return true;
+  }
+
+  function resolveGenerateLocation(): {
+    latitude: number;
+    longitude: number;
+  } | null {
+    // Prefer exact coords from last generate / restored trip.
+    if (
+      lastLocationOverride &&
+      Number.isFinite(lastLocationOverride.latitude) &&
+      Number.isFinite(lastLocationOverride.longitude)
+    ) {
+      return lastLocationOverride;
+    }
+    return null;
   }
 
   function onSubmitForm(e: React.FormEvent) {
@@ -137,20 +383,29 @@ export function BookATripView({
       openAuth({ next: "/book-a-trip/" });
       return;
     }
+    if (!assertPrefsOrTripType()) return;
     try {
-      // Validate radius early before prompt
-      buildAutoTripRequest(draft, "dalat");
+      // Validate radius / maxDistance early
+      buildAutoTripRequest(draft, "dalat", resolveGenerateLocation());
     } catch (err) {
       setError(err instanceof Error ? err.message : "Thiếu thông tin hợp lệ");
       return;
     }
-    setShowLocationPrompt(true);
+    const savedStart = resolveGenerateLocation();
+    if ((draft.startMode ?? "preset") === "gps") {
+      if (savedStart) {
+        void runGenerate(savedStart);
+        return;
+      }
+      void startGenerateFromGps();
+      return;
+    }
+    void runGenerate(savedStart);
   }
 
   async function runGenerate(
     locationOverride?: { latitude: number; longitude: number } | null,
   ) {
-    setShowLocationPrompt(false);
     setError(null);
     setLoading(true);
     try {
@@ -159,10 +414,15 @@ export function BookATripView({
       else setLastLocationOverride(null);
       const data = await generateAutoTrip(request);
       setCommittedDraft(structuredClone(draft));
+      const selectedOptionId =
+        data.itineraries.length === 1
+          ? data.itineraries[0]?.optionId
+          : undefined;
       saveAutoTrip({
         request,
         result: data,
         createdAt: new Date().toISOString(),
+        selectedOptionId,
       });
       setResult(data);
       setSelectedStopKey(null);
@@ -171,7 +431,6 @@ export function BookATripView({
       setMobileMapOpen(false);
       setLeftTab("itinerary");
       setSavedTripId(null);
-      setSaveMessage(null);
       if (data.itineraries.length === 1) {
         setSelectedOption(cloneOption(data.itineraries[0]!));
         setPhase("itinerary");
@@ -193,7 +452,23 @@ export function BookATripView({
     }
   }
 
-  /** Re-generate from prefs tab — keep last GPS if any, skip location modal. */
+  async function startGenerateFromGps() {
+    setLocating(true);
+    setError(null);
+    try {
+      const coords = await getBrowserLocation();
+      await runGenerate(coords);
+    } catch (err) {
+      setLocating(false);
+      setError(
+        err instanceof Error
+          ? `${err.message} Chọn điểm trong danh sách hoặc cho phép vị trí rồi thử lại.`
+          : "Không lấy được vị trí hiện tại.",
+      );
+    }
+  }
+
+  /** Re-generate from prefs tab — GPS if selected, else preset. */
   function applyPrefsAndRegenerate() {
     setError(null);
     if (authLoading) return;
@@ -201,38 +476,39 @@ export function BookATripView({
       openAuth({ next: "/book-a-trip/" });
       return;
     }
+    if (!assertPrefsOrTripType()) return;
+    const savedStart = resolveGenerateLocation();
     try {
-      buildAutoTripRequest(draft, "dalat", lastLocationOverride);
+      buildAutoTripRequest(draft, "dalat", savedStart);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Thiếu thông tin hợp lệ");
       return;
     }
-    void runGenerate(lastLocationOverride);
+    if ((draft.startMode ?? "preset") === "gps") {
+      if (savedStart) {
+        void runGenerate(savedStart);
+        return;
+      }
+      void startGenerateFromGps();
+      return;
+    }
+    void runGenerate(savedStart);
   }
 
   function resetPrefsToLastApplied() {
     if (!committedDraft) return;
-    setDraft(structuredClone(committedDraft));
+    setDraft({ ...DEFAULT_AUTO_TRIP_DRAFT, ...structuredClone(committedDraft) });
     setError(null);
   }
 
-  async function onAllowLocation() {
-    setLocating(true);
-    try {
-      const coords = await getBrowserLocation();
-      await runGenerate(coords);
-    } catch {
-      // Denied / unavailable → still generate from selected start preset
-      setLocating(false);
-      await runGenerate(null);
-    }
-  }
-
-  function onSkipLocation() {
-    void runGenerate(null);
-  }
-
   function resetToForm() {
+    // Prevent `?edit=` effect from immediately re-opening the map view.
+    if (editTripId) {
+      prefillAppliedRef.current = `cleared:edit:${editTripId}`;
+      router.replace("/book-a-trip/", { scroll: false });
+    } else if (fromTripId) {
+      router.replace("/book-a-trip/", { scroll: false });
+    }
     setPhase("form");
     setLeftTab("itinerary");
     setResult(null);
@@ -243,21 +519,22 @@ export function BookATripView({
     setRouteStale(false);
     setMobileMapOpen(false);
     setError(null);
-    setShowLocationPrompt(false);
     setSavedTripId(null);
-    setSaveMessage(null);
+    setEditingTrip(null);
+    setEditingPrefsId(null);
   }
 
   function pickOption(opt: ItineraryOption) {
-    setSelectedOption(cloneOption(opt));
+    const cloned = cloneOption(opt);
+    setSelectedOption(cloned);
     setSelectedStopKey(null);
     setReplaceTargetKey(null);
     setRouteStale(false);
     setMobileMapOpen(false);
     setLeftTab("itinerary");
     setSavedTripId(null);
-    setSaveMessage(null);
     setPhase("itinerary");
+    saveAutoTripSelection(opt.optionId);
   }
 
   function selectStop(key: string) {
@@ -266,60 +543,266 @@ export function BookATripView({
 
   function applyReplace(alt: AlternativePlaceSuggestion) {
     if (!selectedOption || !replaceStop) return;
-    setSelectedOption(
-      swapVisitPlace(
-        selectedOption,
-        replaceStop.day,
-        replaceStop.scheduleIndex,
-        alt,
-        {
-          latitude: replaceStop.place.latitude,
-          longitude: replaceStop.place.longitude,
-        },
-      ),
+    const next = swapVisitPlace(
+      selectedOption,
+      replaceStop.day,
+      replaceStop.scheduleIndex,
+      alt,
+      {
+        latitude: replaceStop.place.latitude,
+        longitude: replaceStop.place.longitude,
+      },
     );
+    setSelectedOption(next);
     setRouteStale(true);
     setReplaceTargetKey(null);
     setSelectedStopKey(replaceStop.key);
     setSavedTripId(null);
-    setSaveMessage(null);
+    // Keep localStorage draft in sync with the edited option.
+    if (result) {
+      const itineraries = result.itineraries.map((o) =>
+        o.optionId === next.optionId ? next : o,
+      );
+      const nextResult = { ...result, itineraries };
+      setResult(nextResult);
+      const prev = loadAutoTrip();
+      if (prev) {
+        saveAutoTrip({
+          ...prev,
+          result: nextResult,
+          selectedOptionId: next.optionId,
+        });
+      }
+    }
   }
 
-  async function saveCurrentTrip() {
-    if (!selectedOption || saving || savedTripId) return;
+  function buildSaveBody(option: ItineraryOption): CreateSavedTripBody {
+    const start = lastLocationOverride ?? {
+      latitude: activeStart.latitude,
+      longitude: activeStart.longitude,
+    };
+    const { start: startTimePerDay, end: endTimePerDay } = parseDraftHours(
+      draft.hours,
+    );
+    const radiusKm = Number(String(draft.radiusKm).trim().replace(",", "."));
+    const maxDistance = Number(
+      String(draft.maxDistance).trim().replace(",", "."),
+    );
+    const preferences = buildPreferences(draft);
+    const generatePrefs = {
+      tripType: draft.tripType || undefined,
+      targetCustomer: draft.targetCustomer || undefined,
+      preferences,
+      budgetLevel: draft.budgetLevel,
+      pace: draft.pace,
+      radiusKm: Number.isFinite(radiusKm) ? radiusKm : undefined,
+      maxDistance: Number.isFinite(maxDistance) ? maxDistance : undefined,
+      isRoundTrip: draft.isRoundTrip,
+      startTimePerDay,
+      endTimePerDay,
+      showRoad: draft.showRoad,
+      startCoords: start,
+      startMode: draft.startMode,
+      startId: draft.startId,
+      roundTrip: draft.isRoundTrip,
+    };
+    return {
+      title: draft.title.trim().slice(0, 120),
+      source: "auto",
+      itinerary: option.itinerary,
+      date: draft.date.trim().slice(0, 10),
+      tripDate: draft.date.trim().slice(0, 10),
+      // Saved trips are OnGoing until the travel day passes (server also enforces).
+      tripStatus: "OnGoing",
+      durationDays: option.itinerary.length,
+      pace: draft.pace,
+      startCoords: start,
+      startLatitude: start.latitude,
+      startLongitude: start.longitude,
+      summary: option.summary?.slice(0, 2000),
+      tripType: draft.tripType || undefined,
+      targetCustomer: draft.targetCustomer || undefined,
+      preferences,
+      budgetLevel: draft.budgetLevel,
+      radiusKm: generatePrefs.radiusKm,
+      maxDistance: generatePrefs.maxDistance,
+      isRoundTrip: draft.isRoundTrip,
+      roundTrip: draft.isRoundTrip,
+      showRoad: draft.showRoad,
+      startTimePerDay,
+      endTimePerDay,
+      startMode: draft.startMode,
+      startId: draft.startId,
+      generatePrefs,
+    };
+  }
+
+  async function persistTrip(
+    mode: "create" | "update",
+    option?: ItineraryOption | null,
+  ) {
+    const opt = option ?? selectedOption;
+    if (!opt || saving) return;
+    // After create, UI flips to "Xem đã lưu" — don't POST again.
+    if (mode === "create" && savedTripId) return;
+    if (mode === "update" && !editingTripId) return;
     if (!isAuthenticated) {
-      openAuth({ next: "/book-a-trip/" });
+      openAuth({
+        next: editingTripId
+          ? `/book-a-trip/?edit=${encodeURIComponent(editingTripId)}`
+          : "/book-a-trip/",
+      });
       return;
     }
+    const identityErr = validateTripTitleAndDate(draft, {
+      allowPast: Boolean(editingTripId),
+    });
+    if (identityErr) {
+      setError(identityErr);
+      return;
+    }
+    const body = buildSaveBody(opt);
+
     setSaving(true);
-    setSaveMessage(null);
     setError(null);
     try {
-      const start = lastLocationOverride ?? {
-        latitude: activeStart.latitude,
-        longitude: activeStart.longitude,
-      };
-      const trip = await createSavedTrip({
-        title: (selectedOption.title || "Chuyến đi Đà Lạt").slice(0, 120),
-        source: "auto",
-        itinerary: selectedOption.itinerary,
-        durationDays: selectedOption.itinerary.length,
-        pace: draft.pace,
-        startCoords: start,
-        summary: selectedOption.summary?.slice(0, 2000),
-      });
-      setSavedTripId(trip.id);
-      setSaveMessage("Đã lưu chuyến đi.");
+      const trip =
+        mode === "update" && editingTripId
+          ? await updateSavedTrip(editingTripId, body)
+          : await createSavedTrip(body);
+      if (mode === "update") {
+        setEditingTrip(trip.id);
+        setSavedTripId(null);
+        toastSuccess("Đã cập nhật chuyến đi.");
+      } else {
+        setSavedTripId(trip.id);
+        setEditingTrip(null);
+        toastSuccess("Đã lưu chuyến đi.");
+      }
     } catch (err) {
       const msg =
         err instanceof ApiError
           ? err.message
           : err instanceof Error
             ? err.message
-            : "Không lưu được chuyến đi";
+            : mode === "update"
+              ? "Không cập nhật được chuyến đi"
+              : "Không lưu được chuyến đi";
       setError(msg);
     } finally {
       setSaving(false);
+    }
+  }
+
+  async function saveCurrentTrip() {
+    await persistTrip("create");
+  }
+
+  async function updateCurrentTrip() {
+    await persistTrip("update");
+  }
+
+  function buildPrefsOnlyBody(): TripPrefsBody {
+    const start = resolveGenerateLocation() ?? {
+      latitude: activeStart.latitude,
+      longitude: activeStart.longitude,
+    };
+    const { start: startTimePerDay, end: endTimePerDay } = parseDraftHours(
+      draft.hours,
+    );
+    const radiusKm = Number(String(draft.radiusKm).trim().replace(",", "."));
+    const maxDistance = Number(
+      String(draft.maxDistance).trim().replace(",", "."),
+    );
+    const preferences = buildPreferences(draft);
+    const generatePrefs = {
+      tripType: draft.tripType || undefined,
+      targetCustomer: draft.targetCustomer || undefined,
+      preferences,
+      budgetLevel: draft.budgetLevel,
+      pace: draft.pace,
+      radiusKm: Number.isFinite(radiusKm) ? radiusKm : undefined,
+      maxDistance: Number.isFinite(maxDistance) ? maxDistance : undefined,
+      isRoundTrip: draft.isRoundTrip,
+      startTimePerDay,
+      endTimePerDay,
+      showRoad: draft.showRoad,
+      startCoords: start,
+      startMode: draft.startMode,
+      startId: draft.startId,
+      roundTrip: draft.isRoundTrip,
+    };
+    return {
+      ...generatePrefs,
+      startLatitude: start.latitude,
+      startLongitude: start.longitude,
+      generatePrefs,
+      tripId: editingTripId || savedTripId || null,
+      label: (draft.title.trim() || selectedOption?.title || "Tiêu chí Đà Lạt").slice(
+        0,
+        120,
+      ),
+    };
+  }
+
+  /** Persist planner options only — does not regenerate itinerary. */
+  async function savePrefsOnly() {
+    if (savingPrefs || loading || locating) return;
+    if (authLoading) return;
+    if (!isAuthenticated) {
+      openAuth({
+        next: editingTripId
+          ? `/book-a-trip/?edit=${encodeURIComponent(editingTripId)}`
+          : "/book-a-trip/",
+      });
+      return;
+    }
+    if (!assertPrefsOrTripType()) return;
+
+    setSavingPrefs(true);
+    setError(null);
+    try {
+      const body = buildPrefsOnlyBody();
+      const tripId = editingTripId || savedTripId;
+
+      if (tripId) {
+        // PATCH trip (no itinerary) → upserts trip_prefs on the server.
+        const {
+          label: _label,
+          tripId: _tripId,
+          generatePrefs,
+          ...flat
+        } = body;
+        const trip = await updateSavedTrip(tripId, {
+          ...flat,
+          generatePrefs,
+          source: "auto",
+        });
+        setEditingTrip(trip.id);
+        if (trip.prefsId) setEditingPrefsId(trip.prefsId);
+        setCommittedDraft(structuredClone(draft));
+        toastSuccess("Đã lưu bộ tiêu chí.");
+      } else if (editingPrefsId) {
+        const prefs = await updateTripPrefs(editingPrefsId, body);
+        setEditingPrefsId(prefs.id);
+        setCommittedDraft(structuredClone(draft));
+        toastSuccess("Đã cập nhật bộ tiêu chí.");
+      } else {
+        const prefs = await createTripPrefs(body);
+        setEditingPrefsId(prefs.id);
+        setCommittedDraft(structuredClone(draft));
+        toastSuccess("Đã lưu bộ tiêu chí.");
+      }
+    } catch (err) {
+      setError(
+        err instanceof ApiError
+          ? err.message
+          : err instanceof Error
+            ? err.message
+            : "Không lưu được bộ tiêu chí",
+      );
+    } finally {
+      setSavingPrefs(false);
     }
   }
 
@@ -359,13 +842,16 @@ export function BookATripView({
               alt="LocaTrip"
               width={36}
               height={36}
-                    quality={LT_IMAGE_QUALITY}
-                  />
+              quality={LT_IMAGE_QUALITY}
+            />
             <span>Gợi ý chuyến Đà Lạt</span>
           </div>
-          <span className={styles.focusStep}>
-            {phase === "options" ? "Chọn lộ trình" : "Lịch trình"}
-          </span>
+          <div className={styles.focusMeta}>
+            <span className={styles.focusStep}>
+              {phase === "options" ? "Chọn lộ trình" : "Lịch trình"}
+            </span>
+            <AccountMenu variant="bar" />
+          </div>
         </div>
       )}
 
@@ -377,7 +863,28 @@ export function BookATripView({
         }
       >
         <AnimatePresence mode="wait">
-          {phase === "form" ? (
+          {editTripId && phase === "form" && !error ? (
+            <motion.div
+              key="opening-edit"
+              className={styles.autoForm}
+              style={{
+                display: "grid",
+                placeItems: "center",
+                minHeight: "40vh",
+                padding: "2rem",
+              }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+            >
+              <LtBrandLoader
+                size="lg"
+                tone="onLight"
+                label="Đang mở lịch trình…"
+              />
+            </motion.div>
+          ) : phase === "form" ? (
             <motion.form
               key="form"
               className={styles.autoForm}
@@ -392,6 +899,12 @@ export function BookATripView({
                 <h2>{BOOK_TRIP_COPY.leftTitle}</h2>
                 <p>{BOOK_TRIP_COPY.leftSub}</p>
               </div>
+
+              {prefillNotice ? (
+                <p className={styles.saveOk} role="status">
+                  {prefillNotice}
+                </p>
+              ) : null}
 
               <AutoTripPrefsFields
                 draft={draft}
@@ -408,7 +921,8 @@ export function BookATripView({
                   </p>
                 ) : (
                   <p className={styles.autoPreviewMuted}>
-                    Chưa chọn gu mềm — vẫn tạo được lịch theo vị trí & ngân sách.
+                    Chưa chọn Chủ đề chuyến đi hoặc Sở thích — cần ít nhất một
+                    trong hai để tạo lịch.
                   </p>
                 )}
                 {error ? <p className={styles.error}>{error}</p> : null}
@@ -441,22 +955,62 @@ export function BookATripView({
             >
               <h2 className={styles.autoResultTitle}>Chọn một lộ trình</h2>
               <p className={styles.autoHint}>
-                Mỗi option là một chuỗi điểm trong ngày, tối ưu theo gu bạn chọn.
+                So nhanh chuỗi điểm trong ngày — chọn một lộ trình để xem chi
+                tiết trên bản đồ.
               </p>
               <ul className={styles.optionList}>
-                {result.itineraries.map((opt) => (
-                  <li key={opt.optionId}>
-                    <button
-                      type="button"
-                      className={styles.optionCard}
-                      onClick={() => pickOption(opt)}
-                    >
-                      <strong>{opt.title}</strong>
-                      <span>{opt.summary}</span>
-                      <em>{opt.totalEstimatedCost}</em>
-                    </button>
-                  </li>
-                ))}
+                {result.itineraries.map((opt, idx) => {
+                  const card = summarizeOptionForCard(opt);
+                  const metaParts = [
+                    card.styleLabel,
+                    card.stopCount > 0 ? `${card.stopCount} điểm` : null,
+                    card.timeRange,
+                  ].filter(Boolean);
+                  return (
+                    <li key={opt.optionId}>
+                      <button
+                        type="button"
+                        className={styles.optionCard}
+                        onClick={() => pickOption(opt)}
+                      >
+                        <span className={styles.optionIndex}>
+                          Lộ trình {idx + 1}
+                        </span>
+                        <span className={styles.optionPending}>Đề xuất</span>
+                        <strong className={styles.optionTitle}>
+                          {opt.title.replace(/^Lộ trình\s+\d+:\s*/i, "") ||
+                            opt.title}
+                        </strong>
+                        {metaParts.length > 0 ? (
+                          <span className={styles.optionMeta}>
+                            {metaParts.join(" · ")}
+                          </span>
+                        ) : null}
+                        {card.previewTitles.length > 0 ? (
+                          <ol className={styles.optionStops}>
+                            {card.previewTitles.map((title, i) => (
+                              <li key={`${opt.optionId}-${i}`}>{title}</li>
+                            ))}
+                            {card.moreCount > 0 ? (
+                              <li className={styles.optionMore}>
+                                +{card.moreCount} điểm nữa
+                              </li>
+                            ) : null}
+                          </ol>
+                        ) : opt.summary ? (
+                          <span className={styles.optionSummary}>
+                            {opt.summary}
+                          </span>
+                        ) : null}
+                        {opt.totalEstimatedCost ? (
+                          <em className={styles.optionCost}>
+                            {opt.totalEstimatedCost}
+                          </em>
+                        ) : null}
+                      </button>
+                    </li>
+                  );
+                })}
               </ul>
               {error ? <p className={styles.error}>{error}</p> : null}
             </motion.div>
@@ -502,8 +1056,30 @@ export function BookATripView({
                   <>
                 <header className={styles.itineraryHead}>
                   <h2 className={styles.autoResultTitle}>
-                    {selectedOption.title || "Lịch trình của bạn"}
+                    {draft.title.trim() ||
+                      selectedOption.title ||
+                      "Lịch trình của bạn"}
                   </h2>
+                  {draft.date ? (
+                    <p className={styles.tripSubtitle}>
+                      Ngày đi:{" "}
+                      {(() => {
+                        try {
+                          const [y, m, d] = draft.date
+                            .slice(0, 10)
+                            .split("-")
+                            .map(Number);
+                          return new Intl.DateTimeFormat("vi-VN", {
+                            dateStyle: "medium",
+                          }).format(new Date(y!, (m ?? 1) - 1, d));
+                        } catch {
+                          return draft.date;
+                        }
+                      })()}
+                      {" · "}
+                      {savedTripId || editingTripId ? "Đang đi" : "Đề xuất"}
+                    </p>
+                  ) : null}
                   {selectedOption.summary ? (
                     <p className={styles.autoHint}>{selectedOption.summary}</p>
                   ) : null}
@@ -550,6 +1126,8 @@ export function BookATripView({
                             itineraryStops.find((s) => s.key === key)?.order ??
                             null;
                           const active = selectedStopKey === key;
+                          const kind = visitKindLabel(item.place || {});
+                          const title = visitDisplayTitle(item.place || {});
                           return (
                             <li key={key} className={styles.visitItem}>
                               <button
@@ -562,18 +1140,49 @@ export function BookATripView({
                                 onClick={() => selectStop(key)}
                               >
                                 <span className={styles.time}>{item.time}</span>
-                                <span className={styles.stopOrder}>
-                                  {stopOrder}
+                                <span
+                                  className={styles.stopOrder}
+                                  aria-label={
+                                    stopOrder != null
+                                      ? `Điểm ${stopOrder}`
+                                      : "Điểm dừng"
+                                  }
+                                >
+                                  {stopOrder ?? "·"}
                                 </span>
                                 <div className={styles.scheduleBody}>
                                   <span className={styles.visitLabel}>
-                                    Tham quan
+                                    {kind}
                                   </span>
-                                  <strong>
-                                    {item.place?.title || "Địa điểm"}
-                                  </strong>
+                                  <strong>{title}</strong>
                                   {item.place?.address ? (
-                                    <p>{item.place.address}</p>
+                                    <p className={styles.visitAddr}>
+                                      {item.place.address}
+                                    </p>
+                                  ) : null}
+                                  {item.place?.reviewRating != null ||
+                                  (item.place?.category &&
+                                    item.place.category !== kind) ||
+                                  item.place?.areaType ? (
+                                    <div className={styles.visitMeta}>
+                                      {item.place?.reviewRating != null ? (
+                                        <span>
+                                          {item.place.reviewRating.toFixed(1)}★
+                                        </span>
+                                      ) : null}
+                                      {item.place?.category &&
+                                      item.place.category !== kind ? (
+                                        <span>{item.place.category}</span>
+                                      ) : null}
+                                      {item.place?.areaType ? (
+                                        <span>{item.place.areaType}</span>
+                                      ) : null}
+                                    </div>
+                                  ) : null}
+                                  {item.warning?.message ? (
+                                    <p className={styles.visitWarn}>
+                                      {item.warning.message}
+                                    </p>
                                   ) : null}
                                 </div>
                               </button>
@@ -666,6 +1275,29 @@ export function BookATripView({
                     >
                       Xem đã lưu
                     </button>
+                  ) : editingTripId ? (
+                    <>
+                      <button
+                        type="button"
+                        className={styles.btnPrimary}
+                        disabled={saving}
+                        onClick={() => void updateCurrentTrip()}
+                      >
+                        {saving ? (
+                          <LtButtonLoading label="Đang cập nhật…" />
+                        ) : (
+                          "Cập nhật chuyến này"
+                        )}
+                      </button>
+                      <button
+                        type="button"
+                        className={styles.btnGhost}
+                        disabled={saving}
+                        onClick={() => void saveCurrentTrip()}
+                      >
+                        Lưu thành chuyến mới
+                      </button>
+                    </>
                   ) : (
                     <button
                       type="button"
@@ -688,9 +1320,6 @@ export function BookATripView({
                     Tạo lại
                   </button>
                 </div>
-                {saveMessage ? (
-                  <p className={styles.saveOk}>{saveMessage}</p>
-                ) : null}
                 {error && phase === "itinerary" ? (
                   <p className={styles.error}>{error}</p>
                 ) : null}
@@ -719,7 +1348,8 @@ export function BookATripView({
                         </p>
                       ) : (
                         <p className={styles.autoPreviewMuted}>
-                          Chưa chọn gu mềm — vẫn tạo theo vị trí & ngân sách.
+                          Chưa chọn Chủ đề chuyến đi hoặc Sở thích — cần ít nhất
+                          một trong hai để tạo lịch.
                         </p>
                       )}
                       {error ? <p className={styles.error}>{error}</p> : null}
@@ -728,14 +1358,14 @@ export function BookATripView({
                           type="button"
                           className={styles.btnGhost}
                           onClick={resetPrefsToLastApplied}
-                          disabled={loading || !committedDraft}
+                          disabled={loading || savingPrefs || !committedDraft}
                         >
                           Reset lựa chọn
                         </button>
                         <button
                           type="button"
                           className={styles.btnPrimary}
-                          disabled={loading || locating}
+                          disabled={loading || locating || savingPrefs}
                           onClick={applyPrefsAndRegenerate}
                         >
                           {loading || locating ? (
@@ -745,6 +1375,18 @@ export function BookATripView({
                           )}
                         </button>
                       </div>
+                      <button
+                        type="button"
+                        className={`${styles.btnGhost} ${styles.prefsSaveOptionsBtn}`}
+                        disabled={loading || locating || savingPrefs}
+                        onClick={() => void savePrefsOnly()}
+                      >
+                        {savingPrefs ? (
+                          <LtButtonLoading label="Đang lưu tiêu chí…" />
+                        ) : (
+                          "Lưu bộ tiêu chí"
+                        )}
+                      </button>
                     </div>
                   </>
                 )}
@@ -885,66 +1527,6 @@ export function BookATripView({
           ) : null}
         </AnimatePresence>
       </section>
-
-      <AnimatePresence>
-        {showLocationPrompt ? (
-          <motion.div
-            className={styles.locOverlay}
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="loc-prompt-title"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            <motion.div
-              className={styles.locDialog}
-              initial={{ opacity: 0, y: 18, scale: 0.98 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 10 }}
-              transition={{ duration: 0.28 }}
-            >
-              <p className={styles.locEyebrow}>Trước khi tạo lịch</p>
-              <h3 id="loc-prompt-title">Cho phép lấy vị trí hiện tại?</h3>
-              <p>
-                Hệ thống có thể dùng vị trí GPS của bạn làm điểm xuất phát để
-                lịch trình gần hơn. Nếu không, chúng tôi dùng điểm bắt đầu bạn
-                đã chọn ({activeStart.label}).
-              </p>
-              <div className={styles.locActions}>
-                <button
-                  type="button"
-                  className={styles.btnPrimary}
-                  disabled={locating || loading}
-                  onClick={() => void onAllowLocation()}
-                >
-                  {locating || loading ? (
-                    <LtButtonLoading
-                      label={
-                        locating ? "Đang lấy vị trí…" : "Đang dựng lịch…"
-                      }
-                    />
-                  ) : (
-                    "Cho phép lấy vị trí"
-                  )}
-                </button>
-                <button
-                  type="button"
-                  className={styles.btnGhost}
-                  disabled={locating || loading}
-                  onClick={onSkipLocation}
-                >
-                  {loading && !locating ? (
-                    <LtButtonLoading label="Đang dựng lịch…" onDark={false} />
-                  ) : (
-                    "Không, dùng điểm đã chọn"
-                  )}
-                </button>
-              </div>
-            </motion.div>
-          </motion.div>
-        ) : null}
-      </AnimatePresence>
     </div>
   );
 }

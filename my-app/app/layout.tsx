@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { AuthProvider } from "@/components/auth/AuthProvider";
 import { AuthModalProvider } from "@/components/auth/AuthModalProvider";
 import { AccountFab } from "@/components/auth/AccountFab";
+import { ImmersiveUiProvider } from "@/components/layout/ImmersiveUiContext";
+import { ToastProvider } from "@/components/ui/ToastProvider";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -23,8 +25,12 @@ export default function RootLayout({
       <body className="bg-white text-lt-ink antialiased">
         <AuthProvider>
           <AuthModalProvider>
-            {children}
-            <AccountFab />
+            <ImmersiveUiProvider>
+              <ToastProvider>
+                {children}
+                <AccountFab />
+              </ToastProvider>
+            </ImmersiveUiProvider>
           </AuthModalProvider>
         </AuthProvider>
       </body>

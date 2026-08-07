@@ -1,10 +1,13 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { useAuth } from "react-oidc-context";
 import { useRouter } from "next/navigation";
 import { LtBrandLoader } from "@/components/book-a-trip/LtBrandLoader";
-import { clearOidcStaleState, getUserManager } from "@/lib/auth/user-manager";
+import {
+  clearOidcStaleState,
+  completeSigninCallback,
+  getUserManager,
+} from "@/lib/auth/user-manager";
 
 function returnToFromUserState(raw: unknown): string {
   try {
@@ -18,24 +21,44 @@ function returnToFromUserState(raw: unknown): string {
   return "/";
 }
 
+function stripAuthParamsFromUrl() {
+  const url = new URL(window.location.href);
+  if (!url.searchParams.has("code") && !url.searchParams.has("state")) return;
+  window.history.replaceState({}, document.title, url.pathname);
+}
+
 /**
- * Completes PKCE code exchange (AuthProvider runs signinCallback here),
- * then redirects home or to `state.returnTo`.
+ * Completes PKCE code exchange once, then redirects home or to `state.returnTo`.
+ * AuthProvider skips auto-callback so Strict Mode cannot double-consume state.
  */
 export default function AuthCallbackPage() {
-  const auth = useAuth();
   const router = useRouter();
-  const handledError = useRef(false);
-  const manualTried = useRef(false);
+  const started = useRef(false);
 
   useEffect(() => {
-    if (auth.isLoading) return;
+    if (started.current) return;
+    started.current = true;
 
-    if (auth.error) {
-      if (handledError.current) return;
-      handledError.current = true;
-      console.error("OIDC callback error", auth.error);
-      void (async () => {
+    void (async () => {
+      try {
+        const params = new URLSearchParams(window.location.search);
+        const hasCode = params.has("code") && params.has("state");
+
+        let user = await getUserManager().getUser();
+
+        if (hasCode) {
+          // Stores user + fires userLoaded for react-oidc-context.
+          user = (await completeSigninCallback()) ?? user;
+          stripAuthParamsFromUrl();
+        }
+
+        if (user) {
+          router.replace(returnToFromUserState(user.state));
+          return;
+        }
+
+        router.replace("/login?error=callback&next=/book-a-trip/");
+      } catch {
         try {
           await clearOidcStaleState();
           await getUserManager().removeUser();
@@ -43,47 +66,9 @@ export default function AuthCallbackPage() {
           /* ignore */
         }
         router.replace("/login?error=callback&next=/book-a-trip/");
-      })();
-      return;
-    }
-
-    if (auth.isAuthenticated) {
-      router.replace(returnToFromUserState(auth.user?.state));
-      return;
-    }
-
-    // Provider finished loading but session missing — complete PKCE manually once,
-    // or bail out so we never spin forever.
-    const params = new URLSearchParams(window.location.search);
-    const hasCode = params.has("code") && params.has("state");
-
-    if (hasCode && !manualTried.current) {
-      manualTried.current = true;
-      void getUserManager()
-        .signinCallback()
-        .then((user) => {
-          const next = returnToFromUserState(user && "state" in user ? user.state : undefined);
-          window.history.replaceState({}, document.title, window.location.pathname);
-          router.replace(next);
-        })
-        .catch(async (err) => {
-          console.error("OIDC manual callback error", err);
-          try {
-            await clearOidcStaleState();
-            await getUserManager().removeUser();
-          } catch {
-            /* ignore */
-          }
-          router.replace("/login?error=callback&next=/book-a-trip/");
-        });
-      return;
-    }
-
-    const timeout = window.setTimeout(() => {
-      router.replace("/login?error=callback&next=/book-a-trip/");
-    }, 6000);
-    return () => window.clearTimeout(timeout);
-  }, [auth.isLoading, auth.isAuthenticated, auth.error, auth.user, router]);
+      }
+    })();
+  }, [router]);
 
   return (
     <div

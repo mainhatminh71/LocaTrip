@@ -2,6 +2,8 @@ import type { AutoTripRequest } from "@/lib/trip";
 import { START_PRESETS_BY_CITY, type CityId } from "@/lib/trip";
 import {
   isScorablePreferenceTag,
+  normalizeHHMM,
+  validateSameDayHours,
   type AutoTripDraft,
 } from "@/lib/auto-trip-form";
 
@@ -61,9 +63,22 @@ export function buildAutoTripRequest(
 
   const [startTimePerDay, endTimePerDay] = draft.hours.split("|");
 
+  const hoursError = validateSameDayHours(
+    startTimePerDay || "",
+    endTimePerDay || "",
+  );
+  if (hoursError) {
+    throw new Error(hoursError);
+  }
+
   const radiusKm = Number(String(draft.radiusKm).trim().replace(",", "."));
   if (!Number.isFinite(radiusKm) || radiusKm <= 0) {
     throw new Error("Bán kính phải là số km lớn hơn 0");
+  }
+
+  const maxDistance = Number(String(draft.maxDistance).trim().replace(",", "."));
+  if (!Number.isFinite(maxDistance) || maxDistance < 1) {
+    throw new Error("Khoảng cách giữa các điểm phải là số km ≥ 1");
   }
 
   const request: AutoTripRequest = {
@@ -73,13 +88,16 @@ export function buildAutoTripRequest(
     budgetLevel: draft.budgetLevel,
     preferences: buildPreferences(draft),
     pace: draft.pace,
-    // Always request road geometry for the itinerary map.
-    showRoad: true,
+    showRoad: draft.showRoad,
+    maxDistance,
+    isRoundTrip: draft.isRoundTrip,
   };
 
-  if (startTimePerDay && endTimePerDay) {
-    request.startTimePerDay = startTimePerDay;
-    request.endTimePerDay = endTimePerDay;
+  const startNorm = normalizeHHMM(startTimePerDay || "");
+  const endNorm = normalizeHHMM(endTimePerDay || "");
+  if (startNorm && endNorm) {
+    request.startTimePerDay = startNorm;
+    request.endTimePerDay = endNorm;
   }
 
   if (draft.tripType) request.tripType = draft.tripType;

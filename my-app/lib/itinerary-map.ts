@@ -60,6 +60,7 @@ export type RouteFeatureCollection = {
 
 export function buildRouteGeoJSON(
   itinerary: DayItinerary[],
+  startCoords?: { latitude: number; longitude: number } | null,
 ): RouteFeatureCollection | null {
   const features: RouteFeatureCollection["features"] = [];
   for (const day of itinerary) {
@@ -78,8 +79,37 @@ export function buildRouteGeoJSON(
       });
     }
   }
-  if (features.length === 0) return null;
-  return { type: "FeatureCollection", features };
+  if (features.length > 0) {
+    return { type: "FeatureCollection", features };
+  }
+
+  // Saved trips strip OSRM polylines — connect stop coords (straight segments).
+  const stops = stopsForMap(itinerary);
+  if (stops.length === 0) return null;
+
+  const line: [number, number][] = [];
+  if (
+    startCoords &&
+    Number.isFinite(startCoords.latitude) &&
+    Number.isFinite(startCoords.longitude)
+  ) {
+    line.push([startCoords.longitude, startCoords.latitude]);
+  }
+  for (const stop of stops) {
+    line.push([stop.lng, stop.lat]);
+  }
+  if (line.length < 2) return null;
+
+  return {
+    type: "FeatureCollection",
+    features: [
+      {
+        type: "Feature",
+        properties: { synthetic: true },
+        geometry: { type: "LineString", coordinates: line },
+      },
+    ],
+  };
 }
 
 export function cloneOption(opt: ItineraryOption): ItineraryOption {
@@ -162,35 +192,23 @@ export function stopsForMap(itinerary: DayItinerary[]): MapStopPoint[] {
   const out: MapStopPoint[] = [];
 
   for (const stop of stops) {
-    let lat = stop.place.latitude;
-    let lng = stop.place.longitude;
+    let lat = toFiniteNumber(stop.place.latitude);
+    let lng = toFiniteNumber(stop.place.longitude);
 
-    if (
-      lat == null ||
-      lng == null ||
-      !Number.isFinite(lat) ||
-      !Number.isFinite(lng)
-    ) {
+    if (lat == null || lng == null) {
       const day = itinerary.find((d) => d.day === stop.day);
       const prev = day?.schedule?.[stop.scheduleIndex - 1];
       if (prev && prev.type === "travel") {
         const coords = prev.routeGeometry?.coordinates;
         if (coords && coords.length > 0) {
           const last = coords[coords.length - 1]!;
-          lng = last[0];
-          lat = last[1];
+          lng = toFiniteNumber(last[0]);
+          lat = toFiniteNumber(last[1]);
         }
       }
     }
 
-    if (
-      lat == null ||
-      lng == null ||
-      !Number.isFinite(lat) ||
-      !Number.isFinite(lng)
-    ) {
-      continue;
-    }
+    if (lat == null || lng == null) continue;
 
     out.push({
       key: stop.key,
@@ -204,3 +222,112 @@ export function stopsForMap(itinerary: DayItinerary[]): MapStopPoint[] {
 
   return out;
 }
+
+function toFiniteNumber(value: unknown): number | null {
+  if (typeof value === "number" && Number.isFinite(value)) return value;
+  if (typeof value === "string" && value.trim()) {
+    const n = Number(value);
+    return Number.isFinite(n) ? n : null;
+  }
+  return null;
+}
+
+/**
+ * Fill missing visit lat/lng via place lookup (saved trips often lack coords).
+ */
+export async function enrichItineraryCoords(
+  itinerary: DayItinerary[],
+  fetchPlace: (
+    placeId: string,
+  ) => Promise<{ latitude?: number; longitude?: number } | null>,
+): Promise<DayItinerary[]> {
+  const next = structuredClone(itinerary);
+  const cache = new Map<string, { latitude?: number; longitude?: number } | null>();
+
+  const tasks: Promise<void>[] = [];
+  for (const day of next) {
+    for (const item of day.schedule || []) {
+      if (item.type !== "visit" || !item.place) continue;
+
+      const existingLat = toFiniteNumber(item.place.latitude);
+      const existingLng = toFiniteNumber(item.place.longitude);
+      if (existingLat != null && existingLng != null) {
+        item.place.latitude = existingLat;
+        item.place.longitude = existingLng;
+        continue;
+      }
+
+      const placeId = item.place.placeId?.trim();
+      if (!placeId) continue;
+
+      tasks.push(
+        (async () => {
+          let hit = cache.get(placeId);
+          if (hit === undefined) {
+            try {
+              hit = await fetchPlace(placeId);
+            } catch {
+              hit = null;
+            }
+            cache.set(placeId, hit);
+          }
+          const lat = toFiniteNumber(hit?.latitude);
+          const lng = toFiniteNumber(hit?.longitude);
+          if (lat != null && lng != null) {
+            item.place.latitude = lat;
+            item.place.longitude = lng;
+          }
+        })(),
+      );
+    }
+  }
+
+  await Promise.all(tasks);
+  return next;
+}
+
+export type OptionCardSummary = {
+  stopCount: number;
+  timeRange: string | null;
+  previewTitles: string[];
+  moreCount: number;
+  styleLabel: string | null;
+};
+
+const TRIP_STYLE_LABEL: Record<string, string> = {
+  city_culture: "Nội thành",
+  suburbs_nature: "Ngoại ô / thiên nhiên",
+};
+
+/** Compact facts for the “Chọn lộ trình” cards. */
+export function summarizeOptionForCard(
+  option: ItineraryOption,
+  previewLimit = 3,
+): OptionCardSummary {
+  const visits = (option.itinerary || []).flatMap((day) =>
+    visitItems(day.schedule || []),
+  );
+  const titles = visits
+    .map((v) => v.place?.title?.trim())
+    .filter((t): t is string => Boolean(t));
+  const firstTime = visits[0]?.time?.split("-")[0]?.trim() || null;
+  const lastTime =
+    visits[visits.length - 1]?.time?.split("-").pop()?.trim() || null;
+  const timeRange =
+    firstTime && lastTime
+      ? firstTime === lastTime
+        ? firstTime
+        : `${firstTime} – ${lastTime}`
+      : null;
+  const previewTitles = titles.slice(0, previewLimit);
+  return {
+    stopCount: visits.length,
+    timeRange,
+    previewTitles,
+    moreCount: Math.max(0, titles.length - previewTitles.length),
+    styleLabel: option.tripStyle
+      ? TRIP_STYLE_LABEL[option.tripStyle] || null
+      : null,
+  };
+}
+

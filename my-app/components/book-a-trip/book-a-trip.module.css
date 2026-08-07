@@ -658,9 +658,17 @@
 
 .focusMeta {
   justify-self: end;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.focusStep {
   font-size: 13px;
   font-weight: 600;
   color: rgba(255, 255, 255, 0.72);
+  white-space: nowrap;
 }
 
 .sheetFocus {
@@ -2142,7 +2150,6 @@
 }
 
 .focusStep {
-  justify-self: end;
   font-size: 13px;
   font-weight: 600;
   color: rgba(255, 255, 255, 0.72);
@@ -2213,11 +2220,82 @@
   line-height: 1.25;
 }
 
+.startModeList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.startModeOption {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr);
+  gap: 10px;
+  align-items: start;
+  margin: 0;
+  padding: 12px 12px;
+  border-radius: var(--lt-radius-md);
+  border: 1px solid color-mix(in srgb, var(--lt-ink) 10%, transparent);
+  background: #fff;
+  cursor: pointer;
+}
+
+.startModeOption:has(.startModeCheck:checked) {
+  border-color: color-mix(in srgb, var(--lt-teal) 55%, transparent);
+  background: color-mix(in srgb, var(--lt-teal) 8%, #fff);
+}
+
+.startModeCheck {
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  accent-color: var(--lt-deep);
+  cursor: pointer;
+}
+
+.startModeCopy {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.startModeTitle {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--lt-deep);
+  line-height: 1.35;
+}
+
 .autoHint {
   margin: 0;
   font-size: 13px;
   line-height: 1.45;
   color: var(--lt-muted);
+}
+
+.prefsGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+.prefsGroupHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 0 2px;
+}
+
+.prefsGroupLabel {
+  margin: 0;
+  font-family: var(--lt-font-display);
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  text-transform: none;
+  color: var(--lt-deep);
+  line-height: 1.25;
 }
 
 .chipRow {
@@ -2233,6 +2311,29 @@
   position: relative;
   display: block;
   width: min(220px, 100%);
+}
+
+.tripInfoRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 12px 16px;
+}
+
+.tripInfoField {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1 1 220px;
+  min-width: 0;
+}
+
+.tripInfoField .autoInput {
+  padding-right: 14px;
+}
+
+.tripInfoDate {
+  flex: 0 1 200px;
 }
 
 .autoInput {
@@ -2254,6 +2355,56 @@
 .autoInput:focus {
   border-color: var(--lt-deep);
   box-shadow: inset 0 0 0 1px var(--lt-deep);
+}
+
+.hoursTimeRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 10px 12px;
+  margin-top: 12px;
+  width: 100%;
+}
+
+.hoursTimeField {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1 1 140px;
+  max-width: 220px;
+  min-width: 0;
+}
+
+.hoursTimeField .autoInput {
+  padding-right: 14px;
+}
+
+.hoursTimeLabel {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--lt-muted);
+}
+
+.hoursTimeSep {
+  display: none;
+  padding-bottom: 14px;
+  font-weight: 700;
+  color: var(--lt-muted);
+}
+
+@media (min-width: 520px) {
+  .hoursTimeSep {
+    display: inline-block;
+  }
+}
+
+.hoursTimeError {
+  margin: 8px 0 0;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: #b42318;
 }
 
 .autoInputSuffix {
@@ -2429,9 +2580,10 @@
   appearance: none;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  align-items: stretch;
+  gap: 8px;
   text-align: left;
-  padding: 18px 20px;
+  padding: 16px 18px;
   border-radius: var(--lt-radius-lg);
   border: 1px solid color-mix(in srgb, var(--lt-ink) 10%, transparent);
   background: var(--lt-white);
@@ -2446,23 +2598,100 @@
   box-shadow: 0 10px 28px rgba(1, 40, 48, 0.08);
 }
 
-.optionCard strong {
+.optionIndex {
+  align-self: flex-start;
+  margin: 0;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--lt-deep);
+  background: color-mix(in srgb, var(--lt-teal) 16%, #fff);
+  line-height: 1.2;
+}
+
+.optionPending {
+  align-self: flex-start;
+  margin: 0;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #6b5a2e;
+  background: #f5efd8;
+  line-height: 1.2;
+}
+
+.optionTitle {
+  margin: 0;
   font-size: 16px;
   font-weight: 700;
   color: var(--lt-deep);
+  line-height: 1.35;
 }
 
-.optionCard span {
+.optionMeta {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--lt-muted);
+  line-height: 1.35;
+}
+
+.optionStops {
+  list-style: none;
+  margin: 2px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.optionStops li {
+  position: relative;
+  margin: 0;
+  padding: 0 0 0 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--lt-ink);
+  line-height: 1.35;
+}
+
+.optionStops li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.55em;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--lt-teal);
+}
+
+.optionMore {
+  font-weight: 650 !important;
+  color: var(--lt-muted) !important;
+}
+
+.optionMore::before {
+  background: color-mix(in srgb, var(--lt-ink) 28%, transparent) !important;
+}
+
+.optionSummary {
+  margin: 0;
   font-size: 13px;
   line-height: 1.45;
   color: var(--lt-muted);
 }
 
-.optionCard em {
+.optionCost {
+  margin: 2px 0 0;
   font-style: normal;
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--lt-teal);
+  font-size: 13px;
+  font-weight: 750;
+  color: var(--lt-deep);
 }
 
 .pageFocus .autoForm,
@@ -2739,6 +2968,27 @@
   z-index: 1;
 }
 
+.mapMarkerStart {
+  appearance: none;
+  flex: 0 0 auto;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  background: linear-gradient(135deg, #2bc48a, #0a6b7c);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 800;
+  font-family: var(--lt-font-body);
+  cursor: default;
+  box-shadow: 0 4px 14px rgba(10, 107, 124, 0.4);
+  display: grid;
+  place-items: center;
+  padding: 0;
+  line-height: 1;
+  z-index: 2;
+}
+
 .mapMarkerSelected {
   background: #0a6b7c;
   transform: scale(1.12);
@@ -2748,7 +2998,8 @@
 }
 
 .mapPin,
-.mapPinSelected {
+.mapPinSelected,
+.mapPinStart {
   display: flex;
   align-items: center;
   gap: 6px;
@@ -2757,8 +3008,13 @@
   filter: drop-shadow(0 2px 6px rgba(1, 40, 48, 0.25));
 }
 
+.mapPinStart {
+  cursor: default;
+}
+
 .mapPlaceTag,
-.mapPlaceTagSelected {
+.mapPlaceTagSelected,
+.mapPlaceTagStart {
   max-width: 160px;
   padding: 5px 10px;
   border-radius: 999px;
@@ -2773,6 +3029,11 @@
   overflow: hidden;
   text-overflow: ellipsis;
   pointer-events: none;
+}
+
+.mapPlaceTagStart {
+  border-color: rgba(10, 107, 124, 0.35);
+  color: #0a6b7c;
 }
 
 .mapPlaceTagSelected {
@@ -3004,16 +3265,24 @@
 .scheduleBody {
   min-width: 0;
   padding-top: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .visitLabel {
-  display: block;
-  margin-bottom: 2px;
+  display: inline-flex;
+  align-self: flex-start;
+  margin: 0;
+  padding: 3px 8px;
+  border-radius: 999px;
   font-size: 10px;
   font-weight: 800;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--lt-teal);
+  color: var(--lt-deep);
+  background: color-mix(in srgb, var(--lt-teal) 18%, #fff);
+  line-height: 1.2;
 }
 
 .scheduleBody strong {
@@ -3022,6 +3291,41 @@
   font-weight: 700;
   color: var(--lt-deep);
   line-height: 1.3;
+}
+
+.visitAddr {
+  margin: 0 !important;
+  font-size: 12px !important;
+  font-weight: 500;
+  color: var(--lt-muted) !important;
+  line-height: 1.4 !important;
+}
+
+.visitMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 2px;
+}
+
+.visitMeta span {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 650;
+  color: var(--lt-muted);
+  background: var(--lt-field);
+  line-height: 1.3;
+}
+
+.visitWarn {
+  margin: 2px 0 0 !important;
+  font-size: 12px !important;
+  font-weight: 600;
+  color: #b45309 !important;
+  line-height: 1.35 !important;
 }
 
 .stopRow,
@@ -3061,7 +3365,7 @@
   font-weight: 800;
   display: grid;
   place-items: center;
-  margin-top: 14px;
+  margin-top: 2px;
   line-height: 1;
   flex: none;
 }
@@ -3091,6 +3395,27 @@
   flex: 1 1 120px;
 }
 
+.itineraryPane .prefsSticky .prefsSaveOptionsBtn {
+  flex: 0 0 auto;
+  align-self: stretch;
+  width: 100%;
+  min-height: 40px;
+  height: 40px;
+  padding: 0 14px;
+  font-size: 13px;
+  font-weight: 650;
+  border-radius: 12px;
+  border: 1px solid rgba(1, 40, 48, 0.14);
+  background: #fff;
+  color: var(--lt-teal, #0a6b7c);
+}
+
+.itineraryPane .prefsSticky .prefsSaveOptionsBtn:hover:not(:disabled) {
+  background: #eef8f5;
+  border-color: rgba(10, 107, 124, 0.35);
+  color: var(--lt-deep, #012830);
+}
+
 .itineraryPane .prefsSticky {
   flex-direction: column;
   flex-wrap: nowrap;
@@ -3100,7 +3425,8 @@
 
 .itineraryPane .prefsSticky .autoPreview,
 .itineraryPane .prefsSticky .autoPreviewMuted,
-.itineraryPane .prefsSticky .error {
+.itineraryPane .prefsSticky .error,
+.itineraryPane .prefsSticky .saveOk {
   flex: none;
   width: 100%;
 }
@@ -3110,6 +3436,7 @@
   grid-template-columns: 1fr 1.35fr;
   gap: 10px;
   width: 100%;
+  flex: none;
 }
 
 .prefsStickyActions .btnPrimary,
@@ -3117,6 +3444,11 @@
   flex: none;
   width: 100%;
   min-width: 0;
+}
+
+.prefsSaveOptionsBtn {
+  width: 100%;
+  margin-top: 0;
 }
 
 .mapToggleBtn {

@@ -15,6 +15,10 @@ export type AutoTripRequest = {
   showRoad?: boolean;
   startTimePerDay?: string;
   endTimePerDay?: string;
+  /** Max hop distance between consecutive stops (km). */
+  maxDistance?: number;
+  /** Return to start at end of day. */
+  isRoundTrip?: boolean;
 };
 
 export type TripPlace = {
@@ -95,6 +99,8 @@ export type StoredAutoTrip = {
   request: AutoTripRequest;
   result: AutoTripResult;
   createdAt: string;
+  /** Which proposal the user picked (when API returns ≥2). */
+  selectedOptionId?: number;
 };
 
 export const AUTO_TRIP_STORAGE_KEY = "locatrip.autoTrip";
@@ -175,6 +181,14 @@ export const HOURS_OPTIONS = [
   { value: "14:00|21:30", label: "14:00 – 21:30 (chiều tối)" },
 ] as const;
 
+/** Chip value for free start/end time inputs (not sent as hours). */
+export const HOURS_CUSTOM_VALUE = "custom";
+
+export const HOURS_CHIP_OPTIONS = [
+  ...HOURS_OPTIONS.map((o) => ({ value: o.value, label: o.label })),
+  { value: HOURS_CUSTOM_VALUE, label: "Tự do (chỉnh giờ)" },
+] as const;
+
 export const RADIUS_OPTIONS = [
   { value: 8, label: "8 km" },
   { value: 10, label: "10 km" },
@@ -242,16 +256,34 @@ export const PACE_OPTIONS: { value: Pace; label: string }[] = [
 
 export function saveAutoTrip(data: StoredAutoTrip) {
   if (typeof window === "undefined") return;
-  sessionStorage.setItem(AUTO_TRIP_STORAGE_KEY, JSON.stringify(data));
+  try {
+    localStorage.setItem(AUTO_TRIP_STORAGE_KEY, JSON.stringify(data));
+  } catch {
+    /* quota / private mode */
+  }
 }
 
 export function loadAutoTrip(): StoredAutoTrip | null {
   if (typeof window === "undefined") return null;
-  const raw = sessionStorage.getItem(AUTO_TRIP_STORAGE_KEY);
-  if (!raw) return null;
   try {
-    return JSON.parse(raw) as StoredAutoTrip;
+    const raw =
+      localStorage.getItem(AUTO_TRIP_STORAGE_KEY) ||
+      sessionStorage.getItem(AUTO_TRIP_STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as StoredAutoTrip;
+    // Migrate older sessionStorage drafts into localStorage.
+    if (!localStorage.getItem(AUTO_TRIP_STORAGE_KEY)) {
+      saveAutoTrip(parsed);
+    }
+    return parsed;
   } catch {
     return null;
   }
+}
+
+/** Persist which itinerary option was chosen (no API / no toast). */
+export function saveAutoTripSelection(optionId: number) {
+  const current = loadAutoTrip();
+  if (!current) return;
+  saveAutoTrip({ ...current, selectedOptionId: optionId });
 }

@@ -28,16 +28,21 @@ export function TourDetailView({ tour }: { tour: TourCard }) {
             fill
             className={styles.thumbImg}
             sizes="760px"
-                    quality={LT_IMAGE_QUALITY}
-                  />
+            quality={LT_IMAGE_QUALITY}
+          />
         </div>
         <p className={styles.articleLead}>
-          Mẫu lịch trình có sẵn từ Framer — đang được port sang React. Bạn có
-          thể tạo lịch trình cá nhân hóa ngay.
+          Lịch trình mẫu cố định — xem điểm dừng trên bản đồ. Không chỉnh tiêu
+          chí và không gọi API.
         </p>
-        <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginTop: 28 }}>
-          <Link href="/book-a-trip/" className={styles.cta}>
-            Tạo lịch trình
+        <div
+          style={{ display: "flex", gap: 12, flexWrap: "wrap", marginTop: 28 }}
+        >
+          <Link
+            href={`/map/?tour=${encodeURIComponent(tour.slug)}`}
+            className={styles.cta}
+          >
+            Xem trên bản đồ
           </Link>
           <Link
             href="/tours/"

@@ -1,3 +1,4 @@
+import type { TripProgressStatus } from "@/lib/api/trips";
 import type { BudgetLevel, Pace } from "@/lib/trip";
 
 export type ChipOption = { value: string; label: string };
@@ -81,13 +82,38 @@ export const FORM_CONSTRAINT_OPTIONS: ChipOption[] = [
   { value: "amenities:wheelchair_accessible", label: "Xe lăn / tiếp cận" },
 ];
 
+export type AutoTripStartMode = "gps" | "preset";
+export type AutoTripHoursMode = "preset" | "custom";
+
+/** Local calendar day as YYYY-MM-DD. */
+export function todayYmd(d = new Date()): string {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+
 export type AutoTripDraft = {
+  /** User-facing trip name for My Trips (required to save). */
+  title: string;
   startId: string;
+  /** GPS vs preset list for start coordinates. */
+  startMode: AutoTripStartMode;
   /** Free-text km; parsed when building the AutoTrip request. */
   radiusKm: string;
+  /** Free-text km; hop limit between consecutive stops. */
+  maxDistance: string;
+  /** Return to start at end of day. */
+  isRoundTrip: boolean;
   budgetLevel: BudgetLevel;
   pace: Pace;
+  /** Trip calendar day YYYY-MM-DD */
+  date: string;
+  /** Derived on server for saved trips: OnGoing → Done; Pending = unsaved proposals only. */
+  tripStatus: TripProgressStatus;
   hours: string; // "HH:MM|HH:MM"
+  /** Preset chips vs free time inputs. */
+  hoursMode: AutoTripHoursMode;
   tripType: string | null;
   targetCustomer: string | null;
   atmosphere: string[];
@@ -98,18 +124,25 @@ export type AutoTripDraft = {
 };
 
 export const DEFAULT_AUTO_TRIP_DRAFT: AutoTripDraft = {
+  title: "",
   startId: "center",
+  startMode: "preset",
   radiusKm: "10",
+  maxDistance: "5",
+  isRoundTrip: true,
   budgetLevel: "mid-range",
   pace: "moderate",
+  date: todayYmd(),
+  tripStatus: "OnGoing",
   hours: "08:30|21:30",
+  hoursMode: "preset",
   tripType: null,
   targetCustomer: null,
   atmosphere: [],
   food: [],
   activities: [],
   constraints: [],
-  showRoad: true,
+  showRoad: false,
 };
 
 const LABEL_MAP = new Map<string, string>(
@@ -148,6 +181,78 @@ export function toggleMulti(
   if (list.includes(value)) return list.filter((v) => v !== value);
   if (max != null && list.length >= max) return list;
   return [...list, value];
+}
+
+/** Normalize `<input type="time">` / draft values to `HH:MM` (same calendar day window). */
+export function normalizeHHMM(raw: string): string | null {
+  const m = String(raw || "")
+    .trim()
+    .match(/^([01]?\d|2[0-3]):([0-5]\d)/);
+  if (!m) return null;
+  return `${m[1]!.padStart(2, "0")}:${m[2]}`;
+}
+
+export function parseDraftHours(hours: string): {
+  start: string;
+  end: string;
+} {
+  const [a, b] = String(hours || "").split("|");
+  return {
+    start: normalizeHHMM(a || "") || "08:30",
+    end: normalizeHHMM(b || "") || "21:30",
+  };
+}
+
+export function joinDraftHours(start: string, end: string): string {
+  const s = normalizeHHMM(start) || "08:30";
+  const e = normalizeHHMM(end) || "21:30";
+  return `${s}|${e}`;
+}
+
+export function minutesFromHHMM(hhmm: string): number | null {
+  const n = normalizeHHMM(hhmm);
+  if (!n) return null;
+  const [h, m] = n.split(":").map(Number);
+  return h! * 60 + m!;
+}
+
+/** Same-day window: end must be strictly after start (no overnight). */
+export function validateSameDayHours(
+  start: string,
+  end: string,
+): string | null {
+  const s = minutesFromHHMM(start);
+  const e = minutesFromHHMM(end);
+  if (s == null || e == null) {
+    return "Giờ bắt đầu / kết thúc phải đúng định dạng HH:MM.";
+  }
+  if (e <= s) {
+    return "Giờ kết thúc phải sau giờ bắt đầu trong cùng một ngày.";
+  }
+  return null;
+}
+
+/** Required trip name + calendar date (≥ today when creating; past OK when editing). */
+export function validateTripTitleAndDate(
+  draft: Pick<AutoTripDraft, "title" | "date">,
+  opts?: { allowPast?: boolean; today?: string },
+): string | null {
+  const today = opts?.today ?? todayYmd();
+  const title = draft.title.trim();
+  if (!title) {
+    return "Vui lòng nhập tên chuyến đi.";
+  }
+  if (title.length > 120) {
+    return "Tên chuyến đi tối đa 120 ký tự.";
+  }
+  const day = (draft.date || "").trim().slice(0, 10);
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(day)) {
+    return "Vui lòng chọn ngày đi.";
+  }
+  if (!opts?.allowPast && day < today) {
+    return "Ngày đi phải từ hôm nay trở đi.";
+  }
+  return null;
 }
 
 /** Groups auto-planner can soft-score via ALLOWED_TAGS_MAP. */

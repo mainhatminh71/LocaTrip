@@ -26,7 +26,10 @@ export function GeneratedPlanView() {
     setReady(true);
   }, []);
 
-  const option = stored?.result.itineraries?.[0];
+  const option =
+    stored?.result.itineraries?.find(
+      (o) => o.optionId === stored.selectedOptionId,
+    ) ?? stored?.result.itineraries?.[0];
 
   return (
     <main className={styles.page}>

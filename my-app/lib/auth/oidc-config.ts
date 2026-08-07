@@ -30,6 +30,8 @@ export function getOidcConfig() {
     client_id: getKeycloakClientId(),
     redirect_uri: `${origin}/auth/callback`,
     post_logout_redirect_uri: `${origin}/`,
+    // Dedicated silent page — must not share /auth/callback (request_type clash).
+    silent_redirect_uri: `${origin}/auth/silent`,
     response_type: "code" as const,
     scope: "openid profile email",
     automaticSilentRenew: true,

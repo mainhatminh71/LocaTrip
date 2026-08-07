@@ -6,6 +6,7 @@ import { LT_IMAGE_QUALITY } from "@/lib/image-quality";
 import { usePathname } from "next/navigation";
 import { useEffect, useId, useRef, useState } from "react";
 import { useAuthActions } from "@/components/auth/useAuthActions";
+import { useImmersiveUi } from "@/components/layout/ImmersiveUiContext";
 import { BOOK_TRIP_ASSETS } from "@/lib/book-a-trip-assets";
 import styles from "./account-fab.module.css";
 
@@ -15,10 +16,16 @@ type MenuItem = {
   href: string;
   label: string;
   description: string;
-  icon: "trips" | "account" | "create";
+  icon: "home" | "trips" | "account" | "create";
 };
 
 const MENU_ITEMS: MenuItem[] = [
+  {
+    href: "/",
+    label: "Trang chủ",
+    description: "Landing page LocaTrip",
+    icon: "home",
+  },
   {
     href: "/my-trips/",
     label: "Chuyến đi của tôi",
@@ -39,8 +46,14 @@ const MENU_ITEMS: MenuItem[] = [
   },
 ];
 
-export function AccountFab() {
+type AccountMenuProps = {
+  /** Floating bottom-right FAB, or compact control for dark focus bar. */
+  variant?: "fab" | "bar";
+};
+
+export function AccountMenu({ variant = "fab" }: AccountMenuProps) {
   const pathname = usePathname();
+  const { immersive } = useImmersiveUi();
   const { isAuthenticated, isLoading, displayName, signOut } = useAuthActions();
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
@@ -70,13 +83,24 @@ export function AccountFab() {
     };
   }, [open]);
 
+  // Bottom FAB is hidden while itinerary focus bar hosts the bar menu.
+  if (variant === "fab" && immersive) return null;
   if (isLoading || !isAuthenticated || hidden) return null;
 
+  const rootClass =
+    variant === "bar"
+      ? `${styles.root} ${styles.rootBar}`
+      : styles.root;
+  const panelClass =
+    variant === "bar"
+      ? `${styles.panel} ${styles.panelBar}`
+      : styles.panel;
+
   return (
-    <div className={styles.root} ref={rootRef}>
+    <div className={rootClass} ref={rootRef}>
       {open ? (
         <div
-          className={styles.panel}
+          className={panelClass}
           id={menuId}
           role="menu"
           aria-label="Tài khoản LocaTrip"
@@ -119,32 +143,57 @@ export function AccountFab() {
         </div>
       ) : null}
 
-      <button
-        type="button"
-        className={`${styles.fab} ${open ? styles.fabOpen : ""}`}
-        aria-label={open ? "Đóng menu tài khoản" : "Mở menu tài khoản"}
-        aria-expanded={open}
-        aria-controls={menuId}
-        onClick={() => setOpen((v) => !v)}
-      >
-        <span className={styles.fabIcon} aria-hidden>
-          {open ? (
-            <CloseIcon />
-          ) : (
-            <Image
-              src={BOOK_TRIP_ASSETS.logo}
-              alt=""
-              width={34}
-              height={34}
-              className={styles.fabLogo}
-              priority
-                    quality={LT_IMAGE_QUALITY}
-                  />
-          )}
-        </span>
-      </button>
+      {variant === "bar" ? (
+        <button
+          type="button"
+          className={`${styles.barBtn} ${open ? styles.barBtnOpen : ""}`}
+          aria-label={
+            open ? "Đóng menu tài khoản" : "Mở menu tài khoản LocaTrip"
+          }
+          aria-expanded={open}
+          aria-controls={menuId}
+          onClick={() => setOpen((v) => !v)}
+        >
+          <span className={styles.barBtnIcon} aria-hidden>
+            {open ? <CloseIcon /> : <MenuGlyph />}
+          </span>
+          <span className={styles.barBtnLabel}>Menu</span>
+        </button>
+      ) : (
+        <button
+          type="button"
+          className={`${styles.fab} ${open ? styles.fabOpen : ""}`}
+          aria-label={
+            open ? "Đóng menu tài khoản" : "Mở menu tài khoản LocaTrip"
+          }
+          aria-expanded={open}
+          aria-controls={menuId}
+          onClick={() => setOpen((v) => !v)}
+        >
+          <span className={styles.fabIcon} aria-hidden>
+            {open ? (
+              <CloseIcon />
+            ) : (
+              <Image
+                src={BOOK_TRIP_ASSETS.logo}
+                alt=""
+                width={34}
+                height={34}
+                className={styles.fabLogo}
+                priority
+                quality={LT_IMAGE_QUALITY}
+              />
+            )}
+          </span>
+        </button>
+      )}
     </div>
   );
+}
+
+/** Floating bottom-right account menu (legacy export name). */
+export function AccountFab() {
+  return <AccountMenu variant="fab" />;
 }
 
 function CloseIcon() {
@@ -160,7 +209,32 @@ function CloseIcon() {
   );
 }
 
+function MenuGlyph() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+      <path
+        d="M5 7h14M5 12h14M5 17h10"
+        stroke="currentColor"
+        strokeWidth="1.9"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
 function MenuIcon({ name }: { name: MenuItem["icon"] }) {
+  if (name === "home") {
+    return (
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+        <path
+          d="M4 10.5 12 4l8 6.5V20a1 1 0 0 1-1 1h-5v-6H10v6H5a1 1 0 0 1-1-1v-9.5Z"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          strokeLinejoin="round"
+        />
+      </svg>
+    );
+  }
   if (name === "trips") {
     return (
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none">

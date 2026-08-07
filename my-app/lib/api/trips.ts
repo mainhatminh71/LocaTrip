@@ -1,6 +1,7 @@
 import type {
   AutoTripRequest,
   AutoTripResult,
+  BudgetLevel,
   DayItinerary,
   Pace,
   ScheduleItem,
@@ -20,19 +21,71 @@ export type PlaceSearchHit = {
 
 export type SavedTripSource = "cart" | "auto" | "manual";
 export type SavedTripStatus = "active" | "archived";
+/** User-facing trip phase (not the active/archived list flag). */
+export type TripProgressStatus = "Pending" | "OnGoing" | "Done";
+
+export const TRIP_PROGRESS_OPTIONS: {
+  value: TripProgressStatus;
+  label: string;
+}[] = [
+  { value: "Pending", label: "Đề xuất" },
+  { value: "OnGoing", label: "Đang đi" },
+  { value: "Done", label: "Hoàn thành" },
+];
+
+/** Planner prefs aligned with POST /trips generate fields + generatePrefs. */
+export type TripGeneratePrefs = {
+  tripType?: string;
+  targetCustomer?: string;
+  preferences?: string[];
+  budgetLevel?: BudgetLevel;
+  pace?: Pace;
+  radiusKm?: number;
+  maxDistance?: number;
+  isRoundTrip?: boolean;
+  roundTrip?: boolean;
+  startTimePerDay?: string;
+  endTimePerDay?: string;
+  showRoad?: boolean;
+  startCoords?: { latitude: number; longitude: number };
+  startMode?: "gps" | "preset" | string;
+  startId?: string;
+};
 
 export type CreateSavedTripBody = {
   title: string;
   itinerary: DayItinerary[];
+  /** Calendar day YYYY-MM-DD (required on create; ≥ today) */
+  date: string;
+  /** Alias accepted by LocalTrip */
+  tripDate?: string;
   source?: SavedTripSource;
   status?: SavedTripStatus;
+  tripStatus?: TripProgressStatus;
   startCoords?: { latitude: number; longitude: number };
+  /** Aliases accepted by LocalTrip POST/PATCH /trips */
+  startLatitude?: number;
+  startLongitude?: number;
   durationDays?: number;
   pace?: Pace;
   unscheduledItems?: { placeId?: string; title: string; reason: string }[];
   warnings?: unknown[];
   summary?: string;
-  totalEstimatedCost?: number;
+  totalEstimatedCost?: number | string;
+  tripType?: string;
+  targetCustomer?: string;
+  preferences?: string[];
+  budgetLevel?: BudgetLevel;
+  radiusKm?: number;
+  maxDistance?: number;
+  isRoundTrip?: boolean;
+  roundTrip?: boolean;
+  startTimePerDay?: string;
+  endTimePerDay?: string;
+  showRoad?: boolean;
+  startMode?: string;
+  startId?: string;
+  generatePrefs?: TripGeneratePrefs;
 };
 
 export type SavedTrip = {
@@ -41,17 +94,71 @@ export type SavedTrip = {
   title: string;
   source: SavedTripSource;
   itinerary: DayItinerary[];
+  /** Calendar day YYYY-MM-DD when set */
+  date?: string;
+  /** Alias some responses / older clients may send */
+  tripDate?: string;
   startCoords?: { latitude: number; longitude: number };
+  startLatitude?: number;
+  startLongitude?: number;
   durationDays?: number;
   pace?: Pace;
   unscheduledItems?: { placeId?: string; title: string; reason: string }[];
   warnings?: unknown[];
   summary?: string;
-  totalEstimatedCost?: number;
+  totalEstimatedCost?: number | string;
   status: SavedTripStatus;
+  tripStatus?: TripProgressStatus;
   createdAt: string;
   updatedAt: string;
+  tripType?: string;
+  targetCustomer?: string;
+  preferences?: string[];
+  budgetLevel?: BudgetLevel;
+  radiusKm?: number;
+  maxDistance?: number;
+  isRoundTrip?: boolean;
+  roundTrip?: boolean;
+  startTimePerDay?: string;
+  endTimePerDay?: string;
+  showRoad?: boolean;
+  startMode?: string;
+  startId?: string;
+  generatePrefs?: TripGeneratePrefs;
+  /** Linked doc in Mongo `trip_prefs` when present */
+  prefsId?: string;
 };
+
+/** YYYY-MM-DD from trip.date / tripDate / createdAt (Asia/Ho_Chi_Minh). */
+export function resolveTripDate(
+  trip: Pick<SavedTrip, "date" | "tripDate" | "createdAt">,
+): string | undefined {
+  const raw = trip.date || trip.tripDate;
+  if (typeof raw === "string" && /^\d{4}-\d{2}-\d{2}/.test(raw)) {
+    return raw.slice(0, 10);
+  }
+  if (trip.createdAt) {
+    try {
+      const d = new Date(trip.createdAt);
+      if (!Number.isNaN(d.getTime())) {
+        return new Intl.DateTimeFormat("en-CA", {
+          timeZone: "Asia/Ho_Chi_Minh",
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+        }).format(d);
+      }
+    } catch {
+      /* ignore */
+    }
+  }
+  return undefined;
+}
+
+function normalizeSavedTrip(trip: SavedTrip): SavedTrip {
+  const date = resolveTripDate(trip);
+  return date ? { ...trip, date, tripDate: date } : trip;
+}
 
 async function readError(res: Response): Promise<string> {
   try {
@@ -106,8 +213,11 @@ export async function generateAutoTrip(
 export async function createSavedTrip(
   body: CreateSavedTripBody,
 ): Promise<SavedTrip> {
+  const date = body.date.trim().slice(0, 10);
   const payload: CreateSavedTripBody = {
     ...body,
+    date,
+    tripDate: body.tripDate || date,
     itinerary: slimItineraryForSave(body.itinerary),
   };
   const res = await apiFetch("/api/trips/", {
@@ -122,7 +232,37 @@ export async function createSavedTrip(
   if (!data.trip?.id) {
     throw new ApiError("Server không trả về chuyến đi đã lưu", 502);
   }
-  return data.trip;
+  return normalizeSavedTrip(data.trip);
+}
+
+/** Partial update → `PATCH /trips/:tripId` (same fields as create). */
+export type UpdateSavedTripBody = Partial<CreateSavedTripBody>;
+
+export async function updateSavedTrip(
+  tripId: string,
+  body: UpdateSavedTripBody,
+): Promise<SavedTrip> {
+  const payload: UpdateSavedTripBody = { ...body };
+  if (body.itinerary) {
+    payload.itinerary = slimItineraryForSave(body.itinerary);
+  }
+  if (payload.date && !payload.tripDate) {
+    payload.tripDate = payload.date;
+  }
+  const res = await apiFetch(`/api/trips/${encodeURIComponent(tripId)}/`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+    cache: "no-store",
+  });
+  const data = (await res.json()) as { trip?: SavedTrip; error?: string };
+  if (!res.ok) {
+    throw new ApiError(data.error || (await readError(res)), res.status);
+  }
+  if (!data.trip?.id) {
+    throw new ApiError("Server không trả về chuyến đi đã cập nhật", 502);
+  }
+  return normalizeSavedTrip(data.trip);
 }
 
 /** List my trips → `GET /trips`. */
@@ -142,7 +282,7 @@ export async function listSavedTrips(
   if (!res.ok) {
     throw new ApiError(data.error || (await readError(res)), res.status);
   }
-  return data.trips ?? [];
+  return (data.trips ?? []).map(normalizeSavedTrip);
 }
 
 /** Get one trip → `GET /trips/:id`. */
@@ -159,7 +299,7 @@ export async function getSavedTrip(tripId: string): Promise<SavedTrip> {
   if (!data.trip) {
     throw new ApiError("Không tìm thấy chuyến đi", 404);
   }
-  return data.trip;
+  return normalizeSavedTrip(data.trip);
 }
 
 /** Delete trip → `DELETE /trips/:id`. */
@@ -172,6 +312,68 @@ export async function deleteSavedTrip(tripId: string): Promise<void> {
   if (!res.ok) {
     throw new ApiError(await readError(res), res.status);
   }
+}
+
+/** Body for `trip_prefs` create/patch (options only, no itinerary). */
+export type TripPrefsBody = TripGeneratePrefs & {
+  label?: string;
+  tripId?: string | null;
+  roundTrip?: boolean;
+  startLatitude?: number;
+  startLongitude?: number;
+  generatePrefs?: TripGeneratePrefs;
+};
+
+export type SavedTripPrefs = TripPrefsBody & {
+  id: string;
+  ownerId?: string;
+  generatePrefs?: TripGeneratePrefs;
+  createdAt?: string;
+  updatedAt?: string;
+};
+
+/** Create options set → `POST /trips/prefs`. */
+export async function createTripPrefs(
+  body: TripPrefsBody,
+): Promise<SavedTripPrefs> {
+  const res = await apiFetch("/api/trips/prefs/", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+    cache: "no-store",
+  });
+  const data = (await res.json()) as { prefs?: SavedTripPrefs; error?: string };
+  if (!res.ok) {
+    throw new ApiError(data.error || (await readError(res)), res.status);
+  }
+  if (!data.prefs?.id) {
+    throw new ApiError("Server không trả về bộ tiêu chí đã lưu", 502);
+  }
+  return data.prefs;
+}
+
+/** Update options only → `PATCH /trips/prefs/:prefsId`. */
+export async function updateTripPrefs(
+  prefsId: string,
+  body: TripPrefsBody,
+): Promise<SavedTripPrefs> {
+  const res = await apiFetch(
+    `/api/trips/prefs/${encodeURIComponent(prefsId)}/`,
+    {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+      cache: "no-store",
+    },
+  );
+  const data = (await res.json()) as { prefs?: SavedTripPrefs; error?: string };
+  if (!res.ok) {
+    throw new ApiError(data.error || (await readError(res)), res.status);
+  }
+  if (!data.prefs?.id) {
+    throw new ApiError("Server không trả về bộ tiêu chí đã cập nhật", 502);
+  }
+  return data.prefs;
 }
 
 /** Search places by title/address for replace modal. */

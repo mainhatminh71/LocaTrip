@@ -20,6 +20,15 @@ const BASE_LINKS = [
   { label: "Tạo chuyến đi", href: "/book-a-trip/" },
 ] as const;
 
+/** Always-visible capsule links (desktop). Overlay still lists the full set. */
+const INLINE_LINKS = [
+  { label: "Về chúng tôi", href: "/about/" },
+  { label: "Tours", href: "/tours/" },
+  { label: "Blogs", href: "/blogs/" },
+] as const;
+
+const INLINE_CTA = { label: "Tạo chuyến đi", href: "/book-a-trip/" } as const;
+
 const FEATURE_IMG = "/media/travelers.jpg";
 
 type SiteNavProps = {
@@ -78,9 +87,9 @@ export function SiteNav({ open, onOpenChange }: SiteNavProps) {
             className={styles.capsule}
             data-framer-name="Container"
             style={{
-              backdropFilter: "blur(5px)",
-              WebkitBackdropFilter: "blur(5px)",
-              backgroundColor: "rgba(0, 0, 0, 0.2)",
+              backdropFilter: "blur(8px)",
+              WebkitBackdropFilter: "blur(8px)",
+              backgroundColor: "rgba(0, 0, 0, 0.35)",
             }}
           >
             <Link
@@ -97,14 +106,46 @@ export function SiteNav({ open, onOpenChange }: SiteNavProps) {
                   height={46}
                   className={styles.logoImg}
                   priority
-                    quality={LT_IMAGE_QUALITY}
-                  />
+                  quality={LT_IMAGE_QUALITY}
+                />
               </span>
               <p className={styles.logoText}>
                 LOCA
                 <span className={styles.logoTextLight}>TRIP</span>
               </p>
             </Link>
+
+            <nav className={styles.inlineNav} aria-label="Điều hướng chính">
+              {INLINE_LINKS.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={styles.inlineLink}
+                  onClick={() => onOpenChange(false)}
+                >
+                  {item.label}
+                </Link>
+              ))}
+              {!isLoading && !isAuthenticated ? (
+                <button
+                  type="button"
+                  className={styles.inlineLink}
+                  onClick={() => {
+                    onOpenChange(false);
+                    openAuth();
+                  }}
+                >
+                  Đăng nhập
+                </button>
+              ) : null}
+              <Link
+                href={INLINE_CTA.href}
+                className={styles.inlineCta}
+                onClick={() => onOpenChange(false)}
+              >
+                {INLINE_CTA.label}
+              </Link>
+            </nav>
 
             <button
               type="button"
@@ -114,6 +155,9 @@ export function SiteNav({ open, onOpenChange }: SiteNavProps) {
               data-framer-name="Menu"
               onClick={() => onOpenChange(!open)}
             >
+              <span className={styles.menuLabel} aria-hidden="true">
+                Menu
+              </span>
               <span
                 className={styles.burger}
                 data-framer-name={open ? "Open" : "Close"}
