@@ -16,7 +16,7 @@
   font-family: "Manrope", sans-serif;
   font-size: 48px;
   font-weight: 600;
-  color: #012830;
+  color: var(--lt-deep);
 }
 
 .hero p {
@@ -43,7 +43,7 @@
   margin: 0;
   font-family: "Manrope", sans-serif;
   font-size: 28px;
-  color: #012830;
+  color: var(--lt-deep);
 }
 
 .summary {
@@ -59,7 +59,7 @@
   font-family: "Manrope", sans-serif;
   font-size: 20px;
   font-weight: 600;
-  color: #012830;
+  color: var(--lt-deep);
 }
 
 .tabs {
@@ -82,8 +82,8 @@
 }
 
 .tabOn {
-  background: #012830;
-  border-color: #012830;
+  background: var(--lt-deep);
+  border-color: var(--lt-deep);
   color: #fff;
 }
 
@@ -107,7 +107,7 @@
   margin: 0 0 16px;
   font-family: "Manrope", sans-serif;
   font-size: 20px;
-  color: #012830;
+  color: var(--lt-deep);
 }
 
 .day ul {
@@ -135,7 +135,7 @@
 .day strong {
   font-family: "Inter", system-ui, sans-serif;
   font-size: 15px;
-  color: #191919;
+  color: var(--lt-ink);
 }
 
 .day p {
@@ -166,13 +166,13 @@
 }
 
 .cta {
-  background: #012830;
+  background: var(--lt-deep);
   color: #fff;
 }
 
 .ctaGhost {
   background: #fff;
-  color: #012830;
+  color: var(--lt-deep);
   border: 1px solid #d0d0d0;
 }
 
@@ -185,7 +185,7 @@
 
 .empty h2 {
   font-family: "Manrope", sans-serif;
-  color: #012830;
+  color: var(--lt-deep);
 }
 
 @media (max-width: 809.98px) {

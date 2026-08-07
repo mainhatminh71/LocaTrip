@@ -1,0 +1,118 @@
+.page {
+  min-height: calc(100dvh - 80px);
+  display: grid;
+  place-items: center;
+  padding: 6rem 1.25rem 5rem;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% 0%, rgba(61, 220, 151, 0.12), transparent 55%),
+    #f4f7f6;
+}
+
+.card {
+  width: min(440px, 100%);
+  padding: 1.75rem 1.5rem 1.4rem;
+  border-radius: 22px;
+  background: #fff;
+  border: 1px solid rgba(1, 40, 48, 0.06);
+  box-shadow: 0 18px 40px rgba(1, 40, 48, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.eyebrow {
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--lt-teal, #0a6b7c);
+}
+
+.title {
+  margin: 0;
+  font-family: var(--lt-font-display, system-ui);
+  font-size: 1.55rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--lt-ink, #191919);
+}
+
+.sub {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: var(--lt-muted, #545454);
+}
+
+.meta {
+  margin: 0.35rem 0 0;
+  padding: 0.85rem 0.95rem;
+  border-radius: 14px;
+  background: #f5faf8;
+}
+
+.meta div {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.meta dt {
+  font-size: 0.8rem;
+  color: var(--lt-muted, #545454);
+}
+
+.meta dd {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--lt-deep, #012830);
+  text-transform: capitalize;
+}
+
+.empty {
+  margin-top: 0.25rem;
+  padding: 1.35rem 1rem;
+  border-radius: 14px;
+  border: 1px dashed rgba(10, 107, 124, 0.28);
+  background: #f8fbfa;
+  text-align: center;
+  color: var(--lt-muted, #545454);
+  font-size: 0.9rem;
+}
+
+.empty p {
+  margin: 0;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  margin-top: 0.5rem;
+}
+
+.btnPrimary,
+.btnGhost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.7rem;
+  padding: 0.55rem 1rem;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.btnPrimary {
+  color: var(--lt-deep, #012830);
+  background: linear-gradient(135deg, #4ae6a8, #0a6b7c);
+}
+
+.btnGhost {
+  color: var(--lt-teal, #0a6b7c);
+  background: transparent;
+  border: 1px solid rgba(10, 107, 124, 0.28);
+}

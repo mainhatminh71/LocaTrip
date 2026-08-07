@@ -1,15 +1,19 @@
 import { NextResponse } from "next/server";
+import {
+  getUpstreamBase,
+  proxyJsonResponse,
+  upstreamHeaders,
+  upstreamUnreachable,
+} from "@/lib/api/proxy-upstream";
 
 export const dynamic = "force-dynamic";
-
-const DEFAULT_API = "http://localhost:5000";
 
 /**
  * Proxy to LocalTrip backend `POST /trips/generate/auto`
  * so the browser stays same-origin (no CORS on Express).
  */
 export async function POST(request: Request) {
-  const base = (process.env.LOCALTRIP_API_URL || DEFAULT_API).replace(/\/$/, "");
+  const base = getUpstreamBase();
   let body: unknown;
 
   try {
@@ -21,28 +25,14 @@ export async function POST(request: Request) {
   try {
     const upstream = await fetch(`${base}/trips/generate/auto`, {
       method: "POST",
-      headers: { "Content-Type": "application/json", Accept: "application/json" },
+      headers: upstreamHeaders(request, {
+        "Content-Type": "application/json",
+      }),
       body: JSON.stringify(body),
       cache: "no-store",
     });
-
-    const text = await upstream.text();
-    let data: unknown = null;
-    try {
-      data = text ? JSON.parse(text) : null;
-    } catch {
-      data = { error: text || "Upstream returned non-JSON" };
-    }
-
-    return NextResponse.json(data, { status: upstream.status });
+    return proxyJsonResponse(upstream);
   } catch (err) {
-    const message =
-      err instanceof Error ? err.message : "Cannot reach LocalTrip API";
-    return NextResponse.json(
-      {
-        error: `Không kết nối được backend (${base}). Chạy server LocalTrip rồi thử lại. Chi tiết: ${message}`,
-      },
-      { status: 502 },
-    );
+    return upstreamUnreachable(base, err);
   }
 }

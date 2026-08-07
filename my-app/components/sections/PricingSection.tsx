@@ -14,14 +14,16 @@ export function PricingSection() {
       <div className="mx-auto w-full max-w-[1200px]">
         <div className="mb-10 flex flex-col items-center text-center">
           <SectionTag>Gói dịch vụ</SectionTag>
-          <h2 className="mt-4 font-display text-[32px] font-bold tracking-[-0.02em] text-[#111] md:text-[42px]">
+          <h2 className="mt-4 font-display text-[32px] font-bold tracking-[-0.02em] text-[var(--lt-near-black)] md:text-[42px]">
             phù hợp với nhu cầu
           </h2>
           <div className="mt-6 inline-flex rounded-full bg-white/80 p-1 shadow-sm">
             <button
               type="button"
               className={`rounded-full px-5 py-2 text-sm ${
-                !yearly ? "bg-[#0b0b0b] text-white" : "text-[#555]"
+                !yearly
+                  ? "bg-[var(--lt-black)] text-white"
+                  : "text-[var(--lt-muted)]"
               }`}
               onClick={() => setYearly(false)}
             >
@@ -30,7 +32,9 @@ export function PricingSection() {
             <button
               type="button"
               className={`rounded-full px-5 py-2 text-sm ${
-                yearly ? "bg-[#0b0b0b] text-white" : "text-[#555]"
+                yearly
+                  ? "bg-[var(--lt-black)] text-white"
+                  : "text-[var(--lt-muted)]"
               }`}
               onClick={() => setYearly(true)}
             >
@@ -50,8 +54,8 @@ export function PricingSection() {
               key={plan.name}
               className={`flex flex-col rounded-[22px] border p-7 ${
                 plan.highlight
-                  ? "border-transparent bg-[#0b0b0b] text-white shadow-xl"
-                  : "border-white/60 bg-white text-[#111]"
+                  ? "border-transparent bg-[var(--lt-black)] text-white shadow-xl"
+                  : "border-white/60 bg-white text-[var(--lt-near-black)]"
               }`}
             >
               <p className="text-sm opacity-70">{plan.name}</p>
@@ -65,8 +69,8 @@ export function PricingSection() {
                     <span
                       className={`inline-flex size-5 items-center justify-center rounded-full text-[11px] ${
                         plan.highlight
-                          ? "bg-[#3DDC97] text-[#0b0b0b]"
-                          : "bg-[#111] text-white"
+                          ? "bg-[var(--lt-mint)] text-[var(--lt-black)]"
+                          : "bg-[var(--lt-near-black)] text-white"
                       }`}
                     >
                       ✓
@@ -76,11 +80,11 @@ export function PricingSection() {
                 ))}
               </ul>
               <Link
-                href="/book-a-trip"
+                href="/book-a-trip/"
                 className={`mt-8 inline-flex h-11 items-center justify-center rounded-full text-sm font-medium transition ${
                   plan.highlight
-                    ? "bg-[#3DDC97] text-[#0b0b0b] hover:bg-[#58e8ab]"
-                    : "border border-[#111] text-[#111] hover:bg-[#111] hover:text-white"
+                    ? "bg-[var(--lt-mint)] text-[var(--lt-black)] hover:bg-[#58e8ab]"
+                    : "border border-[var(--lt-near-black)] text-[var(--lt-near-black)] hover:bg-[var(--lt-near-black)] hover:text-white"
                 }`}
               >
                 {plan.cta}

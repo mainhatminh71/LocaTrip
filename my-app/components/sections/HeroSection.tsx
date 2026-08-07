@@ -1,11 +1,11 @@
 "use client";
 
 import Image from "next/image";
+import { LT_IMAGE_QUALITY } from "@/lib/image-quality";
 import Link from "next/link";
-import { useRef, useState, type CSSProperties } from "react";
+import { useRef, type CSSProperties } from "react";
 import { motion, useInView } from "framer-motion";
 import { IMG, heroStats } from "@/lib/content";
-import { SiteNav } from "@/components/layout/SiteNav";
 
 type HeroProps = {
   locationLabel?: string;
@@ -18,7 +18,7 @@ type HeroProps = {
 
 /**
  * Port of Framer `LocaTripHeroExport` → Next.
- * Nav capsule + overlay menu match Framer scrape transitions.
+ * SiteNav comes from MarketingChrome (fixed overlay).
  */
 export function HeroSection({
   locationLabel = "Khu vực: Đà Lạt",
@@ -30,7 +30,6 @@ export function HeroSection({
 }: HeroProps) {
   const heroRef = useRef<HTMLElement | null>(null);
   const inView = useInView(heroRef, { amount: 0.2, once: false });
-  const [menuOpen, setMenuOpen] = useState(false);
 
   const thumbs = [
     {
@@ -78,7 +77,7 @@ export function HeroSection({
   return (
     <section
       ref={heroRef}
-      className="relative isolate flex h-[100svh] min-h-[680px] w-full max-w-full items-stretch justify-center overflow-hidden bg-[#111] text-white"
+      className="relative isolate flex h-[100svh] min-h-[680px] w-full max-w-full items-stretch justify-center overflow-hidden bg-[var(--lt-near-black)] text-white"
     >
       <Image
         src={IMG.homeHero}
@@ -86,6 +85,7 @@ export function HeroSection({
         fill
         priority
         sizes="100vw"
+        quality={LT_IMAGE_QUALITY}
         className={`object-cover object-center transition-transform duration-[1200ms] ease-out ${
           inView ? "scale-[1.02]" : "scale-100"
         }`}
@@ -110,7 +110,14 @@ export function HeroSection({
             aspectRatio: "4 / 5",
           }}
         >
-          <Image src={t.src} alt={t.alt} fill className="object-cover" sizes="130px" />
+          <Image
+            src={t.src}
+            alt={t.alt}
+            fill
+            className="object-cover"
+            sizes="130px"
+            quality={LT_IMAGE_QUALITY}
+          />
         </div>
       ))}
 
@@ -118,10 +125,8 @@ export function HeroSection({
         initial={inView ? { opacity: 0, y: 18 } : false}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.7 }}
-        className="relative z-[2] flex w-full max-w-[980px] flex-col justify-between gap-6 p-[clamp(16px,3vw,28px)]"
+        className="relative z-[2] flex w-full max-w-[980px] flex-col justify-end gap-6 p-[clamp(16px,3vw,28px)] pt-[clamp(88px,14vh,120px)]"
       >
-        <SiteNav open={menuOpen} onOpenChange={setMenuOpen} />
-
         <div className="mx-auto my-auto flex w-[min(100%,760px)] flex-col items-center gap-3.5 px-[clamp(6px,2vw,20px)] py-[clamp(8px,1vw,14px)] text-center">
           <span className="font-body rounded-full border border-white/25 bg-[rgba(12,20,22,0.42)] px-3.5 py-2 text-[15px] font-semibold leading-none tracking-[-0.01em] text-white/92">
             {locationLabel}
@@ -141,7 +146,7 @@ export function HeroSection({
               whileTap={{ scale: 0.97 }}
               whileHover={{ y: -1 }}
               transition={{ type: "spring", stiffness: 450, damping: 30 }}
-              className="font-body inline-flex cursor-pointer items-center gap-2 rounded-full border border-black/10 bg-white px-[18px] py-3 text-[15px] font-semibold leading-none tracking-[-0.01em] text-[#111] shadow-[0_8px_22px_rgba(0,0,0,0.2)]"
+              className="font-body inline-flex cursor-pointer items-center gap-2 rounded-full border border-black/10 bg-white px-[18px] py-3 text-[15px] font-semibold leading-none tracking-[-0.01em] text-[var(--lt-near-black)] shadow-[0_8px_22px_rgba(0,0,0,0.2)]"
             >
               <span>{ctaLabel}</span>
               <span aria-hidden>→</span>
@@ -150,7 +155,7 @@ export function HeroSection({
         </div>
 
         {showTrustRow ? (
-          <div className="mx-auto flex min-h-[42px] w-[min(94%,640px)] flex-wrap items-center justify-center gap-x-5 gap-y-2 rounded-full border border-black/5 bg-white/96 px-3.5 py-2.5 text-[#111] shadow-[0_6px_20px_rgba(0,0,0,0.1)]">
+          <div className="mx-auto flex min-h-[42px] w-[min(94%,640px)] flex-wrap items-center justify-center gap-x-5 gap-y-2 rounded-full border border-black/5 bg-white/96 px-3.5 py-2.5 text-[var(--lt-near-black)] shadow-[0_6px_20px_rgba(0,0,0,0.1)]">
             {heroStats.map((s) => (
               <span
                 key={s.text}
@@ -172,7 +177,7 @@ function TrustIcon({ kind }: { kind: "google" | "people" | "ig" }) {
     return (
       <svg width="14" height="14" viewBox="0 0 24 24" aria-hidden>
         <path
-          fill="#111"
+          fill="currentColor"
           d="M12 17.3 18.2 21l-1.6-7.1L22 9.2l-7.2-.6L12 2 9.2 8.6 2 9.2l5.4 4.7L5.8 21z"
         />
       </svg>
@@ -183,16 +188,16 @@ function TrustIcon({ kind }: { kind: "google" | "people" | "ig" }) {
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden>
         <path
           d="M16 11a3 3 0 1 0-3-3 3 3 0 0 0 3 3ZM8 11a3 3 0 1 0-3-3 3 3 0 0 0 3 3ZM8.2 13C5.4 13 2 14.2 2 16.5V18h8.5v-1.5c0-.9.4-1.7 1.1-2.3A7.4 7.4 0 0 0 8.2 13Zm7.3 0c-.5 0-1 .05-1.4.14A4.2 4.2 0 0 1 16.5 16.5V18H22v-1.5C22 14.2 18.6 13 15.5 13Z"
-          fill="#111"
+          fill="currentColor"
         />
       </svg>
     );
   }
   return (
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden>
-      <rect x="3" y="3" width="18" height="18" rx="5" stroke="#111" strokeWidth="1.6" />
-      <circle cx="12" cy="12" r="3.5" stroke="#111" strokeWidth="1.6" />
-      <circle cx="17.2" cy="6.8" r="1" fill="#111" />
+      <rect x="3" y="3" width="18" height="18" rx="5" stroke="currentColor" strokeWidth="1.6" />
+      <circle cx="12" cy="12" r="3.5" stroke="currentColor" strokeWidth="1.6" />
+      <circle cx="17.2" cy="6.8" r="1" fill="currentColor" />
     </svg>
   );
 }

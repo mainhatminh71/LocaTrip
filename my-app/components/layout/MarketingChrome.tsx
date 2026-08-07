@@ -11,21 +11,34 @@ type MarketingChromeProps = {
   children: ReactNode;
   /** Hide Conversion CTA band (e.g. 404). */
   hideConversion?: boolean;
+  /** Hide nav + footer (focus mode while picking places). */
+  hideChrome?: boolean;
+  /** Hide footer only (e.g. login). */
+  hideFooter?: boolean;
+  /** SiteConversion primary CTA href (book-a-trip uses #top). */
+  conversionCtaHref?: string;
 };
 
-/** Shared React chrome: SiteNav + page body + Conversion + SiteFooter. */
+/** Shared site chrome: one SiteNav + optional Conversion + SiteFooter. */
 export function MarketingChrome({
   children,
   hideConversion = false,
+  hideChrome = false,
+  hideFooter = false,
+  conversionCtaHref = "/book-a-trip/",
 }: MarketingChromeProps) {
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
     <SiteShell>
-      <SiteNav open={menuOpen} onOpenChange={setMenuOpen} />
+      {hideChrome ? null : (
+        <SiteNav open={menuOpen} onOpenChange={setMenuOpen} />
+      )}
       {children}
-      {hideConversion ? null : <SiteConversion />}
-      <SiteFooter />
+      {hideConversion || hideChrome ? null : (
+        <SiteConversion ctaHref={conversionCtaHref} />
+      )}
+      {hideChrome || hideFooter ? null : <SiteFooter />}
     </SiteShell>
   );
 }

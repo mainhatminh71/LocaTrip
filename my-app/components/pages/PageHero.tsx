@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { LT_IMAGE_QUALITY } from "@/lib/image-quality";
 import styles from "./page-hero.module.css";
 
 type PageHeroProps = {
@@ -17,7 +18,8 @@ export function PageHero({ title, sub, bgSrc }: PageHeroProps) {
         fill
         priority
         sizes="100vw"
-      />
+                    quality={LT_IMAGE_QUALITY}
+                  />
       <div className={styles.copy} data-framer-name="Titles">
         <h1 data-framer-name="Main Title">{title}</h1>
         <p data-framer-name="Sub Title">{sub}</p>

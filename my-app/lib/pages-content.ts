@@ -1,18 +1,16 @@
-/** Framer page content for React ports (about / tours / blogs / policies). */
+/** Page content for React ports (about / tours / blogs / policies). */
 
 export const ABOUT = {
   heroTitle: "Về chúng tôi",
   heroSub: "Du lịch là để thư thả, không phải để vội",
-  heroBg:
-    "https://framerusercontent.com/images/nOTKvIVT302nbJc99jtmoA2mBc.jpg",
+  heroBg: "/media/sunset-hills.jpg",
   aboutTitle:
     "Tạo nên những chuyến trải nghiệm xứng đáng với thời gian và ngân sách",
   aboutBody: [
     "Được thành lập dựa trên niềm tin rằng du lịch nên là trải nghiệm cá nhân và dễ dàng — LocaTrip là trợ thủ du lịch đáng tin cậy.",
     "Từ những chuyến đi nghỉ cuối tuần đến những hành trình theo nhóm, chúng tôi đề cao thời gian du khách bỏ ra và giúp mỗi chuyến đi đáng nhớ hơn.",
   ],
-  aboutImage:
-    "https://framerusercontent.com/images/rURHZSdoSX3cawci8xHnhL9BONA.jpg",
+  aboutImage: "/media/group-travel.jpg",
   milestoneTitle: "Cột mốc",
   stats: [
     { value: "10,000+", label: "Chuyến đi" },
@@ -48,8 +46,7 @@ export const ABOUT = {
 export const TOURS_PAGE = {
   heroTitle: "Mẫu lịch trình có sẵn",
   heroSub: "Du lịch dựa theo lịch trình đã được tối ưu",
-  heroBg:
-    "https://framerusercontent.com/images/2W9zQkhITjj1b8OOvZwnR1nRrhM.jpg",
+  heroBg: "/media/mountain-mist.jpg",
   filters: ["Tất cả", "Thiên nhiên", "Lãng mạn", "Mạo hiểm"] as const,
 } as const;
 
@@ -60,7 +57,7 @@ export const TOUR_CARDS = [
     days: "3 ngày / 2 đêm",
     price: "đ3,600K",
     filter: "Lãng mạn",
-    image: "https://framerusercontent.com/images/GPNEa8sBXk6aWDS6GbYHSp7DMM.png",
+    image: "/media/travelers.jpg",
   },
   {
     slug: "italy-classic-discovery",
@@ -68,7 +65,7 @@ export const TOUR_CARDS = [
     days: "7 Days / 6 Nights",
     price: "đ1,400K",
     filter: "Thiên nhiên",
-    image: "https://framerusercontent.com/images/MBAx1mHhNJTAWa0PKC0AtH64oBI.png",
+    image: "/media/mountain-mist.jpg",
   },
   {
     slug: "paris-classics",
@@ -76,7 +73,7 @@ export const TOUR_CARDS = [
     days: "6 Days / 5 Nights",
     price: "đ1,500K",
     filter: "Thiên nhiên",
-    image: "https://framerusercontent.com/images/5y9i7sXxka5OvOM4z5snlX7neo.png",
+    image: "/media/sunset-hills.jpg",
   },
   {
     slug: "paris-cultural-getaway",
@@ -84,7 +81,7 @@ export const TOUR_CARDS = [
     days: "5 Days / 4 Nights",
     price: "đ4,100K",
     filter: "Thiên nhiên",
-    image: "https://framerusercontent.com/images/6j3ZWL8yZ9iP4E4druKfCwtqxw.png",
+    image: "/media/waterfall.jpg",
   },
   {
     slug: "africa-safari-experience",
@@ -92,7 +89,7 @@ export const TOUR_CARDS = [
     days: "8 Days / 7 Nights",
     price: "đ2,200K",
     filter: "Thiên nhiên",
-    image: "https://framerusercontent.com/images/t2wnjcDDLKkJLV7VQN0iT9QzTA.png",
+    image: "/media/forest-path.jpg",
   },
   {
     slug: "new-york-highlights-copy",
@@ -100,7 +97,7 @@ export const TOUR_CARDS = [
     days: "6 Days / 5 Nights",
     price: "$1,300",
     filter: "Mạo hiểm",
-    image: "https://framerusercontent.com/images/GPNEa8sBXk6aWDS6GbYHSp7DMM.png",
+    image: "/media/dalat-hills.jpg",
   },
   {
     slug: "spain-cultural-trail",
@@ -108,7 +105,7 @@ export const TOUR_CARDS = [
     days: "6 Days / 5 Nights",
     price: "$1,200",
     filter: "Lãng mạn",
-    image: "https://framerusercontent.com/images/MBAx1mHhNJTAWa0PKC0AtH64oBI.png",
+    image: "/media/group-travel.jpg",
   },
   {
     slug: "bali-cultural-retreat",
@@ -116,15 +113,14 @@ export const TOUR_CARDS = [
     days: "6 Days / 5 Nights",
     price: "đ2,950K",
     filter: "Mạo hiểm",
-    image: "https://framerusercontent.com/images/5y9i7sXxka5OvOM4z5snlX7neo.png",
+    image: "/media/vietnam-street.jpg",
   },
 ] as const;
 
 export const BLOGS_PAGE = {
   heroTitle: "Travel Stories & Guides",
   heroSub: "Stories, tips, and insights to inspire your journey.",
-  heroBg:
-    "https://framerusercontent.com/images/uNOaiw8D5CbJIpX7nghun4PT340.jpg",
+  heroBg: "/media/cta-banner.jpg",
 } as const;
 
 export const BLOG_POSTS = [
@@ -133,7 +129,7 @@ export const BLOG_POSTS = [
     title: "Đón bình minh ở Đà Lạt tựa như đến chốn thần tiên",
     author: "Chu Mẫn Nghi",
     date: "25 Feb 2026",
-    image: "https://framerusercontent.com/images/t2wnjcDDLKkJLV7VQN0iT9QzTA.png",
+    image: "/media/sunset-hills.jpg",
     excerpt:
       "Bình minh trên phố núi — khoảnh khắc khiến Đà Lạt trở thành điểm đến khó quên.",
   },
@@ -142,7 +138,7 @@ export const BLOG_POSTS = [
     title: "Festival Hoa Đà Lạt năm 2019",
     author: "Chu Mẫn Nghi",
     date: "10 Mar 2026",
-    image: "https://framerusercontent.com/images/L1whDyPPzOfGHiLVY1006VxFc.png",
+    image: "/media/cafe-view.jpg",
     excerpt:
       "Sắc hoa và nhịp sống lễ hội — góc nhìn về Festival Hoa Đà Lạt.",
   },
@@ -151,7 +147,7 @@ export const BLOG_POSTS = [
     title: "Tham quan thung lũng Atiso",
     author: "Chu Mẫn Nghi",
     date: "13 Mar 2026",
-    image: "https://framerusercontent.com/images/HnZ2DNpNgFJqZSNWQ4GYf0u8bo.jpg",
+    image: "/media/dalat-hills.jpg",
     excerpt:
       "Thung lũng Atiso — không gian xanh và nhịp chậm giữa lòng cao nguyên.",
   },
@@ -160,7 +156,7 @@ export const BLOG_POSTS = [
     title: "Nông trại cúng cưng phục vụ du lịch tại Đà Lạt",
     author: "Chu Mẫn Nghi",
     date: "19 Jan 2026",
-    image: "https://framerusercontent.com/images/7TWZu3vfa0cxeoXkcRGHmncyw.jpg",
+    image: "/media/market.jpg",
     excerpt:
       "Trải nghiệm nông trại thú cưng — góc check-in và hoạt động thân thiện gia đình.",
   },

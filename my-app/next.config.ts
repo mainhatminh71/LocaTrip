@@ -8,6 +8,10 @@ const nextConfig: NextConfig = {
     root: process.cwd(),
   },
   images: {
+    // OpenNext IMAGES binding re-transforms on most hits (~1s+ TTFB) and
+    // /cdn-cgi/image requires Image Resizing (not enabled on locatrip.app).
+    // Serve pre-compressed static assets from Workers ASSETS instead.
+    unoptimized: true,
     remotePatterns: [
       {
         protocol: "https",

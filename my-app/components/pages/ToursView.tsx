@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { LT_IMAGE_QUALITY } from "@/lib/image-quality";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { TOUR_CARDS, TOURS_PAGE } from "@/lib/pages-content";
@@ -55,7 +56,8 @@ export function ToursView() {
                   fill
                   className={styles.thumbImg}
                   sizes="(max-width:809px) 100vw, 360px"
-                />
+                    quality={LT_IMAGE_QUALITY}
+                  />
               </div>
               <p className={styles.meta}>{tour.days}</p>
               <h3 className={styles.title}>{tour.title}</h3>

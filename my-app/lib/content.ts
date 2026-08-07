@@ -1,57 +1,44 @@
 /**
- * Assets copied from Framer Chrome-save (_files), same hashes as HTML.
- * Hero order in Framer SSR: logo → hero-bg → float×4 → icons…
+ * Local media in /public/media (Unsplash travel / Da Lat–style stock).
+ * No scrape or Framer CDN dependency for page images.
  */
 export const IMG = {
-  logo: "/home/logo.png",
-  homeHero: "/home/hero-bg.jpg",
-  /** Floating cards around hero (Framer order) */
-  hero1: "/home/float-1.png",
-  hero2: "/home/float-2.png",
-  hero3: "/home/float-3.png",
-  hero4: "/home/float-4.png",
-  iconGoogle: "/home/icon-pin.svg",
-  iconPeople: "/home/icon-people.svg",
-  iconIg: "/home/icon-bird.svg",
-  /** Framer About dual images (exact CDN filenames from scrape) */
-  aboutMain:
-    "https://framerusercontent.com/images/AH8SH5eDglzjKBPBQFq3Yo7Nmrw.png",
-  aboutSide:
-    "https://framerusercontent.com/images/mzvUBcw1Da0Uo6Zh4sidKqIebA.png",
-  whyBg:
-    "https://framerusercontent.com/images/Wf2MNykv3Zg5ogSRxiaSZFyJGdI.jpg",
-  exp1: "https://framerusercontent.com/images/EjalgXG0z9c7pOuDSiGNaxtaheU.png",
-  exp2: "https://framerusercontent.com/images/6rWPmbqDQO9hJIhXRVDVCRbWUo.png",
-  exp3: "https://framerusercontent.com/images/sE84HzSdps9I8RvYi3apLLt1m8.png",
-  exp4: "https://framerusercontent.com/images/dxFaHkdx8IDfjbztuPt6XStL5M.png",
-  dest1: "https://framerusercontent.com/images/I6igcYQetVpLzLeJMFWe3js5R8.jpg",
-  dest2: "https://framerusercontent.com/images/pFmTQeAfrl6ODSYhTm5iCVFyHc.jpg",
-  dest3: "https://framerusercontent.com/images/Wjm1G19SGwvkVURQAKYBJiyXHIs.jpg",
-  dest4: "https://framerusercontent.com/images/xPq9YoLQc0DjJyTkUVKVGxOgZzU.png",
-  tour1: "https://framerusercontent.com/images/GPNEa8sBXk6aWDS6GbYHSp7DMM.png",
-  tour2: "https://framerusercontent.com/images/MBAx1mHhNJTAWa0PKC0AtH64oBI.png",
-  tour3: "https://framerusercontent.com/images/5y9i7sXxka5OvOM4z5snlX7neo.png",
-  tour4: "https://framerusercontent.com/images/6j3ZWL8yZ9iP4E4druKfCwtqxw.png",
-  tour5: "https://framerusercontent.com/images/t2wnjcDDLKkJLV7VQN0iT9QzTA.png",
-  why1: "https://framerusercontent.com/images/SV1MiT2BJSPLRUGiJqhm8CRVHkg.jpg",
-  why2: "https://framerusercontent.com/images/TbABSK0jO0lK92h2zYYIMJTiusY.jpg",
-  why3: "https://framerusercontent.com/images/rpVOKYpAImjkvR673iT3Gjc4XI.jpg",
-  why4: "https://framerusercontent.com/images/j5yLKM0E783r5ug16dHihjxz6c.png",
-  testimonial:
-    "https://framerusercontent.com/images/o2lDRrcAtneLj0hShUdzHpIYRGI.png",
-  avatar1:
-    "https://framerusercontent.com/images/Z8uoeno7ffCAB8uZsn9MJcoSw.jpg",
-  avatar2:
-    "https://framerusercontent.com/images/1qOlVnV2OGWz5QUAwfV5EkSHxNc.jpg",
-  avatar3:
-    "https://framerusercontent.com/images/cQDM4UGHbkNJdKaXIcNdkbMAbo.jpg",
-  blog1: "https://framerusercontent.com/images/L1whDyPPzOfGHiLVY1006VxFc.png",
-  blog2: "https://framerusercontent.com/images/NPVGQTBuWTgKghTzjcUHJMKAX6Y.jpg",
-  story1: "https://framerusercontent.com/images/RAenYu1Zwzu8EU9Z2pipfgakApQ.png",
-  story2: "https://framerusercontent.com/images/wQHTCAms5SNygRswHiQwBRhtI.png",
-  story3: "https://framerusercontent.com/images/mzvUBcw1Da0Uo6Zh4sidKqIebA.png",
-  footer:
-    "https://framerusercontent.com/images/mzvUBcw1Da0Uo6Zh4sidKqIebA.png",
+  logo: "/media/logo.png",
+  homeHero: "/media/dalat-lake.jpg",
+  hero1: "/media/float-1.jpg",
+  hero2: "/media/float-2.jpg",
+  hero3: "/media/float-3.jpg",
+  hero4: "/media/float-4.jpg",
+  aboutMain: "/media/vietnam-street.jpg",
+  aboutSide: "/media/dalat-hills.jpg",
+  whyBg: "/media/sunset-hills.jpg",
+  exp1: "/media/temple.jpg",
+  exp2: "/media/mountain-mist.jpg",
+  exp3: "/media/forest-path.jpg",
+  exp4: "/media/market.jpg",
+  dest1: "/media/vietnam-street.jpg",
+  dest2: "/media/dalat-lake.jpg",
+  dest3: "/media/dalat-hills.jpg",
+  dest4: "/media/mountain-mist.jpg",
+  tour1: "/media/travelers.jpg",
+  tour2: "/media/mountain-mist.jpg",
+  tour3: "/media/sunset-hills.jpg",
+  tour4: "/media/forest-path.jpg",
+  tour5: "/media/dalat-lake.jpg",
+  why1: "/media/waterfall.jpg",
+  why2: "/media/cafe-view.jpg",
+  why3: "/media/temple.jpg",
+  why4: "/media/market.jpg",
+  testimonial: "/media/travelers.jpg",
+  avatar1: "/media/avatar-1.jpg",
+  avatar2: "/media/avatar-2.jpg",
+  avatar3: "/media/avatar-3.jpg",
+  blog1: "/media/sunset-hills.jpg",
+  blog2: "/media/cafe-view.jpg",
+  story1: "/media/sunset-hills.jpg",
+  story2: "/media/dalat-lake.jpg",
+  story3: "/media/cafe-view.jpg",
+  footer: "/media/dalat-hills.jpg",
 } as const;
 
 export const heroStats = [

@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { LT_IMAGE_QUALITY } from "@/lib/image-quality";
 import { ABOUT } from "@/lib/pages-content";
 import { PageHero } from "@/components/pages/PageHero";
 import styles from "./about.module.css";
@@ -29,7 +30,8 @@ export function AboutView() {
               fill
               className={styles.photoImg}
               sizes="(max-width: 809px) 100vw, 560px"
-            />
+                    quality={LT_IMAGE_QUALITY}
+                  />
           </div>
         </div>
       </section>

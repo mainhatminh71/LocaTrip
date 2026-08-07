@@ -16,6 +16,7 @@ export const LT = {
     line: 'var(--lt-line)',
     white: 'var(--lt-white)',
     black: 'var(--lt-black)',
+    nearBlack: 'var(--lt-near-black)',
     deep: 'var(--lt-deep)',
     teal: 'var(--lt-teal)',
     tealDeep: 'var(--lt-teal-deep)',

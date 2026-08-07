@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { LT_IMAGE_QUALITY } from "@/lib/image-quality";
 import Link from "next/link";
 import { BLOG_POSTS, BLOGS_PAGE } from "@/lib/pages-content";
 import { PageHero } from "@/components/pages/PageHero";
@@ -27,7 +28,8 @@ export function BlogsView() {
                   fill
                   className={styles.thumbImg}
                   sizes="(max-width:809px) 100vw, 360px"
-                />
+                    quality={LT_IMAGE_QUALITY}
+                  />
               </div>
               <h3 className={styles.title}>{post.title}</h3>
               <div className={styles.blogMeta}>

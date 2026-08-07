@@ -2,14 +2,15 @@
   "name": "my-app",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": "22.x"
+  },
   "scripts": {
     "lint": "eslint app components lib next.config.ts open-next.config.ts --max-warnings 0",
     "dev": "next dev",
-    "dev:sync": "npm run sync:routes && next dev",
-    "sync:routes": "node scripts/sync-public-routes.mjs",
-    "build": "npm run sync:routes && next build",
+    "build": "next build",
     "start": "next start",
-    "build:cf": "npm run sync:routes && opennextjs-cloudflare build",
+    "build:cf": "opennextjs-cloudflare build",
     "deploy:cf": "opennextjs-cloudflare deploy",
     "preview:cf": "opennextjs-cloudflare preview"
   },
@@ -17,8 +18,10 @@
     "framer-motion": "^12.42.2",
     "mapbox-gl": "^3.27.0",
     "next": "16.2.12",
+    "oidc-client-ts": "^3.5.0",
     "react": "19.2.4",
-    "react-dom": "19.2.4"
+    "react-dom": "19.2.4",
+    "react-oidc-context": "^3.3.1"
   },
   "devDependencies": {
     "@opennextjs/cloudflare": "^1.20.2",

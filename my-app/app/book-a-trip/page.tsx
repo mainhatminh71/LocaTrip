@@ -1,13 +1,12 @@
 import type { Metadata } from "next";
-import { BookATripView } from "@/components/book-a-trip/BookATripView";
+import { BookATripClient } from "@/components/book-a-trip/BookATripClient";
 
 export const metadata: Metadata = {
   title: "Lên kế hoạch Đà Lạt | LocaTrip",
   description:
-    "Chia sẻ nhu cầu — LocaTrip thiết kế trải nghiệm tốt nhất dành cho bạn.",
+    "Thiết lập chuyến đi Đà Lạt, trả lời câu hỏi và xem gợi ý địa điểm trước khi tạo lịch trình.",
 };
 
-/** Book-a-trip — uses global Framer tokens/fonts from app/globals.css */
 export default function BookATripPage() {
-  return <BookATripView />;
+  return <BookATripClient />;
 }

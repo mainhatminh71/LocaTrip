@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { LT_IMAGE_QUALITY } from "@/lib/image-quality";
 import { IMG } from "@/lib/content";
 import { SectionTag } from "@/components/ui/SectionTag";
 import styles from "./stories.module.css";
@@ -44,7 +45,8 @@ export function StoriesSection() {
                     alt=""
                     fill
                     className={styles.img}
-                    sizes="220px"
+                    sizes="(max-width: 809px) 160px, 200px"
+                    quality={LT_IMAGE_QUALITY}
                   />
                   <p className={styles.cardLabel}>{story.label}</p>
                 </article>

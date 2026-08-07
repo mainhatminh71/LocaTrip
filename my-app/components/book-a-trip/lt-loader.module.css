@@ -1,0 +1,159 @@
+.wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--lt-font-body);
+}
+
+.mark {
+  position: relative;
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+}
+
+.orbit,
+.orbitSoft {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border-style: solid;
+  border-color: transparent;
+  box-sizing: border-box;
+}
+
+.orbit {
+  border-top-color: currentColor;
+  border-right-color: currentColor;
+  animation: ltSpin 0.85s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+}
+
+.orbitSoft {
+  inset: 12%;
+  border-bottom-color: var(--lt-mint, #3ddc97);
+  border-left-color: color-mix(in srgb, var(--lt-mint, #3ddc97) 55%, transparent);
+  animation: ltSpin 1.35s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite reverse;
+}
+
+.leaf {
+  position: relative;
+  z-index: 1;
+  width: 55%;
+  height: 55%;
+  animation: ltPulse 1.4s ease-in-out infinite;
+}
+
+.leafFill {
+  fill: var(--lt-mint, #3ddc97);
+}
+
+.leafVein {
+  stroke: var(--lt-deep, #012830);
+  fill: none;
+}
+
+.onDark {
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.onDark .leafVein {
+  stroke: #012830;
+}
+
+.onDark .leafFill {
+  fill: var(--lt-mint, #3ddc97);
+}
+
+.onLight {
+  color: var(--lt-deep, #012830);
+}
+
+.onLight .orbitSoft {
+  border-bottom-color: var(--lt-mint, #3ddc97);
+}
+
+.label {
+  font-size: 13px;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+  color: inherit;
+}
+
+.btnInner {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+/* sizes */
+.sm .mark {
+  width: 16px;
+  height: 16px;
+}
+
+.sm .orbit {
+  border-width: 1.5px;
+}
+
+.sm .orbitSoft {
+  border-width: 1.5px;
+}
+
+.sm .label {
+  font-size: 12px;
+}
+
+.md .mark {
+  width: 28px;
+  height: 28px;
+}
+
+.md .orbit,
+.md .orbitSoft {
+  border-width: 2px;
+}
+
+.lg {
+  flex-direction: column;
+  gap: 12px;
+}
+
+.lg .mark {
+  width: 52px;
+  height: 52px;
+}
+
+.lg .orbit,
+.lg .orbitSoft {
+  border-width: 2.5px;
+}
+
+.lg .label {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--lt-deep, #012830);
+  text-align: center;
+}
+
+.lg.onDark .label {
+  color: rgba(255, 255, 255, 0.92);
+}
+
+@keyframes ltSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes ltPulse {
+  0%,
+  100% {
+    transform: scale(0.92);
+    opacity: 0.85;
+  }
+  50% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}

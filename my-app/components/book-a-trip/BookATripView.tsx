@@ -1,395 +1,950 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { LT_IMAGE_QUALITY } from "@/lib/image-quality";
+import { useEffect, useMemo, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { createSavedTrip, generateAutoTrip } from "@/lib/api/trips";
+import { ApiError } from "@/lib/api/http";
 import { BOOK_TRIP_ASSETS, BOOK_TRIP_COPY } from "@/lib/book-a-trip-assets";
 import {
-  FRAMER_AREA_OPTIONS,
-  FRAMER_BUS_OPTIONS,
-  FRAMER_INTEREST_OPTIONS,
-  FRAMER_PRIORITY_OPTIONS,
-  FRAMER_STAY_OPTIONS,
-  FRAMER_TRIP_LEG_OPTIONS,
-  mapAreaToRadiusKm,
-  mapAreaToStartId,
-  mapBudgetMillion,
-  mapInterestToPreferences,
-  mapPeopleToCustomer,
-  mapPriorityToPace,
-  mapPriorityToTripType,
-} from "@/lib/book-a-trip-form";
+  DEFAULT_AUTO_TRIP_DRAFT,
+  previewSoftLabels,
+  type AutoTripDraft,
+} from "@/lib/auto-trip-form";
+import { buildAutoTripRequest, getBrowserLocation } from "@/lib/build-auto-trip-request";
 import {
-  START_PRESETS,
-  type AutoTripRequest,
-  type AutoTripResult,
+  START_PRESETS_BY_CITY,
   saveAutoTrip,
+  type AlternativePlaceSuggestion,
+  type AutoTripResult,
+  type ItineraryOption,
 } from "@/lib/trip";
-import { SiteConversion } from "@/components/layout/SiteConversion";
-import { SiteFooter } from "@/components/layout/SiteFooter";
-import { SiteNav } from "@/components/layout/SiteNav";
+import {
+  buildRouteGeoJSON,
+  cloneOption,
+  extractStops,
+  stopsForMap,
+  swapVisitPlace,
+  tagChips,
+} from "@/lib/itinerary-map";
+import { useAuthActions } from "@/components/auth/useAuthActions";
+import { useAuthModal } from "@/components/auth/AuthModalProvider";
+import { AutoTripPrefsFields } from "./AutoTripPrefsFields";
+import { ItineraryMap } from "./ItineraryMap";
+import { LtButtonLoading } from "./LtBrandLoader";
+import { ReplacePlaceModal } from "./ReplacePlaceModal";
 import styles from "./book-a-trip.module.css";
+import { useRouter } from "next/navigation";
 
-function PhoneIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
-      <path
-        d="M7 3.8c.4-.5 1.1-.6 1.6-.3l2.1 1.3c.5.3.7.9.5 1.4L10.4 9c-.1.4 0 .8.3 1.1l3.2 3.2c.3.3.7.4 1.1.3l2.8-.8c.5-.2 1.1 0 1.4.5l1.3 2.1c.3.5.2 1.2-.3 1.6l-1.1 1c-.8.7-1.9 1-3 .6-2.5-.9-5.3-3.1-7.6-5.4S4.2 9.3 3.3 6.8c-.4-1.1-.1-2.2.6-3l1.1-1Z"
-        stroke="currentColor"
-        strokeWidth="1.5"
-      />
-    </svg>
+type Phase = "form" | "options" | "itinerary";
+type LeftTab = "itinerary" | "prefs";
+
+export function BookATripView({
+  onImmersiveChange,
+}: {
+  onImmersiveChange?: (immersive: boolean) => void;
+}) {
+  const [phase, setPhase] = useState<Phase>("form");
+  const [leftTab, setLeftTab] = useState<LeftTab>("itinerary");
+  const [draft, setDraft] = useState<AutoTripDraft>(DEFAULT_AUTO_TRIP_DRAFT);
+  /** Snapshot of draft used for the last successful generate — prefs reset target. */
+  const [committedDraft, setCommittedDraft] = useState<AutoTripDraft | null>(
+    null,
   );
-}
-
-function MailIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
-      <rect x="3.5" y="5.5" width="17" height="13" rx="2" stroke="currentColor" strokeWidth="1.5" />
-      <path d="M4.5 7.5 12 13l7.5-5.5" stroke="currentColor" strokeWidth="1.5" />
-    </svg>
-  );
-}
-
-function PinIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
-      <path
-        d="M12 21s6.5-5 6.5-10.2A6.5 6.5 0 0 0 5.5 10.8C5.5 16 12 21 12 21Z"
-        stroke="currentColor"
-        strokeWidth="1.5"
-      />
-      <circle cx="12" cy="10.5" r="2.2" stroke="currentColor" strokeWidth="1.5" />
-    </svg>
-  );
-}
-
-export function BookATripView() {
-  const router = useRouter();
-  const [menuOpen, setMenuOpen] = useState(false);
-
-  /* Framer form state (Option A) — API mapping happens on submit only */
-  const [departureDate, setDepartureDate] = useState("");
-  const [durationDays, setDurationDays] = useState("");
-  const [people, setPeople] = useState("");
-  const [budgetMillion, setBudgetMillion] = useState("");
-  const [area, setArea] = useState("");
-  const [interest, setInterest] = useState("");
-  const [priority, setPriority] = useState("");
-  const [stay, setStay] = useState("");
-  const [bus, setBus] = useState("");
-  const [tripLeg, setTripLeg] = useState("");
-  const [agree, setAgree] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [result, setResult] = useState<AutoTripResult | null>(null);
+  const [selectedOption, setSelectedOption] = useState<ItineraryOption | null>(
+    null,
+  );
+  const [selectedStopKey, setSelectedStopKey] = useState<string | null>(null);
+  const [replaceTargetKey, setReplaceTargetKey] = useState<string | null>(null);
+  const [mobileMapOpen, setMobileMapOpen] = useState(false);
+  const [routeStale, setRouteStale] = useState(false);
+  const [isNarrow, setIsNarrow] = useState(false);
+  const [showLocationPrompt, setShowLocationPrompt] = useState(false);
+  const [locating, setLocating] = useState(false);
+  const [lastLocationOverride, setLastLocationOverride] = useState<{
+    latitude: number;
+    longitude: number;
+  } | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [savedTripId, setSavedTripId] = useState<string | null>(null);
+  const [saveMessage, setSaveMessage] = useState<string | null>(null);
+  const { isAuthenticated, isLoading: authLoading } = useAuthActions();
+  const { openAuth } = useAuthModal();
+  const router = useRouter();
 
-  async function onSubmit(e: React.FormEvent) {
+  const startPresets = START_PRESETS_BY_CITY.dalat;
+  const activeStart =
+    startPresets.find((p) => p.id === draft.startId) ?? startPresets[0]!;
+
+  const immersive = phase !== "form";
+
+  useEffect(() => {
+    onImmersiveChange?.(immersive);
+  }, [immersive, onImmersiveChange]);
+
+  useEffect(() => {
+    return () => onImmersiveChange?.(false);
+  }, [onImmersiveChange]);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 980px)");
+    const sync = () => setIsNarrow(mq.matches);
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, []);
+
+  const preview = useMemo(() => previewSoftLabels(draft), [draft]);
+
+  const itineraryStops = useMemo(
+    () => (selectedOption ? extractStops(selectedOption.itinerary) : []),
+    [selectedOption],
+  );
+
+  const selectedStop = useMemo(
+    () => itineraryStops.find((s) => s.key === selectedStopKey) ?? null,
+    [itineraryStops, selectedStopKey],
+  );
+
+  const mapStops = useMemo(
+    () => (selectedOption ? stopsForMap(selectedOption.itinerary) : []),
+    [selectedOption],
+  );
+
+  const routeGeoJSON = useMemo(() => {
+    if (!selectedOption || routeStale) return null;
+    return buildRouteGeoJSON(selectedOption.itinerary);
+  }, [selectedOption, routeStale]);
+
+  const replaceStop = useMemo(
+    () => itineraryStops.find((s) => s.key === replaceTargetKey) ?? null,
+    [itineraryStops, replaceTargetKey],
+  );
+
+  function patchDraft(partial: Partial<AutoTripDraft>) {
+    setDraft((d) => ({ ...d, ...partial }));
+  }
+
+  function onSubmitForm(e: React.FormEvent) {
     e.preventDefault();
-    if (!agree) {
-      setError("Vui lòng đồng ý với các chính sách của LocaTrip");
+    setError(null);
+    if (authLoading) return;
+    if (!isAuthenticated) {
+      openAuth({ next: "/book-a-trip/" });
       return;
     }
-    if (!area || area === "Chọn khu vực") {
-      setError("Vui lòng chọn khu vực");
+    try {
+      // Validate radius early before prompt
+      buildAutoTripRequest(draft, "dalat");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Thiếu thông tin hợp lệ");
       return;
     }
-    if (!interest || interest === "Chọn sở thích") {
-      setError("Vui lòng chọn sở thích");
-      return;
-    }
+    setShowLocationPrompt(true);
+  }
+
+  async function runGenerate(
+    locationOverride?: { latitude: number; longitude: number } | null,
+  ) {
+    setShowLocationPrompt(false);
     setError(null);
     setLoading(true);
-
-    const startId = mapAreaToStartId(area);
-    const preset =
-      START_PRESETS.find((p) => p.id === startId) ?? START_PRESETS[0];
-    const preferences = mapInterestToPreferences(interest);
-
-    const request: AutoTripRequest = {
-      startLatitude: preset.latitude,
-      startLongitude: preset.longitude,
-      radiusKm: mapAreaToRadiusKm(area),
-      budgetLevel: mapBudgetMillion(budgetMillion),
-      tripType: mapPriorityToTripType(priority),
-      targetCustomer: mapPeopleToCustomer(people),
-      preferences,
-      pace: mapPriorityToPace(priority),
-      showRoad: true,
-      startTimePerDay: "08:30",
-      endTimePerDay: "21:30",
-    };
-
     try {
-      const res = await fetch("/api/trips/generate/auto/", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(request),
-      });
-      const data = (await res.json()) as AutoTripResult & { error?: string };
-      if (!res.ok) throw new Error(data.error || `Lỗi ${res.status}`);
-      if (!data.itineraries?.length) {
-        throw new Error(
-          "Không có lộ trình phù hợp. Thử đổi khu vực / sở thích / ngân sách.",
-        );
-      }
+      const request = buildAutoTripRequest(draft, "dalat", locationOverride);
+      if (locationOverride) setLastLocationOverride(locationOverride);
+      else setLastLocationOverride(null);
+      const data = await generateAutoTrip(request);
+      setCommittedDraft(structuredClone(draft));
       saveAutoTrip({
         request,
         result: data,
         createdAt: new Date().toISOString(),
       });
-      router.push("/generated-plan/");
+      setResult(data);
+      setSelectedStopKey(null);
+      setReplaceTargetKey(null);
+      setRouteStale(false);
+      setMobileMapOpen(false);
+      setLeftTab("itinerary");
+      setSavedTripId(null);
+      setSaveMessage(null);
+      if (data.itineraries.length === 1) {
+        setSelectedOption(cloneOption(data.itineraries[0]!));
+        setPhase("itinerary");
+      } else {
+        setSelectedOption(null);
+        setPhase("options");
+      }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Không tạo được lịch trình");
+      const msg =
+        err instanceof Error ? err.message : "Không tạo được lịch trình";
+      if (msg.includes("hết hạn") || msg.includes("Chưa đăng nhập")) {
+        setError(`${msg}. Thử đăng nhập lại rồi tạo lịch.`);
+      } else {
+        setError(msg);
+      }
     } finally {
       setLoading(false);
+      setLocating(false);
+    }
+  }
+
+  /** Re-generate from prefs tab — keep last GPS if any, skip location modal. */
+  function applyPrefsAndRegenerate() {
+    setError(null);
+    if (authLoading) return;
+    if (!isAuthenticated) {
+      openAuth({ next: "/book-a-trip/" });
+      return;
+    }
+    try {
+      buildAutoTripRequest(draft, "dalat", lastLocationOverride);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Thiếu thông tin hợp lệ");
+      return;
+    }
+    void runGenerate(lastLocationOverride);
+  }
+
+  function resetPrefsToLastApplied() {
+    if (!committedDraft) return;
+    setDraft(structuredClone(committedDraft));
+    setError(null);
+  }
+
+  async function onAllowLocation() {
+    setLocating(true);
+    try {
+      const coords = await getBrowserLocation();
+      await runGenerate(coords);
+    } catch {
+      // Denied / unavailable → still generate from selected start preset
+      setLocating(false);
+      await runGenerate(null);
+    }
+  }
+
+  function onSkipLocation() {
+    void runGenerate(null);
+  }
+
+  function resetToForm() {
+    setPhase("form");
+    setLeftTab("itinerary");
+    setResult(null);
+    setSelectedOption(null);
+    setCommittedDraft(null);
+    setSelectedStopKey(null);
+    setReplaceTargetKey(null);
+    setRouteStale(false);
+    setMobileMapOpen(false);
+    setError(null);
+    setShowLocationPrompt(false);
+    setSavedTripId(null);
+    setSaveMessage(null);
+  }
+
+  function pickOption(opt: ItineraryOption) {
+    setSelectedOption(cloneOption(opt));
+    setSelectedStopKey(null);
+    setReplaceTargetKey(null);
+    setRouteStale(false);
+    setMobileMapOpen(false);
+    setLeftTab("itinerary");
+    setSavedTripId(null);
+    setSaveMessage(null);
+    setPhase("itinerary");
+  }
+
+  function selectStop(key: string) {
+    setSelectedStopKey(key);
+  }
+
+  function applyReplace(alt: AlternativePlaceSuggestion) {
+    if (!selectedOption || !replaceStop) return;
+    setSelectedOption(
+      swapVisitPlace(
+        selectedOption,
+        replaceStop.day,
+        replaceStop.scheduleIndex,
+        alt,
+        {
+          latitude: replaceStop.place.latitude,
+          longitude: replaceStop.place.longitude,
+        },
+      ),
+    );
+    setRouteStale(true);
+    setReplaceTargetKey(null);
+    setSelectedStopKey(replaceStop.key);
+    setSavedTripId(null);
+    setSaveMessage(null);
+  }
+
+  async function saveCurrentTrip() {
+    if (!selectedOption || saving || savedTripId) return;
+    if (!isAuthenticated) {
+      openAuth({ next: "/book-a-trip/" });
+      return;
+    }
+    setSaving(true);
+    setSaveMessage(null);
+    setError(null);
+    try {
+      const start = lastLocationOverride ?? {
+        latitude: activeStart.latitude,
+        longitude: activeStart.longitude,
+      };
+      const trip = await createSavedTrip({
+        title: (selectedOption.title || "Chuyến đi Đà Lạt").slice(0, 120),
+        source: "auto",
+        itinerary: selectedOption.itinerary,
+        durationDays: selectedOption.itinerary.length,
+        pace: draft.pace,
+        startCoords: start,
+        summary: selectedOption.summary?.slice(0, 2000),
+      });
+      setSavedTripId(trip.id);
+      setSaveMessage("Đã lưu chuyến đi.");
+    } catch (err) {
+      const msg =
+        err instanceof ApiError
+          ? err.message
+          : err instanceof Error
+            ? err.message
+            : "Không lưu được chuyến đi";
+      setError(msg);
+    } finally {
+      setSaving(false);
     }
   }
 
   return (
-    <div className={styles.page}>
-      {/* Section 1 — Framer fixed nav (qWghg). Do not restyle other sections here. */}
-      <SiteNav open={menuOpen} onOpenChange={setMenuOpen} />
-
-      {/* Framer Header (framer-1wpwdg2): padding 200px 0 0, black, absolute BG image */}
-      <header className={styles.hero} data-framer-name="Header">
-        <div className={styles.heroBgWrap} data-framer-name="Background Image">
-          <Image
-            className={styles.heroBg}
-            src={BOOK_TRIP_ASSETS.heroBg}
-            alt=""
-            fill
-            priority
-            sizes="100vw"
-            data-framer-name="Image"
-            style={{ opacity: 0.4, transform: "scale(1.15)" }}
-          />
-        </div>
-        <div className={styles.heroInner} data-framer-name="Content">
-          <div className={styles.heroCopy} data-framer-name="Titles">
-            <h1 data-framer-name="Main Title">{BOOK_TRIP_COPY.heroTitle}</h1>
-            <p data-framer-name="Sub Title">{BOOK_TRIP_COPY.heroSub}</p>
+    <div
+      className={immersive ? `${styles.page} ${styles.pageFocus}` : styles.page}
+      id="top"
+    >
+      {!immersive ? (
+        <header className={styles.hero} data-framer-name="Header">
+          <div className={styles.heroBgWrap}>
+            <Image
+              src={activeStart.thumbnail || BOOK_TRIP_ASSETS.heroBg}
+              alt=""
+              fill
+              priority
+              className={styles.heroBg}
+              sizes="100vw"
+                    quality={LT_IMAGE_QUALITY}
+                  />
           </div>
+          <div className={styles.heroInner}>
+            <div className={styles.heroCopy}>
+              <h1>{BOOK_TRIP_COPY.heroTitle}</h1>
+              <p>{BOOK_TRIP_COPY.heroSub}</p>
+            </div>
+          </div>
+        </header>
+      ) : (
+        <div className={styles.focusBar}>
+          <button type="button" className={styles.focusReset} onClick={resetToForm}>
+            Thiết lập lại
+          </button>
+          <div className={styles.focusBrand}>
+            <Image
+              src={BOOK_TRIP_ASSETS.logo}
+              alt="LocaTrip"
+              width={36}
+              height={36}
+                    quality={LT_IMAGE_QUALITY}
+                  />
+            <span>Gợi ý chuyến Đà Lạt</span>
+          </div>
+          <span className={styles.focusStep}>
+            {phase === "options" ? "Chọn lộ trình" : "Lịch trình"}
+          </span>
         </div>
-        {/* Framer framer-1qubwfb — white top-radius strip under header */}
-        <div className={styles.heroCurve} aria-hidden />
-      </header>
+      )}
 
-      <section className={styles.sheet}>
-        <div className={styles.card}>
-          <aside className={styles.left}>
-            <h2 className={styles.leftTitle}>{BOOK_TRIP_COPY.leftTitle}</h2>
-            <p className={styles.leftSub}>{BOOK_TRIP_COPY.leftSub}</p>
-            <div className={styles.photoWrap}>
-              <Image
-                src={BOOK_TRIP_ASSETS.groupPhoto}
-                alt="Du khách Đà Lạt"
-                width={900}
-                height={600}
-                className={styles.photo}
-                sizes="(max-width: 980px) 100vw, 480px"
-                priority
+      <section
+        className={
+          immersive
+            ? `${styles.sheet} ${styles.sheetFocus} ${styles.autoSheet}${phase === "itinerary" ? ` ${styles.sheetItinerary}` : ""}`
+            : `${styles.sheet} ${styles.autoSheet}`
+        }
+      >
+        <AnimatePresence mode="wait">
+          {phase === "form" ? (
+            <motion.form
+              key="form"
+              className={styles.autoForm}
+              onSubmit={onSubmitForm}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.28 }}
+            >
+              <div className={styles.autoFormIntro}>
+                <p className={styles.autoEyebrow}>Đà Lạt · 1 ngày</p>
+                <h2>{BOOK_TRIP_COPY.leftTitle}</h2>
+                <p>{BOOK_TRIP_COPY.leftSub}</p>
+              </div>
+
+              <AutoTripPrefsFields
+                draft={draft}
+                startPresets={[...startPresets]}
+                activeStart={activeStart}
+                onPatch={patchDraft}
               />
-            </div>
-            <p className={styles.supportTitle}>{BOOK_TRIP_COPY.supportTitle}</p>
-            <div className={styles.supportGrid}>
-              <div className={styles.supportItem}>
-                <span>
-                  <PhoneIcon />
-                </span>
-                {BOOK_TRIP_COPY.phone}
-              </div>
-              <div className={styles.supportItem}>
-                <span>
-                  <MailIcon />
-                </span>
-                {BOOK_TRIP_COPY.email}
-              </div>
-              <div className={styles.supportItem}>
-                <span>
-                  <PinIcon />
-                </span>
-                {BOOK_TRIP_COPY.address}
-              </div>
-            </div>
-          </aside>
 
-          <form className={styles.formShell} onSubmit={onSubmit} data-framer-name="Form">
-            <div className={styles.secBlock}>
-              <p className={styles.secTitle}>Thông tin cốt lõi</p>
-              <div className={styles.fields}>
-                <label className={styles.field}>
-                  Ngày khởi hành
-                  <input
-                    type="date"
-                    name="departureDate"
-                    required
-                    value={departureDate}
-                    onChange={(e) => setDepartureDate(e.target.value)}
-                  />
-                </label>
-                <label className={styles.field}>
-                  Thời lượng
-                  <input
-                    type="number"
-                    name="durationDays"
-                    required
-                    min={1}
-                    placeholder="Đơn vị: Ngày"
-                    value={durationDays}
-                    onChange={(e) => setDurationDays(e.target.value)}
-                  />
-                </label>
-                <label className={styles.field}>
-                  Đi mấy người?
-                  <input
-                    type="number"
-                    name="people"
-                    required
-                    min={1}
-                    max={10}
-                    placeholder="Đi mấy người?"
-                    value={people}
-                    onChange={(e) => setPeople(e.target.value)}
-                  />
-                </label>
-                <label className={styles.field}>
-                  Ngân sách
-                  <input
-                    type="number"
-                    name="budgetMillion"
-                    required
-                    min={1}
-                    max={50}
-                    placeholder="Đơn vị: Triệu đồng"
-                    value={budgetMillion}
-                    onChange={(e) => setBudgetMillion(e.target.value)}
-                  />
-                </label>
+              <div className={styles.autoSticky}>
+                {preview.length > 0 ? (
+                  <p className={styles.autoPreview}>
+                    Sẽ ưu tiên: {preview.slice(0, 6).join(", ")}
+                    {preview.length > 6 ? "…" : ""}
+                  </p>
+                ) : (
+                  <p className={styles.autoPreviewMuted}>
+                    Chưa chọn gu mềm — vẫn tạo được lịch theo vị trí & ngân sách.
+                  </p>
+                )}
+                {error ? <p className={styles.error}>{error}</p> : null}
+                <button
+                  type="submit"
+                  className={styles.btnPrimary}
+                  disabled={loading || locating}
+                >
+                  {loading || locating ? (
+                    <LtButtonLoading
+                      label={
+                        locating ? "Đang lấy vị trí…" : "Đang dựng lịch…"
+                      }
+                    />
+                  ) : (
+                    BOOK_TRIP_COPY.submit
+                  )}
+                </button>
               </div>
-            </div>
+            </motion.form>
+          ) : null}
 
-            <div className={styles.secBlock}>
-              <p className={styles.secTitle}>Cá nhân hóa</p>
-              <div className={styles.fields}>
-                <label className={styles.field}>
-                  Khu vực
-                  <select
-                    name="area"
-                    required
-                    value={area}
-                    onChange={(e) => setArea(e.target.value)}
+          {phase === "options" && result ? (
+            <motion.div
+              key="options"
+              className={styles.autoResult}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+            >
+              <h2 className={styles.autoResultTitle}>Chọn một lộ trình</h2>
+              <p className={styles.autoHint}>
+                Mỗi option là một chuỗi điểm trong ngày, tối ưu theo gu bạn chọn.
+              </p>
+              <ul className={styles.optionList}>
+                {result.itineraries.map((opt) => (
+                  <li key={opt.optionId}>
+                    <button
+                      type="button"
+                      className={styles.optionCard}
+                      onClick={() => pickOption(opt)}
+                    >
+                      <strong>{opt.title}</strong>
+                      <span>{opt.summary}</span>
+                      <em>{opt.totalEstimatedCost}</em>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+              {error ? <p className={styles.error}>{error}</p> : null}
+            </motion.div>
+          ) : null}
+
+          {phase === "itinerary" && selectedOption ? (
+            <motion.div
+              key="itinerary"
+              className={styles.itinerarySplit}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+            >
+              <div className={styles.itineraryPane}>
+                <div className={styles.leftTabs} role="tablist" aria-label="Cột lịch trình">
+                  <button
+                    type="button"
+                    role="tab"
+                    aria-selected={leftTab === "itinerary"}
+                    className={
+                      leftTab === "itinerary"
+                        ? styles.leftTabOn
+                        : styles.leftTab
+                    }
+                    onClick={() => setLeftTab("itinerary")}
                   >
-                    {FRAMER_AREA_OPTIONS.map((o) => (
-                      <option key={o} value={o === "Chọn khu vực" ? "" : o} disabled={o === "Chọn khu vực"}>
-                        {o}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                <label className={styles.field}>
-                  Sở thích
-                  <select
-                    name="interest"
-                    required
-                    value={interest}
-                    onChange={(e) => setInterest(e.target.value)}
+                    Lịch trình
+                  </button>
+                  <button
+                    type="button"
+                    role="tab"
+                    aria-selected={leftTab === "prefs"}
+                    className={
+                      leftTab === "prefs" ? styles.leftTabOn : styles.leftTab
+                    }
+                    onClick={() => setLeftTab("prefs")}
                   >
-                    {FRAMER_INTEREST_OPTIONS.map((o) => (
-                      <option key={o} value={o === "Chọn sở thích" ? "" : o} disabled={o === "Chọn sở thích"}>
-                        {o}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                <label className={styles.field}>
-                  Ưu tiên trong chuyến đi
-                  <select
-                    name="priority"
-                    value={priority}
-                    onChange={(e) => setPriority(e.target.value)}
-                  >
-                    {FRAMER_PRIORITY_OPTIONS.map((o) => (
-                      <option
-                        key={o}
-                        value={o === "Loại hình lưu trú" ? "" : o}
-                        disabled={o === "Loại hình lưu trú"}
+                    Tiêu chí
+                  </button>
+                </div>
+
+                {leftTab === "itinerary" ? (
+                  <>
+                <header className={styles.itineraryHead}>
+                  <h2 className={styles.autoResultTitle}>
+                    {selectedOption.title || "Lịch trình của bạn"}
+                  </h2>
+                  {selectedOption.summary ? (
+                    <p className={styles.autoHint}>{selectedOption.summary}</p>
+                  ) : null}
+                  {routeStale ? (
+                    <p className={styles.routeStaleNote}>
+                      Thời gian giữ theo lịch gốc; tạo lại để tính lại lộ trình
+                      trên bản đồ.
+                    </p>
+                  ) : null}
+                </header>
+
+                <div className={styles.days}>
+                  {(selectedOption.itinerary || []).map((day) => (
+                    <section key={day.day} className={styles.day}>
+                      <h3>Ngày {day.day}</h3>
+                      <ul>
+                        {(day.schedule || []).map((item, i) => {
+                          const key = `${day.day}-${i}`;
+                          if (item.type === "travel") {
+                            return (
+                              <li key={key} className={styles.travelItem}>
+                                <span className={styles.time}>{item.time}</span>
+                                <span
+                                  className={styles.travelRail}
+                                  aria-hidden="true"
+                                />
+                                <div className={styles.travelBody}>
+                                  <span className={styles.travelLabel}>
+                                    Di chuyển
+                                    {item.durationMin != null
+                                      ? ` · ${item.durationMin} phút`
+                                      : ""}
+                                  </span>
+                                  {item.instruction ? (
+                                    <p className={styles.travelHint}>
+                                      {item.instruction}
+                                    </p>
+                                  ) : null}
+                                </div>
+                              </li>
+                            );
+                          }
+                          const stopOrder =
+                            itineraryStops.find((s) => s.key === key)?.order ??
+                            null;
+                          const active = selectedStopKey === key;
+                          return (
+                            <li key={key} className={styles.visitItem}>
+                              <button
+                                type="button"
+                                className={
+                                  active
+                                    ? styles.stopRowActive
+                                    : styles.stopRow
+                                }
+                                onClick={() => selectStop(key)}
+                              >
+                                <span className={styles.time}>{item.time}</span>
+                                <span className={styles.stopOrder}>
+                                  {stopOrder}
+                                </span>
+                                <div className={styles.scheduleBody}>
+                                  <span className={styles.visitLabel}>
+                                    Tham quan
+                                  </span>
+                                  <strong>
+                                    {item.place?.title || "Địa điểm"}
+                                  </strong>
+                                  {item.place?.address ? (
+                                    <p>{item.place.address}</p>
+                                  ) : null}
+                                </div>
+                              </button>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    </section>
+                  ))}
+                </div>
+
+                {selectedStop ? (
+                  <div className={styles.detailCardMobile}>
+                    <div className={styles.detailCardHead}>
+                      <p className={styles.detailEyebrow}>
+                        Điểm {selectedStop.order} · {selectedStop.time}
+                      </p>
+                      <button
+                        type="button"
+                        className={styles.detailClose}
+                        aria-label="Đóng"
+                        onClick={() => setSelectedStopKey(null)}
                       >
-                        {o}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                <label className={styles.field}>
-                  Loại hình lưu trú ưu tiên
-                  <select
-                    name="stay"
-                    value={stay}
-                    onChange={(e) => setStay(e.target.value)}
+                        <svg viewBox="0 0 14 14" aria-hidden="true">
+                          <path
+                            d="M3 3l8 8M11 3L3 11"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="1.75"
+                            strokeLinecap="round"
+                          />
+                        </svg>
+                      </button>
+                    </div>
+                    <h3>{selectedStop.place.title}</h3>
+                    {selectedStop.place.address ? (
+                      <p className={styles.detailAddr}>
+                        {selectedStop.place.address}
+                      </p>
+                    ) : null}
+                    <div className={styles.detailMeta}>
+                      {selectedStop.place.reviewRating != null ? (
+                        <span>{selectedStop.place.reviewRating.toFixed(1)}★</span>
+                      ) : null}
+                      {selectedStop.place.category ? (
+                        <span>{selectedStop.place.category}</span>
+                      ) : null}
+                    </div>
+                    {tagChips(selectedStop.place.tags).length > 0 ? (
+                      <div className={styles.tagChipRow}>
+                        {tagChips(selectedStop.place.tags).map((t) => (
+                          <span key={t} className={styles.tagChip}>
+                            {t}
+                          </span>
+                        ))}
+                      </div>
+                    ) : null}
+                    <button
+                      type="button"
+                      className={styles.btnPrimary}
+                      onClick={() => setReplaceTargetKey(selectedStop.key)}
+                    >
+                      Thay thế
+                    </button>
+                  </div>
+                ) : null}
+
+                <div className={styles.autoSticky}>
+                  <button
+                    type="button"
+                    className={`${styles.btnGhost} ${styles.mapToggleBtn}`}
+                    onClick={() => setMobileMapOpen(true)}
                   >
-                    {FRAMER_STAY_OPTIONS.map((o) => (
-                      <option key={o} value={o}>
-                        {o}
-                      </option>
-                    ))}
-                  </select>
-                </label>
+                    Bản đồ
+                  </button>
+                  {result && result.itineraries.length > 1 ? (
+                    <button
+                      type="button"
+                      className={styles.btnGhost}
+                      onClick={() => setPhase("options")}
+                    >
+                      Đổi lộ trình khác
+                    </button>
+                  ) : null}
+                  {savedTripId ? (
+                    <button
+                      type="button"
+                      className={styles.btnPrimary}
+                      onClick={() => router.push(`/my-trips/${savedTripId}/`)}
+                    >
+                      Xem đã lưu
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      className={styles.btnPrimary}
+                      disabled={saving}
+                      onClick={() => void saveCurrentTrip()}
+                    >
+                      {saving ? (
+                        <LtButtonLoading label="Đang lưu…" />
+                      ) : (
+                        "Lưu chuyến đi"
+                      )}
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    className={styles.btnGhost}
+                    onClick={resetToForm}
+                  >
+                    Tạo lại
+                  </button>
+                </div>
+                {saveMessage ? (
+                  <p className={styles.saveOk}>{saveMessage}</p>
+                ) : null}
+                {error && phase === "itinerary" ? (
+                  <p className={styles.error}>{error}</p>
+                ) : null}
+                  </>
+                ) : (
+                  <>
+                    <header className={styles.itineraryHead}>
+                      <h2 className={styles.autoResultTitle}>Chỉnh tiêu chí</h2>
+                      <p className={styles.autoHint}>
+                        Sửa lựa chọn rồi áp dụng để tạo lịch mới — map vẫn hiện
+                        bên cạnh.
+                      </p>
+                    </header>
+                    <AutoTripPrefsFields
+                      draft={draft}
+                      startPresets={[...startPresets]}
+                      activeStart={activeStart}
+                      compact
+                      onPatch={patchDraft}
+                    />
+                    <div className={`${styles.autoSticky} ${styles.prefsSticky}`}>
+                      {preview.length > 0 ? (
+                        <p className={styles.autoPreview}>
+                          Sẽ ưu tiên: {preview.slice(0, 6).join(", ")}
+                          {preview.length > 6 ? "…" : ""}
+                        </p>
+                      ) : (
+                        <p className={styles.autoPreviewMuted}>
+                          Chưa chọn gu mềm — vẫn tạo theo vị trí & ngân sách.
+                        </p>
+                      )}
+                      {error ? <p className={styles.error}>{error}</p> : null}
+                      <div className={styles.prefsStickyActions}>
+                        <button
+                          type="button"
+                          className={styles.btnGhost}
+                          onClick={resetPrefsToLastApplied}
+                          disabled={loading || !committedDraft}
+                        >
+                          Reset lựa chọn
+                        </button>
+                        <button
+                          type="button"
+                          className={styles.btnPrimary}
+                          disabled={loading || locating}
+                          onClick={applyPrefsAndRegenerate}
+                        >
+                          {loading || locating ? (
+                            <LtButtonLoading label="Đang dựng lịch…" />
+                          ) : (
+                            "Áp dụng & tạo lại"
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  </>
+                )}
               </div>
-            </div>
 
-            <div className={styles.secBlock}>
-              <p className={styles.secTitle}>Di chuyển</p>
-              <div className={styles.fields}>
-                <label className={styles.field}>
-                  Nhà xe
-                  <select
-                    name="bus"
-                    value={bus}
-                    onChange={(e) => setBus(e.target.value)}
+              <aside className={styles.mapPane} aria-label="Bản đồ lộ trình">
+                <div className={styles.mapPaneInner}>
+                  {!isNarrow ? (
+                    <ItineraryMap
+                      stops={mapStops}
+                      selectedKey={selectedStopKey}
+                      routeGeoJSON={routeGeoJSON}
+                      onSelectStop={selectStop}
+                      busy={loading || locating}
+                      busyLabel={
+                        locating
+                          ? "Đang lấy vị trí…"
+                          : "Đang dựng lộ trình…"
+                      }
+                    />
+                  ) : null}
+                  {selectedStop ? (
+                    <div className={styles.detailCardMap}>
+                      <div className={styles.detailCardHead}>
+                        <p className={styles.detailEyebrow}>
+                          Điểm {selectedStop.order} · {selectedStop.time}
+                        </p>
+                        <button
+                          type="button"
+                          className={styles.detailClose}
+                          aria-label="Đóng"
+                          onClick={() => setSelectedStopKey(null)}
+                        >
+                          <svg viewBox="0 0 14 14" aria-hidden="true">
+                            <path
+                              d="M3 3l8 8M11 3L3 11"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="1.75"
+                              strokeLinecap="round"
+                            />
+                          </svg>
+                        </button>
+                      </div>
+                      <h3>{selectedStop.place.title}</h3>
+                      {selectedStop.place.address ? (
+                        <p className={styles.detailAddr}>
+                          {selectedStop.place.address}
+                        </p>
+                      ) : null}
+                      <div className={styles.detailMeta}>
+                        {selectedStop.place.reviewRating != null ? (
+                          <span>
+                            {selectedStop.place.reviewRating.toFixed(1)}★
+                          </span>
+                        ) : null}
+                        {selectedStop.place.category ? (
+                          <span>{selectedStop.place.category}</span>
+                        ) : null}
+                      </div>
+                      {tagChips(selectedStop.place.tags).length > 0 ? (
+                        <div className={styles.tagChipRow}>
+                          {tagChips(selectedStop.place.tags).map((t) => (
+                            <span key={t} className={styles.tagChip}>
+                              {t}
+                            </span>
+                          ))}
+                        </div>
+                      ) : null}
+                      <button
+                        type="button"
+                        className={styles.btnPrimary}
+                        onClick={() => setReplaceTargetKey(selectedStop.key)}
+                      >
+                        Thay thế
+                      </button>
+                    </div>
+                  ) : (
+                    <p className={styles.mapHint}>
+                      Chọn một điểm trên danh sách hoặc bản đồ để xem chi tiết
+                    </p>
+                  )}
+                </div>
+              </aside>
+
+              <AnimatePresence>
+                {mobileMapOpen && isNarrow ? (
+                  <motion.div
+                    className={styles.mobileMapOverlay}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
                   >
-                    {FRAMER_BUS_OPTIONS.map((o) => (
-                      <option key={o} value={o === "Chọn nhà xe" ? "" : o} disabled={o === "Chọn nhà xe"}>
-                        {o}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                <label className={styles.field}>
-                  Hành trình
-                  <select
-                    name="tripLeg"
-                    value={tripLeg}
-                    onChange={(e) => setTripLeg(e.target.value)}
-                  >
-                    {FRAMER_TRIP_LEG_OPTIONS.map((o) => (
-                      <option key={o} value={o === "Chọn hành trình" ? "" : o} disabled={o === "Chọn hành trình"}>
-                        {o}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-              </div>
-            </div>
+                    <div className={styles.mobileMapSheet}>
+                      <div className={styles.mobileMapBar}>
+                        <span>Bản đồ lộ trình</span>
+                        <button
+                          type="button"
+                          className={styles.focusBack}
+                          onClick={() => setMobileMapOpen(false)}
+                        >
+                          Đóng
+                        </button>
+                      </div>
+                      <div className={styles.mobileMapBody}>
+                        <ItineraryMap
+                          stops={mapStops}
+                          selectedKey={selectedStopKey}
+                          routeGeoJSON={routeGeoJSON}
+                          onSelectStop={(key) => {
+                            selectStop(key);
+                            setMobileMapOpen(false);
+                          }}
+                          busy={loading || locating}
+                          busyLabel={
+                            locating
+                              ? "Đang lấy vị trí…"
+                              : "Đang dựng lộ trình…"
+                          }
+                        />
+                      </div>
+                    </div>
+                  </motion.div>
+                ) : null}
+              </AnimatePresence>
 
-            <label className={styles.agree}>
-              <input
-                type="checkbox"
-                name="Newsletter"
-                checked={agree}
-                onChange={(e) => setAgree(e.target.checked)}
-              />
-              {BOOK_TRIP_COPY.agree}
-            </label>
-
-            <button className={styles.submit} type="submit" disabled={loading}>
-              {loading ? "Đang tạo…" : BOOK_TRIP_COPY.submit}
-            </button>
-            {error ? <p className={styles.error}>{error}</p> : null}
-          </form>
-        </div>
+              <AnimatePresence>
+                {replaceStop ? (
+                  <ReplacePlaceModal
+                    key="replace-modal"
+                    stop={replaceStop}
+                    onClose={() => setReplaceTargetKey(null)}
+                    onPick={applyReplace}
+                  />
+                ) : null}
+              </AnimatePresence>
+            </motion.div>
+          ) : null}
+        </AnimatePresence>
       </section>
 
-      <SiteConversion ctaHref="#top" />
-      <SiteFooter />
+      <AnimatePresence>
+        {showLocationPrompt ? (
+          <motion.div
+            className={styles.locOverlay}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="loc-prompt-title"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <motion.div
+              className={styles.locDialog}
+              initial={{ opacity: 0, y: 18, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 10 }}
+              transition={{ duration: 0.28 }}
+            >
+              <p className={styles.locEyebrow}>Trước khi tạo lịch</p>
+              <h3 id="loc-prompt-title">Cho phép lấy vị trí hiện tại?</h3>
+              <p>
+                Hệ thống có thể dùng vị trí GPS của bạn làm điểm xuất phát để
+                lịch trình gần hơn. Nếu không, chúng tôi dùng điểm bắt đầu bạn
+                đã chọn ({activeStart.label}).
+              </p>
+              <div className={styles.locActions}>
+                <button
+                  type="button"
+                  className={styles.btnPrimary}
+                  disabled={locating || loading}
+                  onClick={() => void onAllowLocation()}
+                >
+                  {locating || loading ? (
+                    <LtButtonLoading
+                      label={
+                        locating ? "Đang lấy vị trí…" : "Đang dựng lịch…"
+                      }
+                    />
+                  ) : (
+                    "Cho phép lấy vị trí"
+                  )}
+                </button>
+                <button
+                  type="button"
+                  className={styles.btnGhost}
+                  disabled={locating || loading}
+                  onClick={onSkipLocation}
+                >
+                  {loading && !locating ? (
+                    <LtButtonLoading label="Đang dựng lịch…" onDark={false} />
+                  ) : (
+                    "Không, dùng điểm đã chọn"
+                  )}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
     </div>
   );
 }

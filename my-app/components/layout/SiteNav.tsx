@@ -1,40 +1,57 @@
 "use client";
 
 import Image from "next/image";
+import { LT_IMAGE_QUALITY } from "@/lib/image-quality";
 import Link from "next/link";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { BOOK_TRIP_ASSETS } from "@/lib/book-a-trip-assets";
+import { useAuthActions } from "@/components/auth/useAuthActions";
+import { useAuthModal } from "@/components/auth/AuthModalProvider";
 import styles from "./site-nav.module.css";
 
-/** Framer bird logo (558RNrhUApov3HeiOMs9CTGdiY) — shared with book-a-trip assets. */
+/** Framer bird logo — shared with book-a-trip assets. */
 const LOGO_URL = BOOK_TRIP_ASSETS.logo;
 
-const MENU_LINKS = [
+const BASE_LINKS = [
   { label: "Trang chủ", href: "/" },
   { label: "Về chúng tôi", href: "/about/" },
   { label: "Tours", href: "/tours/" },
   { label: "Blogs", href: "/blogs/" },
   { label: "Tạo chuyến đi", href: "/book-a-trip/" },
-  { label: "Tài Khoản", href: "/map/" },
 ] as const;
 
-/** Measured Framer open: link tops ~74px apart, row ~42px → 32px between. */
-const LINK_GAP_PX = 32;
-
-const FEATURE_IMG =
-  "https://framerusercontent.com/images/gbVpyIHbkJ3pRoMQBsQuMD2dG3M.jpg";
+const FEATURE_IMG = "/media/travelers.jpg";
 
 type SiteNavProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 };
 
-/**
- * Framer `qWghg` Black-dekstop capsule + overlay menu (GW9HDjUFD).
- * Pixel values from book-a-trip SSR + script_main measurements.
- * Shared site nav for homepage, book-a-trip, and other product pages.
- */
+/** Framer capsule + overlay menu. Auth links depend on Keycloak session. */
 export function SiteNav({ open, onOpenChange }: SiteNavProps) {
+  const { isAuthenticated, isLoading, role, signOut } = useAuthActions();
+  const { openAuth } = useAuthModal();
+
+  const menuLinks = useMemo(() => {
+    const links: {
+      label: string;
+      href: string;
+      action?: "logout" | "signin" | "signup";
+    }[] = [...BASE_LINKS];
+    if (role === "admin") {
+      links.push({ label: "Admin", href: "/admin/" });
+    }
+    if (isAuthenticated) {
+      links.push({ label: "Chuyến đi của tôi", href: "/my-trips/" });
+      links.push({ label: "Tài khoản", href: "/account/" });
+      links.push({ label: "Đăng xuất", href: "#logout", action: "logout" });
+    } else if (!isLoading) {
+      links.push({ label: "Đăng nhập", href: "#login", action: "signin" });
+      links.push({ label: "Đăng ký", href: "#signup", action: "signup" });
+    }
+    return links;
+  }, [isAuthenticated, isLoading, role]);
+
   useEffect(() => {
     document.documentElement.dataset.navHydrated = "1";
   }, []);
@@ -55,7 +72,6 @@ export function SiteNav({ open, onOpenChange }: SiteNavProps) {
 
   return (
     <>
-      {/* Fixed Black-dekstop capsule — stays visible when open (Framer measured). */}
       <div className={styles.root}>
         <div className={styles.bar}>
           <div
@@ -67,8 +83,12 @@ export function SiteNav({ open, onOpenChange }: SiteNavProps) {
               backgroundColor: "rgba(0, 0, 0, 0.2)",
             }}
           >
-            <Link href="/" className={styles.logo} data-framer-name="Logo">
-              {/* Wrapper forces 46×46 in flex — Next/Image span can collapse width. */}
+            <Link
+              href="/"
+              className={styles.logo}
+              data-framer-name="Logo"
+              onClick={() => onOpenChange(false)}
+            >
               <span className={styles.logoImgWrap} data-framer-name="Logo@4x">
                 <Image
                   src={LOGO_URL}
@@ -77,7 +97,8 @@ export function SiteNav({ open, onOpenChange }: SiteNavProps) {
                   height={46}
                   className={styles.logoImg}
                   priority
-                />
+                    quality={LT_IMAGE_QUALITY}
+                  />
               </span>
               <p className={styles.logoText}>
                 LOCA
@@ -126,48 +147,6 @@ export function SiteNav({ open, onOpenChange }: SiteNavProps) {
           }}
         >
           <div className={styles.overlayInner}>
-            {/* Dekstop Transparent — Logo left + X right (measured x:120 / x:1288) */}
-            <div
-              className={styles.overlayTop}
-              data-framer-name="Dekstop Transparent"
-            >
-              <Link
-                href="/"
-                className={styles.overlayLogo}
-                data-framer-name="Logo"
-                onClick={() => onOpenChange(false)}
-              >
-                <Image
-                  src={LOGO_URL}
-                  alt=""
-                  width={28}
-                  height={28}
-                  className={styles.overlayLogoImg}
-                />
-                <span className={styles.overlayLogoText}>
-                  LOCA
-                  <span className={styles.logoTextLight}>TRIP</span>
-                </span>
-              </Link>
-
-              <button
-                type="button"
-                className={styles.overlayClose}
-                aria-label="Đóng menu"
-                data-framer-name="Menu"
-                onClick={() => onOpenChange(false)}
-              >
-                <span className={styles.burger} data-framer-name="Open">
-                  <span
-                    className={`${styles.line} ${styles.lineTop} ${styles.lineTopOpen}`}
-                  />
-                  <span
-                    className={`${styles.line} ${styles.lineBottom} ${styles.lineBottomOpen}`}
-                  />
-                </span>
-              </button>
-            </div>
-
             <div className={styles.overlayMain} data-framer-name="Nav-menu">
               <div
                 className={styles.featureCol}
@@ -178,8 +157,8 @@ export function SiteNav({ open, onOpenChange }: SiteNavProps) {
                     src={FEATURE_IMG}
                     alt="running man on bridge"
                     fill
-                    sizes="273px"
-                    priority
+                    sizes="(max-width: 900px) 40vw, 280px"
+                    quality={LT_IMAGE_QUALITY}
                   />
                 </div>
               </div>
@@ -189,25 +168,46 @@ export function SiteNav({ open, onOpenChange }: SiteNavProps) {
                 aria-label="Menu"
                 data-framer-name="Right Menu"
               >
-                {MENU_LINKS.map((item, i) => (
+                {menuLinks.map((item, i) => (
                   <div
                     key={item.href + item.label}
                     className={styles.navLinkWrap}
                     style={{
-                      paddingBottom:
-                        i === MENU_LINKS.length - 1 ? 0 : LINK_GAP_PX,
                       animationDelay: `${0.05 + i * 0.04}s`,
                     }}
                   >
-                    <Link
-                      href={item.href}
-                      className={styles.navLink}
-                      data-framer-name="Desktop Navlinks"
-                      onClick={() => onOpenChange(false)}
-                    >
-                      <span className={styles.navLinkLine} aria-hidden />
-                      <span className={styles.navLinkText}>{item.label}</span>
-                    </Link>
+                    {item.action === "logout" ||
+                    item.action === "signin" ||
+                    item.action === "signup" ? (
+                      <button
+                        type="button"
+                        className={styles.navLink}
+                        data-framer-name="Desktop Navlinks"
+                        onClick={() => {
+                          onOpenChange(false);
+                          if (item.action === "logout") {
+                            void signOut();
+                          } else if (item.action === "signup") {
+                            openAuth({ mode: "signup" });
+                          } else {
+                            openAuth();
+                          }
+                        }}
+                      >
+                        <span className={styles.navLinkLine} aria-hidden />
+                        <span className={styles.navLinkText}>{item.label}</span>
+                      </button>
+                    ) : (
+                      <Link
+                        href={item.href}
+                        className={styles.navLink}
+                        data-framer-name="Desktop Navlinks"
+                        onClick={() => onOpenChange(false)}
+                      >
+                        <span className={styles.navLinkLine} aria-hidden />
+                        <span className={styles.navLinkText}>{item.label}</span>
+                      </Link>
+                    )}
                   </div>
                 ))}
               </nav>

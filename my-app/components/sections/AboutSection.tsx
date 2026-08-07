@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { LT_IMAGE_QUALITY } from "@/lib/image-quality";
 import { IMG } from "@/lib/content";
 import { PrimaryButton } from "@/components/ui/PrimaryButton";
 import { SectionTag } from "@/components/ui/SectionTag";
@@ -13,7 +14,7 @@ export function AboutSection() {
       <div className="mx-auto grid w-full max-w-[1200px] items-center gap-14 lg:grid-cols-[0.95fr_1.05fr] lg:gap-20">
         <div>
           <SectionTag>Về chúng tôi</SectionTag>
-          <h2 className="mt-4 font-['Manrope','Manrope_Placeholder',sans-serif] text-[32px] font-bold leading-[1.2] tracking-[-0.01em] text-[#012830] capitalize md:text-[32px]">
+          <h2 className="mt-4 font-['Manrope','Manrope_Placeholder',sans-serif] text-[32px] font-bold leading-[1.2] tracking-[-0.01em] text-[var(--lt-deep)] capitalize md:text-[32px]">
             Nhanh chóng và tiện nghi
           </h2>
           <p className="mt-5 max-w-[38ch] font-['Inter',system-ui,sans-serif] text-[15px] font-medium leading-[1.7] tracking-[-0.02em] text-[#5c5c5c]">
@@ -35,7 +36,8 @@ export function AboutSection() {
               fill
               className="object-cover"
               sizes="280px"
-            />
+                    quality={LT_IMAGE_QUALITY}
+                  />
           </div>
           <div className="absolute bottom-0 right-0 z-[2] h-[82%] w-[60%] overflow-hidden rounded-[24px] shadow-2xl ring-[6px] ring-white">
             <Image
@@ -44,7 +46,8 @@ export function AboutSection() {
               fill
               className="object-cover"
               sizes="300px"
-            />
+                    quality={LT_IMAGE_QUALITY}
+                  />
           </div>
         </div>
       </div>

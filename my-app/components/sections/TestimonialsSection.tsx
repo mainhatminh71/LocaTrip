@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { LT_IMAGE_QUALITY } from "@/lib/image-quality";
 import { useState } from "react";
 import { IMG } from "@/lib/content";
 import { SectionTag } from "@/components/ui/SectionTag";
@@ -44,7 +45,7 @@ export function TestimonialsSection() {
     >
       <div className="mx-auto mb-10 max-w-[1200px]">
         <SectionTag>Cảm nhận</SectionTag>
-        <h2 className="mt-4 max-w-[20ch] font-['Manrope','Manrope_Placeholder',sans-serif] text-[32px] font-bold leading-[1.2] tracking-[-0.01em] text-[#012830] capitalize">
+        <h2 className="mt-4 max-w-[20ch] font-['Manrope','Manrope_Placeholder',sans-serif] text-[32px] font-bold leading-[1.2] tracking-[-0.01em] text-[var(--lt-deep)] capitalize">
           Đánh giá từ du khách trải nghiệm locaTrip
         </h2>
       </div>
@@ -57,7 +58,8 @@ export function TestimonialsSection() {
           fill
           className="object-cover transition-opacity duration-500"
           sizes="1200px"
-        />
+                    quality={LT_IMAGE_QUALITY}
+                  />
         <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-transparent" />
         <div className="relative z-[1] flex h-full min-h-[420px] flex-col justify-end p-8 text-white md:min-h-[480px] md:p-12">
           <p className="text-[18px] tracking-wide">★★★★★</p>
@@ -72,7 +74,8 @@ export function TestimonialsSection() {
                 width={48}
                 height={48}
                 className="size-12 rounded-full border-2 border-white object-cover"
-              />
+                    quality={LT_IMAGE_QUALITY}
+                  />
               <div>
                 <p className="font-['Inter',system-ui,sans-serif] text-[16px] font-semibold">
                   {slide.name}

@@ -10,7 +10,7 @@ type PolicyViewProps = {
 };
 
 const POLICY_BG =
-  "https://framerusercontent.com/images/B0ftCKevJrn1HdNlQBk73pkoe8.png";
+  "/media/dalat-lake.jpg";
 
 export function PolicyView({ title, sub, sections }: PolicyViewProps) {
   return (

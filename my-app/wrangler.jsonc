@@ -24,8 +24,5 @@
       "binding": "WORKER_SELF_REFERENCE",
       "service": "locatrip"
     }
-  ],
-  "images": {
-    "binding": "IMAGES"
-  }
+  ]
 }

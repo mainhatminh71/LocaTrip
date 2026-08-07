@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { LT_IMAGE_QUALITY } from "@/lib/image-quality";
 import { useEffect, useState } from "react";
 
 type ImageCrossfadeProps = {
@@ -45,6 +46,7 @@ export function ImageCrossfade({
           alt={i === index ? alt : ""}
           fill
           sizes={sizes}
+          quality={LT_IMAGE_QUALITY}
           priority={priority && i === 0}
           className={`object-cover transition-opacity duration-[1200ms] ease-in-out ${
             i === index ? "opacity-100" : "opacity-0"

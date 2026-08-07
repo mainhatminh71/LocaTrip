@@ -11,7 +11,7 @@ export function ExperiencesSection() {
       <div className="mx-auto max-w-[1200px]">
         <div className="mb-10 max-w-2xl">
           <SectionTag>Khám phá nhanh gọn</SectionTag>
-          <h2 className="mt-4 font-display text-[32px] font-bold leading-[1.2] tracking-[-0.02em] text-[#111] md:text-[40px]">
+          <h2 className="mt-4 font-display text-[32px] font-bold leading-[1.2] tracking-[-0.02em] text-[var(--lt-near-black)] md:text-[40px]">
             Trải nghiệm đa cảm xúc tại nơi bạn đang đặt chân
           </h2>
         </div>
@@ -32,7 +32,7 @@ export function ExperiencesSection() {
                   sizes="(max-width:1280px) 50vw, 25vw"
                 />
               </div>
-              <h3 className="font-display text-xl font-semibold text-[#111]">
+              <h3 className="font-display text-xl font-semibold text-[var(--lt-near-black)]">
                 {item.title}
               </h3>
               <p className="text-sm leading-relaxed text-[#5c5c5c]">{item.desc}</p>
@@ -41,7 +41,7 @@ export function ExperiencesSection() {
         </div>
 
         <div className="mt-12 flex flex-col items-start justify-between gap-4 border-t border-black/5 pt-8 md:flex-row md:items-center">
-          <p className="font-body text-[18px] text-[#111]">
+          <p className="font-body text-[18px] text-[var(--lt-near-black)]">
             Khám phá nhiều địa điểm đang chờ bạn
           </p>
           <PrimaryButton href="/tours" variant="dark">

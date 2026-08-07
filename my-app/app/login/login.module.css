@@ -1,0 +1,125 @@
+.page {
+  min-height: calc(100dvh - 120px);
+  display: grid;
+  place-items: center;
+  padding: 48px 20px 80px;
+  background: #eef3f1;
+}
+
+.center {
+  min-height: 40vh;
+  display: grid;
+  place-items: center;
+}
+
+.card {
+  width: min(420px, 100%);
+  padding: 28px 24px 22px;
+  border-radius: 22px;
+  background: #fff;
+  box-shadow: 0 16px 40px rgba(1, 40, 48, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.eyebrow {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--lt-teal, #0a6b7c);
+}
+
+.card h1 {
+  margin: 0;
+  font-family: var(--lt-font-display, system-ui);
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--lt-deep, #012830);
+  line-height: 1.2;
+}
+
+.sub {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--lt-muted, #545454);
+}
+
+.error {
+  margin: 0;
+  font-size: 13px;
+  color: #b42318;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.btnPrimary,
+.btnGhost {
+  appearance: none;
+  min-height: 48px;
+  padding: 0 20px;
+  border-radius: 999px;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 650;
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btnPrimary {
+  border: 1px solid var(--lt-ink, #191919);
+  background: var(--lt-ink, #191919);
+  color: #fff;
+}
+
+.btnPrimary:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+
+.btnGhost {
+  border: 1px solid color-mix(in srgb, var(--lt-ink, #191919) 18%, transparent);
+  background: #fff;
+  color: var(--lt-ink, #191919);
+}
+
+.btnGhost:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+
+.hint {
+  margin: 8px 0 0;
+  font-size: 12px;
+  color: var(--lt-muted, #545454);
+}
+
+.hint code {
+  font-size: 11px;
+  padding: 1px 5px;
+  border-radius: 6px;
+  background: var(--lt-field, #f5f5f5);
+}
+
+.redirecting {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 180px;
+  padding: 12px 0;
+}

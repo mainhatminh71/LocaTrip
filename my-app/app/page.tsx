@@ -1,6 +1,4 @@
-import { SiteConversion } from "@/components/layout/SiteConversion";
-import { SiteFooter } from "@/components/layout/SiteFooter";
-import { SiteShell } from "@/components/layout/SiteShell";
+import { MarketingChrome } from "@/components/layout/MarketingChrome";
 import { HeroSection } from "@/components/sections/HeroSection";
 import { AboutSection } from "@/components/sections/AboutSection";
 import { ExperiencesSection } from "@/components/sections/ExperiencesSection";
@@ -13,13 +11,12 @@ import { BlogsSection } from "@/components/sections/BlogsSection";
 import { StoriesSection } from "@/components/sections/StoriesSection";
 
 /**
- * Homepage — Framer section order: Hero → … → Stories → Conversion → Footer.
- * Nav lives inside hero capsule (SiteNav).
+ * Homepage — Framer section order. Chrome = shared MarketingChrome (SiteNav…).
  */
 export default function HomePage() {
   return (
-    <SiteShell>
-      <main className="w-full overflow-x-clip bg-white">
+    <MarketingChrome>
+      <main className="w-full overflow-x-clip bg-[var(--lt-white)]">
         <HeroSection />
         <AboutSection />
         <ExperiencesSection />
@@ -30,9 +27,7 @@ export default function HomePage() {
         <PricingSection />
         <BlogsSection />
         <StoriesSection />
-        <SiteConversion />
       </main>
-      <SiteFooter />
-    </SiteShell>
+    </MarketingChrome>
   );
 }

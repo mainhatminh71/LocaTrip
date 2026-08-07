@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { LT_IMAGE_QUALITY } from "@/lib/image-quality";
 import Link from "next/link";
 import styles from "./listing.module.css";
 
@@ -28,7 +29,8 @@ export function BlogPostView({ post }: { post: BlogPost }) {
             fill
             className={styles.thumbImg}
             sizes="760px"
-          />
+                    quality={LT_IMAGE_QUALITY}
+                  />
         </div>
         <p className={styles.articleLead}>
           Nội dung bài viết đang được port từ Framer sang React. Phần mở đầu và

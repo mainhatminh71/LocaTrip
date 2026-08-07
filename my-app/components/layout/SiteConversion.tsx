@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { LT_IMAGE_QUALITY } from "@/lib/image-quality";
 import Link from "next/link";
 import { BOOK_TRIP_ASSETS, BOOK_TRIP_COPY, MARQUEE_ITEMS } from "@/lib/book-a-trip-assets";
 import styles from "./site-conversion.module.css";
@@ -40,7 +41,8 @@ export function SiteConversion({ ctaHref = "/book-a-trip/" }: SiteConversionProp
           fill
           className={styles.ctaBg}
           sizes="100vw"
-        />
+                    quality={LT_IMAGE_QUALITY}
+                  />
       </div>
 
       <div className={styles.ctaBanner} data-framer-name="Container">

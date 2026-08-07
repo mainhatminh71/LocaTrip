@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { LT_IMAGE_QUALITY } from "@/lib/image-quality";
 import { useState } from "react";
 import { IMG, whyUs } from "@/lib/content";
 import { SectionTag } from "@/components/ui/SectionTag";
@@ -22,7 +23,8 @@ export function WhyUsSection() {
           fill
           className="object-cover"
           sizes="100vw"
-        />
+                    quality={LT_IMAGE_QUALITY}
+                  />
       </div>
       <div className="relative z-[1] mx-auto grid w-full max-w-[1200px] items-center gap-9 lg:grid-cols-2 lg:gap-16">
         <div className="relative min-h-[360px] overflow-hidden rounded-[24px] lg:min-h-[480px]">
@@ -32,7 +34,8 @@ export function WhyUsSection() {
             fill
             className="object-cover transition-opacity duration-500"
             sizes="(max-width:1024px) 100vw, 50vw"
-          />
+                    quality={LT_IMAGE_QUALITY}
+                  />
         </div>
 
         <div>
@@ -57,7 +60,7 @@ export function WhyUsSection() {
                     }`}
                   >
                     <div className="flex items-start gap-3">
-                      <span className="mt-0.5 inline-flex size-6 shrink-0 items-center justify-center rounded-full bg-[#3DDC97] text-[12px] font-bold text-[#0b0b0b]">
+                      <span className="mt-0.5 inline-flex size-6 shrink-0 items-center justify-center rounded-full bg-[var(--lt-mint)] text-[12px] font-bold text-[var(--lt-black)]">
                         ✓
                       </span>
                       <div>

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { MarketingChrome } from "@/components/layout/MarketingChrome";
 import { GeneratedPlanView } from "@/components/generated-plan/GeneratedPlanView";
 
 export const metadata: Metadata = {
@@ -7,5 +8,9 @@ export const metadata: Metadata = {
 };
 
 export default function GeneratedPlanPage() {
-  return <GeneratedPlanView />;
+  return (
+    <MarketingChrome>
+      <GeneratedPlanView />
+    </MarketingChrome>
+  );
 }

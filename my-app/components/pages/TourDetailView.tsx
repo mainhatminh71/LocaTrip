@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { LT_IMAGE_QUALITY } from "@/lib/image-quality";
 import Link from "next/link";
 import styles from "./listing.module.css";
 
@@ -27,7 +28,8 @@ export function TourDetailView({ tour }: { tour: TourCard }) {
             fill
             className={styles.thumbImg}
             sizes="760px"
-          />
+                    quality={LT_IMAGE_QUALITY}
+                  />
         </div>
         <p className={styles.articleLead}>
           Mẫu lịch trình có sẵn từ Framer — đang được port sang React. Bạn có
@@ -40,7 +42,7 @@ export function TourDetailView({ tour }: { tour: TourCard }) {
           <Link
             href="/tours/"
             className={styles.cta}
-            style={{ background: "#f5f5f5", color: "#012830" }}
+            style={{ background: "var(--lt-field)", color: "var(--lt-deep)" }}
           >
             ← Tất cả tours
           </Link>
