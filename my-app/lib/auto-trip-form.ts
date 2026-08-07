@@ -109,7 +109,7 @@ export type AutoTripDraft = {
   pace: Pace;
   /** Trip calendar day YYYY-MM-DD */
   date: string;
-  /** Derived on server for saved trips: OnGoing → Done; Pending = unsaved proposals only. */
+  /** Mirrors saved trip lifecycle when editing; not a free-form prefs picker. */
   tripStatus: TripProgressStatus;
   hours: string; // "HH:MM|HH:MM"
   /** Preset chips vs free time inputs. */
@@ -133,7 +133,7 @@ export const DEFAULT_AUTO_TRIP_DRAFT: AutoTripDraft = {
   budgetLevel: "mid-range",
   pace: "moderate",
   date: todayYmd(),
-  tripStatus: "OnGoing",
+  tripStatus: "Pending",
   hours: "08:30|21:30",
   hoursMode: "preset",
   tripType: null,
@@ -253,6 +253,21 @@ export function validateTripTitleAndDate(
     return "Ngày đi phải từ hôm nay trở đi.";
   }
   return null;
+}
+
+/** Distinct titles when auto-saving multiple generate options as Pending. */
+export function titleForPendingOption(
+  baseTitle: string,
+  optionTitle: string,
+  index: number,
+  total: number,
+): string {
+  const base = baseTitle.trim().slice(0, 80) || "Chuyến Đà Lạt";
+  if (total <= 1) return base.slice(0, 120);
+  const clean =
+    optionTitle.replace(/^Lộ trình\s+\d+:\s*/i, "").trim() ||
+    `Lộ trình ${index + 1}`;
+  return `${base} · ${clean}`.slice(0, 120);
 }
 
 /** Groups auto-planner can soft-score via ALLOWED_TAGS_MAP. */

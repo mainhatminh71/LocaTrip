@@ -10,10 +10,15 @@ import {
   generateAutoTrip,
   getPlaceById,
   getSavedTrip,
+  replacePlaceInTrip,
+  resolveTripProgressStatus,
+  todayYmdHcm,
+  TRIP_PROGRESS_OPTIONS,
   updateSavedTrip,
   updateTripPrefs,
   type CreateSavedTripBody,
   type TripPrefsBody,
+  type TripProgressStatus,
 } from "@/lib/api/trips";
 import { ApiError } from "@/lib/api/http";
 import { BOOK_TRIP_ASSETS, BOOK_TRIP_COPY } from "@/lib/book-a-trip-assets";
@@ -21,6 +26,7 @@ import {
   DEFAULT_AUTO_TRIP_DRAFT,
   parseDraftHours,
   previewSoftLabels,
+  titleForPendingOption,
   todayYmd,
   validateTripTitleAndDate,
   type AutoTripDraft,
@@ -39,12 +45,12 @@ import {
 import {
   buildRouteGeoJSON,
   cloneOption,
+  dayArrayIndex,
   enrichItineraryCoords,
   extractStops,
   stopsForMap,
   summarizeOptionForCard,
   swapVisitPlace,
-  tagChips,
 } from "@/lib/itinerary-map";
 import { visitDisplayTitle, visitKindLabel } from "@/lib/place-type";
 import { useAuthActions } from "@/components/auth/useAuthActions";
@@ -54,6 +60,7 @@ import { useToast } from "@/components/ui/ToastProvider";
 import { AutoTripPrefsFields } from "./AutoTripPrefsFields";
 import { ItineraryMap } from "./ItineraryMap";
 import { LtBrandLoader, LtButtonLoading } from "./LtBrandLoader";
+import { PlaceStopDetail } from "./PlaceStopDetail";
 import { ReplacePlaceModal } from "./ReplacePlaceModal";
 import styles from "./book-a-trip.module.css";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -118,7 +125,14 @@ export function BookATripView({
   const [savedTripId, setSavedTripId] = useState<string | null>(null);
   /** When set (from `?from=` / `?edit=`), user can PATCH this trip after regenerate. */
   const [editingTripId, setEditingTripId] = useState<string | null>(null);
+  const [editingTripStatus, setEditingTripStatus] =
+    useState<TripProgressStatus | null>(null);
   const [editingPrefsId, setEditingPrefsId] = useState<string | null>(null);
+  /** optionId → saved Pending trip id after auto-save from generate. */
+  const [optionTripIds, setOptionTripIds] = useState<Record<number, string>>(
+    {},
+  );
+  const [savingGenerated, setSavingGenerated] = useState(false);
 
   useEffect(() => {
     const stored = readStoredEditingTripId();
@@ -132,7 +146,7 @@ export function BookATripView({
   const [prefillNotice, setPrefillNotice] = useState<string | null>(null);
   const { isAuthenticated, isLoading: authLoading } = useAuthActions();
   const { openAuth } = useAuthModal();
-  const { toastSuccess } = useToast();
+  const { toastSuccess, toastError } = useToast();
   const router = useRouter();
   const searchParams = useSearchParams();
   const fromTripId = searchParams.get("from")?.trim() || "";
@@ -190,6 +204,9 @@ export function BookATripView({
         setMobileMapOpen(false);
         setSavedTripId(null);
         setEditingTrip(trip.id);
+        setEditingTripStatus(
+          resolveTripProgressStatus(trip) || trip.tripStatus || "OnGoing",
+        );
         setEditingPrefsId(trip.prefsId || null);
 
         if (mode === "edit") {
@@ -408,6 +425,7 @@ export function BookATripView({
   ) {
     setError(null);
     setLoading(true);
+    setSavingGenerated(false);
     try {
       const request = buildAutoTripRequest(draft, "dalat", locationOverride);
       if (locationOverride) setLastLocationOverride(locationOverride);
@@ -431,12 +449,56 @@ export function BookATripView({
       setMobileMapOpen(false);
       setLeftTab("itinerary");
       setSavedTripId(null);
+      setOptionTripIds({});
+
+      // Persist every generate option as Pending (1..N POSTs).
+      setSavingGenerated(true);
+      const savedMap = await saveAllOptionsAsPending(
+        data.itineraries,
+        locationOverride ?? lastLocationOverride,
+      );
+      setOptionTripIds(savedMap);
+      const savedCount = Object.keys(savedMap).length;
+      const total = data.itineraries.length;
+
+      if (savedCount === 0) {
+        setError(
+          "Đã tạo lộ trình nhưng không lưu được nháp Pending. Thử tạo lại hoặc kiểm tra API.",
+        );
+      } else if (savedCount < total) {
+        toastError(
+          `Chỉ lưu được ${savedCount}/${total} chuyến nháp. Các lộ trình còn lại có thể tạo lại từ danh sách.`,
+        );
+      } else {
+        toastSuccess(
+          total === 1
+            ? "Đã tạo lịch và lưu nháp (Đề xuất)."
+            : `Đã tạo lịch và lưu ${total} chuyến nháp (Đề xuất).`,
+        );
+      }
+
       if (data.itineraries.length === 1) {
-        setSelectedOption(cloneOption(data.itineraries[0]!));
+        const only = data.itineraries[0]!;
+        const tripId = savedMap[only.optionId];
+        setSelectedOption(cloneOption(only));
         setPhase("itinerary");
+        if (tripId) {
+          setEditingTrip(tripId);
+          setEditingTripStatus("Pending");
+          setDraft((d) => ({ ...d, tripStatus: "Pending" }));
+          router.replace(
+            `/book-a-trip/?edit=${encodeURIComponent(tripId)}`,
+            { scroll: false },
+          );
+        }
       } else {
         setSelectedOption(null);
         setPhase("options");
+        setEditingTrip(null);
+        setEditingTripStatus(null);
+        if (editTripId || fromTripId) {
+          router.replace("/book-a-trip/", { scroll: false });
+        }
       }
     } catch (err) {
       const msg =
@@ -447,6 +509,7 @@ export function BookATripView({
         setError(msg);
       }
     } finally {
+      setSavingGenerated(false);
       setLoading(false);
       setLocating(false);
     }
@@ -521,7 +584,9 @@ export function BookATripView({
     setError(null);
     setSavedTripId(null);
     setEditingTrip(null);
+    setEditingTripStatus(null);
     setEditingPrefsId(null);
+    setOptionTripIds({});
   }
 
   function pickOption(opt: ItineraryOption) {
@@ -535,29 +600,56 @@ export function BookATripView({
     setSavedTripId(null);
     setPhase("itinerary");
     saveAutoTripSelection(opt.optionId);
+    const linkedId = optionTripIds[opt.optionId];
+    if (linkedId) {
+      setEditingTrip(linkedId);
+      setEditingTripStatus("Pending");
+      setDraft((d) => ({ ...d, tripStatus: "Pending" }));
+      router.replace(`/book-a-trip/?edit=${encodeURIComponent(linkedId)}`, {
+        scroll: false,
+      });
+    }
   }
 
   function selectStop(key: string) {
     setSelectedStopKey(key);
   }
 
+  const activeTripId = editingTripId || savedTripId;
+  const dateIsPast =
+    Boolean(activeTripId) &&
+    Boolean(draft.date) &&
+    draft.date.trim().slice(0, 10) < todayYmdHcm();
+  const isTripDone = editingTripStatus === "Done" || dateIsPast;
+  const isTripPending = !isTripDone && editingTripStatus === "Pending";
+  const progressLabel =
+    TRIP_PROGRESS_OPTIONS.find(
+      (o) =>
+        o.value ===
+        (isTripDone
+          ? "Done"
+          : editingTripStatus ||
+            (activeTripId ? "OnGoing" : "Pending")),
+    )?.label || "Đề xuất";
+
   function applyReplace(alt: AlternativePlaceSuggestion) {
-    if (!selectedOption || !replaceStop) return;
+    const target = replaceStop ?? selectedStop;
+    if (!selectedOption || !target) return;
     const next = swapVisitPlace(
       selectedOption,
-      replaceStop.day,
-      replaceStop.scheduleIndex,
+      target.day,
+      target.scheduleIndex,
       alt,
       {
-        latitude: replaceStop.place.latitude,
-        longitude: replaceStop.place.longitude,
+        latitude: target.place.latitude,
+        longitude: target.place.longitude,
       },
     );
     setSelectedOption(next);
     setRouteStale(true);
     setReplaceTargetKey(null);
-    setSelectedStopKey(replaceStop.key);
-    setSavedTripId(null);
+    setSelectedStopKey(null);
+    toastSuccess("Đã thay điểm dừng");
     // Keep localStorage draft in sync with the edited option.
     if (result) {
       const itineraries = result.itineraries.map((o) =>
@@ -576,11 +668,50 @@ export function BookATripView({
     }
   }
 
-  function buildSaveBody(option: ItineraryOption): CreateSavedTripBody {
-    const start = lastLocationOverride ?? {
-      latitude: activeStart.latitude,
-      longitude: activeStart.longitude,
-    };
+  async function applyServerReplace(newPlaceId: string) {
+    const target = replaceStop ?? selectedStop;
+    if (!selectedOption || !target || !activeTripId) return;
+    const dayIndex = dayArrayIndex(selectedOption.itinerary, target.day);
+    if (dayIndex < 0) {
+      throw new Error("Không xác định được ngày trong lịch trình.");
+    }
+    const { itinerary } = await replacePlaceInTrip(activeTripId, {
+      dayIndex,
+      scheduleIndex: target.scheduleIndex,
+      newPlaceId,
+    });
+    const next = cloneOption({
+      ...selectedOption,
+      itinerary,
+    });
+    setSelectedOption(next);
+    setRouteStale(true);
+    setReplaceTargetKey(null);
+    setSelectedStopKey(null);
+    toastSuccess("Đã thay điểm dừng");
+    if (result) {
+      const itineraries = result.itineraries.map((o) =>
+        o.optionId === next.optionId ? next : o,
+      );
+      setResult({ ...result, itineraries });
+    }
+  }
+
+  function buildSaveBody(
+    option: ItineraryOption,
+    tripStatus?: TripProgressStatus,
+    opts?: {
+      title?: string;
+      locationOverride?: { latitude: number; longitude: number } | null;
+      optionIndex?: number;
+      optionTotal?: number;
+    },
+  ): CreateSavedTripBody {
+    const start = opts?.locationOverride ??
+      lastLocationOverride ?? {
+        latitude: activeStart.latitude,
+        longitude: activeStart.longitude,
+      };
     const { start: startTimePerDay, end: endTimePerDay } = parseDraftHours(
       draft.hours,
     );
@@ -606,14 +737,18 @@ export function BookATripView({
       startId: draft.startId,
       roundTrip: draft.isRoundTrip,
     };
+    const total = opts?.optionTotal ?? 1;
+    const index = opts?.optionIndex ?? 0;
+    const title =
+      opts?.title ??
+      titleForPendingOption(draft.title, option.title, index, total);
     return {
-      title: draft.title.trim().slice(0, 120),
+      title,
       source: "auto",
       itinerary: option.itinerary,
       date: draft.date.trim().slice(0, 10),
       tripDate: draft.date.trim().slice(0, 10),
-      // Saved trips are OnGoing until the travel day passes (server also enforces).
-      tripStatus: "OnGoing",
+      ...(tripStatus ? { tripStatus } : {}),
       durationDays: option.itinerary.length,
       pace: draft.pace,
       startCoords: start,
@@ -633,73 +768,220 @@ export function BookATripView({
       endTimePerDay,
       startMode: draft.startMode,
       startId: draft.startId,
+      optionId: option.optionId,
       generatePrefs,
     };
   }
 
-  async function persistTrip(
-    mode: "create" | "update",
-    option?: ItineraryOption | null,
+  /**
+   * POST every generate option as Pending. Partial failures are reported;
+   * returns map of optionId → tripId for successes.
+   */
+  async function saveAllOptionsAsPending(
+    options: ItineraryOption[],
+    locationOverride?: { latitude: number; longitude: number } | null,
+  ): Promise<Record<number, string>> {
+    const identityErr = validateTripTitleAndDate(draft, { allowPast: false });
+    if (identityErr) {
+      setError(identityErr);
+      return {};
+    }
+    if (!isAuthenticated) {
+      openAuth({ next: "/book-a-trip/" });
+      return {};
+    }
+
+    const total = options.length;
+    const settled = await Promise.allSettled(
+      options.map((opt, index) =>
+        createSavedTrip(
+          buildSaveBody(opt, "Pending", {
+            locationOverride,
+            optionIndex: index,
+            optionTotal: total,
+          }),
+        ).then((trip) => {
+          warnIfStatusMismatch("Pending", trip.tripStatus);
+          return { optionId: opt.optionId, tripId: trip.id };
+        }),
+      ),
+    );
+
+    const map: Record<number, string> = {};
+    const failMsgs: string[] = [];
+    settled.forEach((res, i) => {
+      if (res.status === "fulfilled") {
+        map[res.value.optionId] = res.value.tripId;
+      } else {
+        const reason = res.reason;
+        failMsgs.push(
+          options[i]?.title?.slice(0, 36) ||
+            (reason instanceof Error ? reason.message : "lỗi"),
+        );
+      }
+    });
+    if (failMsgs.length && Object.keys(map).length > 0) {
+      console.warn("[LocaTrip] Pending save partial failure:", failMsgs);
+    }
+    return map;
+  }
+
+  function warnIfStatusMismatch(
+    expected: TripProgressStatus,
+    actual?: TripProgressStatus,
   ) {
+    if (!actual || actual === expected) return;
+    const want =
+      TRIP_PROGRESS_OPTIONS.find((o) => o.value === expected)?.label ||
+      expected;
+    const got =
+      TRIP_PROGRESS_OPTIONS.find((o) => o.value === actual)?.label || actual;
+    toastError(
+      `Máy chủ trả về “${got}” thay vì “${want}”. Cần cập nhật LocalTrip API để nhận Pending / OnGoing.`,
+    );
+  }
+
+  type PersistMode =
+    | "createPending"
+    | "confirmOnGoing"
+    | "updatePending"
+    | "updateOnGoing";
+
+  async function persistTrip(
+    mode: PersistMode,
+    option?: ItineraryOption | null,
+    tripIdOverride?: string | null,
+  ): Promise<string | null> {
     const opt = option ?? selectedOption;
-    if (!opt || saving) return;
-    // After create, UI flips to "Xem đã lưu" — don't POST again.
-    if (mode === "create" && savedTripId) return;
-    if (mode === "update" && !editingTripId) return;
+    if (!opt || saving) return null;
+    const targetTripId = tripIdOverride || editingTripId;
+    if (
+      (mode === "confirmOnGoing" ||
+        mode === "updatePending" ||
+        mode === "updateOnGoing") &&
+      !targetTripId
+    ) {
+      return null;
+    }
     if (!isAuthenticated) {
       openAuth({
-        next: editingTripId
-          ? `/book-a-trip/?edit=${encodeURIComponent(editingTripId)}`
+        next: targetTripId
+          ? `/book-a-trip/?edit=${encodeURIComponent(targetTripId)}`
           : "/book-a-trip/",
       });
-      return;
+      return null;
     }
     const identityErr = validateTripTitleAndDate(draft, {
-      allowPast: Boolean(editingTripId),
+      allowPast: Boolean(targetTripId),
     });
     if (identityErr) {
       setError(identityErr);
-      return;
+      return null;
     }
-    const body = buildSaveBody(opt);
+
+    const statusForBody: TripProgressStatus | undefined =
+      mode === "createPending"
+        ? "Pending"
+        : mode === "confirmOnGoing"
+          ? "OnGoing"
+          : undefined;
+    const body = buildSaveBody(opt, statusForBody, {
+      optionIndex: 0,
+      optionTotal: 1,
+    });
 
     setSaving(true);
     setError(null);
     try {
-      const trip =
-        mode === "update" && editingTripId
-          ? await updateSavedTrip(editingTripId, body)
-          : await createSavedTrip(body);
-      if (mode === "update") {
+      if (mode === "createPending") {
+        const trip = await createSavedTrip(body);
+        warnIfStatusMismatch("Pending", trip.tripStatus);
         setEditingTrip(trip.id);
-        setSavedTripId(null);
-        toastSuccess("Đã cập nhật chuyến đi.");
-      } else {
+        setEditingTripStatus(trip.tripStatus || "Pending");
         setSavedTripId(trip.id);
-        setEditingTrip(null);
-        toastSuccess("Đã lưu chuyến đi.");
+        setDraft((d) => ({
+          ...d,
+          tripStatus: trip.tripStatus || "Pending",
+        }));
+        toastSuccess("Đã tạo nháp (Đề xuất).");
+        return trip.id;
       }
+
+      const tripId = targetTripId!;
+      const trip = await updateSavedTrip(tripId, body);
+      if (mode === "confirmOnGoing") {
+        warnIfStatusMismatch("OnGoing", trip.tripStatus);
+        setEditingTripStatus(trip.tripStatus || "OnGoing");
+        setDraft((d) => ({
+          ...d,
+          tripStatus: trip.tripStatus || "OnGoing",
+        }));
+        toastSuccess("Đã lưu chính thức.");
+      } else {
+        setEditingTripStatus(trip.tripStatus || editingTripStatus);
+        toastSuccess("Đã cập nhật chuyến đi.");
+      }
+      setEditingTrip(trip.id);
+      setSavedTripId(null);
+      return trip.id;
     } catch (err) {
       const msg =
         err instanceof ApiError
           ? err.message
           : err instanceof Error
             ? err.message
-            : mode === "update"
-              ? "Không cập nhật được chuyến đi"
-              : "Không lưu được chuyến đi";
+            : "Không lưu được chuyến đi";
       setError(msg);
+      toastError(msg);
+      return null;
     } finally {
       setSaving(false);
     }
   }
 
-  async function saveCurrentTrip() {
-    await persistTrip("create");
+  /** Retry Pending save for one option that failed during generate. */
+  async function retryPendingForOption(opt: ItineraryOption) {
+    if (saving || optionTripIds[opt.optionId]) return;
+    if (!result) return;
+    setSaving(true);
+    setError(null);
+    try {
+      const index = result.itineraries.findIndex(
+        (o) => o.optionId === opt.optionId,
+      );
+      const trip = await createSavedTrip(
+        buildSaveBody(opt, "Pending", {
+          optionIndex: Math.max(0, index),
+          optionTotal: result.itineraries.length,
+        }),
+      );
+      warnIfStatusMismatch("Pending", trip.tripStatus);
+      setOptionTripIds((prev) => ({ ...prev, [opt.optionId]: trip.id }));
+      toastSuccess("Đã lưu nháp (Đề xuất).");
+    } catch (err) {
+      const msg =
+        err instanceof ApiError
+          ? err.message
+          : err instanceof Error
+            ? err.message
+            : "Không lưu được nháp";
+      setError(msg);
+      toastError(msg);
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function confirmOfficialTrip(tripIdOverride?: string | null) {
+    await persistTrip("confirmOnGoing", null, tripIdOverride);
   }
 
   async function updateCurrentTrip() {
-    await persistTrip("update");
+    if (editingTripStatus === "Pending") {
+      await persistTrip("updatePending");
+      return;
+    }
+    await persistTrip("updateOnGoing");
   }
 
   function buildPrefsOnlyBody(): TripPrefsBody {
@@ -929,12 +1211,16 @@ export function BookATripView({
                 <button
                   type="submit"
                   className={styles.btnPrimary}
-                  disabled={loading || locating}
+                  disabled={loading || locating || savingGenerated}
                 >
-                  {loading || locating ? (
+                  {loading || locating || savingGenerated ? (
                     <LtButtonLoading
                       label={
-                        locating ? "Đang lấy vị trí…" : "Đang dựng lịch…"
+                        locating
+                          ? "Đang lấy vị trí…"
+                          : savingGenerated
+                            ? "Đang lưu nháp…"
+                            : "Đang dựng lịch…"
                       }
                     />
                   ) : (
@@ -955,8 +1241,8 @@ export function BookATripView({
             >
               <h2 className={styles.autoResultTitle}>Chọn một lộ trình</h2>
               <p className={styles.autoHint}>
-                So nhanh chuỗi điểm trong ngày — chọn một lộ trình để xem chi
-                tiết trên bản đồ.
+                Mỗi lộ trình đã được lưu nháp (Đề xuất). Chọn một cái để xem bản
+                đồ và chỉnh.
               </p>
               <ul className={styles.optionList}>
                 {result.itineraries.map((opt, idx) => {
@@ -966,8 +1252,32 @@ export function BookATripView({
                     card.stopCount > 0 ? `${card.stopCount} điểm` : null,
                     card.timeRange,
                   ].filter(Boolean);
+                  const savedId = optionTripIds[opt.optionId];
                   return (
-                    <li key={opt.optionId}>
+                    <li key={opt.optionId} className={styles.optionCardWrap}>
+                      <div className={styles.optionCardTop}>
+                        {savedId ? (
+                          <span className={styles.optionPending}>
+                            Đã lưu nháp
+                          </span>
+                        ) : (
+                          <button
+                            type="button"
+                            className={styles.btnGhost}
+                            disabled={saving}
+                            onClick={() => void retryPendingForOption(opt)}
+                          >
+                            {saving ? (
+                              <LtButtonLoading
+                                label="Đang lưu…"
+                                onDark={false}
+                              />
+                            ) : (
+                              "Lưu nháp lại"
+                            )}
+                          </button>
+                        )}
+                      </div>
                       <button
                         type="button"
                         className={styles.optionCard}
@@ -1077,7 +1387,12 @@ export function BookATripView({
                         }
                       })()}
                       {" · "}
-                      {savedTripId || editingTripId ? "Đang đi" : "Đề xuất"}
+                      {progressLabel}
+                    </p>
+                  ) : null}
+                  {isTripDone ? (
+                    <p className={styles.routeStaleNote}>
+                      Chuyến đã hoàn thành — chỉ xem
                     </p>
                   ) : null}
                   {selectedOption.summary ? (
@@ -1194,62 +1509,6 @@ export function BookATripView({
                   ))}
                 </div>
 
-                {selectedStop ? (
-                  <div className={styles.detailCardMobile}>
-                    <div className={styles.detailCardHead}>
-                      <p className={styles.detailEyebrow}>
-                        Điểm {selectedStop.order} · {selectedStop.time}
-                      </p>
-                      <button
-                        type="button"
-                        className={styles.detailClose}
-                        aria-label="Đóng"
-                        onClick={() => setSelectedStopKey(null)}
-                      >
-                        <svg viewBox="0 0 14 14" aria-hidden="true">
-                          <path
-                            d="M3 3l8 8M11 3L3 11"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="1.75"
-                            strokeLinecap="round"
-                          />
-                        </svg>
-                      </button>
-                    </div>
-                    <h3>{selectedStop.place.title}</h3>
-                    {selectedStop.place.address ? (
-                      <p className={styles.detailAddr}>
-                        {selectedStop.place.address}
-                      </p>
-                    ) : null}
-                    <div className={styles.detailMeta}>
-                      {selectedStop.place.reviewRating != null ? (
-                        <span>{selectedStop.place.reviewRating.toFixed(1)}★</span>
-                      ) : null}
-                      {selectedStop.place.category ? (
-                        <span>{selectedStop.place.category}</span>
-                      ) : null}
-                    </div>
-                    {tagChips(selectedStop.place.tags).length > 0 ? (
-                      <div className={styles.tagChipRow}>
-                        {tagChips(selectedStop.place.tags).map((t) => (
-                          <span key={t} className={styles.tagChip}>
-                            {t}
-                          </span>
-                        ))}
-                      </div>
-                    ) : null}
-                    <button
-                      type="button"
-                      className={styles.btnPrimary}
-                      onClick={() => setReplaceTargetKey(selectedStop.key)}
-                    >
-                      Thay thế
-                    </button>
-                  </div>
-                ) : null}
-
                 <div className={styles.autoSticky}>
                   <button
                     type="button"
@@ -1267,51 +1526,95 @@ export function BookATripView({
                       Đổi lộ trình khác
                     </button>
                   ) : null}
-                  {savedTripId ? (
+                  {isTripDone ? (
                     <button
                       type="button"
                       className={styles.btnPrimary}
-                      onClick={() => router.push(`/my-trips/${savedTripId}/`)}
+                      onClick={() =>
+                        router.push(
+                          `/my-trips/${encodeURIComponent(activeTripId || "")}/`,
+                        )
+                      }
                     >
-                      Xem đã lưu
+                      Xem chuyến đã lưu
                     </button>
-                  ) : editingTripId ? (
+                  ) : isTripPending && editingTripId ? (
                     <>
                       <button
                         type="button"
                         className={styles.btnPrimary}
                         disabled={saving}
-                        onClick={() => void updateCurrentTrip()}
+                        onClick={() => void confirmOfficialTrip()}
                       >
                         {saving ? (
-                          <LtButtonLoading label="Đang cập nhật…" />
+                          <LtButtonLoading label="Đang lưu…" />
                         ) : (
-                          "Cập nhật chuyến này"
+                          "Lưu chính thức"
                         )}
                       </button>
                       <button
                         type="button"
                         className={styles.btnGhost}
                         disabled={saving}
-                        onClick={() => void saveCurrentTrip()}
+                        onClick={() => void updateCurrentTrip()}
                       >
-                        Lưu thành chuyến mới
+                        Cập nhật nháp
                       </button>
                     </>
-                  ) : (
+                  ) : editingTripId ? (
                     <button
                       type="button"
                       className={styles.btnPrimary}
                       disabled={saving}
-                      onClick={() => void saveCurrentTrip()}
+                      onClick={() => void updateCurrentTrip()}
+                    >
+                      {saving ? (
+                        <LtButtonLoading label="Đang cập nhật…" />
+                      ) : (
+                        "Cập nhật chuyến này"
+                      )}
+                    </button>
+                  ) : selectedOption &&
+                    optionTripIds[selectedOption.optionId] ? (
+                    <button
+                      type="button"
+                      className={styles.btnPrimary}
+                      disabled={saving}
+                      onClick={() => {
+                        const id = optionTripIds[selectedOption.optionId];
+                        if (!id) return;
+                        setEditingTrip(id);
+                        setEditingTripStatus("Pending");
+                        void confirmOfficialTrip(id);
+                      }}
                     >
                       {saving ? (
                         <LtButtonLoading label="Đang lưu…" />
                       ) : (
-                        "Lưu chuyến đi"
+                        "Lưu chính thức"
                       )}
                     </button>
-                  )}
+                  ) : selectedOption ? (
+                    <button
+                      type="button"
+                      className={styles.btnPrimary}
+                      disabled={saving}
+                      onClick={() => void retryPendingForOption(selectedOption)}
+                    >
+                      {saving ? (
+                        <LtButtonLoading label="Đang lưu nháp…" />
+                      ) : (
+                        "Lưu nháp lại"
+                      )}
+                    </button>
+                  ) : null}
+                  <button
+                    type="button"
+                    className={styles.btnGhost}
+                    onClick={() => router.push("/my-trips/")}
+                  >
+                    Chuyến của tôi
+                  </button>
                   <button
                     type="button"
                     className={styles.btnGhost}
@@ -1365,11 +1668,19 @@ export function BookATripView({
                         <button
                           type="button"
                           className={styles.btnPrimary}
-                          disabled={loading || locating || savingPrefs}
+                          disabled={
+                            loading || locating || savingPrefs || savingGenerated
+                          }
                           onClick={applyPrefsAndRegenerate}
                         >
-                          {loading || locating ? (
-                            <LtButtonLoading label="Đang dựng lịch…" />
+                          {loading || locating || savingGenerated ? (
+                            <LtButtonLoading
+                              label={
+                                savingGenerated
+                                  ? "Đang lưu nháp…"
+                                  : "Đang dựng lịch…"
+                              }
+                            />
                           ) : (
                             "Áp dụng & tạo lại"
                           )}
@@ -1408,69 +1719,43 @@ export function BookATripView({
                       }
                     />
                   ) : null}
-                  {selectedStop ? (
-                    <div className={styles.detailCardMap}>
-                      <div className={styles.detailCardHead}>
-                        <p className={styles.detailEyebrow}>
-                          Điểm {selectedStop.order} · {selectedStop.time}
-                        </p>
-                        <button
-                          type="button"
-                          className={styles.detailClose}
-                          aria-label="Đóng"
-                          onClick={() => setSelectedStopKey(null)}
-                        >
-                          <svg viewBox="0 0 14 14" aria-hidden="true">
-                            <path
-                              d="M3 3l8 8M11 3L3 11"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="1.75"
-                              strokeLinecap="round"
-                            />
-                          </svg>
-                        </button>
-                      </div>
-                      <h3>{selectedStop.place.title}</h3>
-                      {selectedStop.place.address ? (
-                        <p className={styles.detailAddr}>
-                          {selectedStop.place.address}
-                        </p>
-                      ) : null}
-                      <div className={styles.detailMeta}>
-                        {selectedStop.place.reviewRating != null ? (
-                          <span>
-                            {selectedStop.place.reviewRating.toFixed(1)}★
-                          </span>
-                        ) : null}
-                        {selectedStop.place.category ? (
-                          <span>{selectedStop.place.category}</span>
-                        ) : null}
-                      </div>
-                      {tagChips(selectedStop.place.tags).length > 0 ? (
-                        <div className={styles.tagChipRow}>
-                          {tagChips(selectedStop.place.tags).map((t) => (
-                            <span key={t} className={styles.tagChip}>
-                              {t}
-                            </span>
-                          ))}
-                        </div>
-                      ) : null}
-                      <button
-                        type="button"
-                        className={styles.btnPrimary}
-                        onClick={() => setReplaceTargetKey(selectedStop.key)}
-                      >
-                        Thay thế
-                      </button>
-                    </div>
-                  ) : (
+                  {!selectedStop ? (
                     <p className={styles.mapHint}>
                       Chọn một điểm trên danh sách hoặc bản đồ để xem chi tiết
                     </p>
-                  )}
+                  ) : null}
                 </div>
               </aside>
+
+              {selectedStop && selectedOption ? (
+                <PlaceStopDetail
+                  stop={selectedStop}
+                  tripId={activeTripId}
+                  dayIndex={dayArrayIndex(
+                    selectedOption.itinerary,
+                    selectedStop.day,
+                  )}
+                  readOnly={isTripDone}
+                  replaceBlockedLabel={
+                    isTripDone ? "Chuyến đã hoàn thành — chỉ xem" : undefined
+                  }
+                  onClose={() => setSelectedStopKey(null)}
+                  onPickLocal={applyReplace}
+                  onPickServer={
+                    activeTripId
+                      ? (newPlaceId) => applyServerReplace(newPlaceId)
+                      : undefined
+                  }
+                  onSearchMore={
+                    isTripDone
+                      ? undefined
+                      : () => {
+                          setReplaceTargetKey(selectedStop.key);
+                          setSelectedStopKey(null);
+                        }
+                  }
+                />
+              ) : null}
 
               <AnimatePresence>
                 {mobileMapOpen && isNarrow ? (
@@ -1514,12 +1799,26 @@ export function BookATripView({
               </AnimatePresence>
 
               <AnimatePresence>
-                {replaceStop ? (
+                {replaceStop && !isTripDone ? (
                   <ReplacePlaceModal
                     key="replace-modal"
                     stop={replaceStop}
+                    tripId={activeTripId}
+                    dayIndex={
+                      selectedOption
+                        ? dayArrayIndex(
+                            selectedOption.itinerary,
+                            replaceStop.day,
+                          )
+                        : -1
+                    }
                     onClose={() => setReplaceTargetKey(null)}
                     onPick={applyReplace}
+                    onPickServer={
+                      activeTripId
+                        ? (newPlaceId) => applyServerReplace(newPlaceId)
+                        : undefined
+                    }
                   />
                 ) : null}
               </AnimatePresence>

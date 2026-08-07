@@ -1,7 +1,8 @@
-import type {
-  SavedTrip,
-  TripGeneratePrefs,
-  TripProgressStatus,
+import {
+  resolveTripProgressStatus,
+  type SavedTrip,
+  type TripGeneratePrefs,
+  type TripProgressStatus,
 } from "@/lib/api/trips";
 import {
   DEFAULT_AUTO_TRIP_DRAFT,
@@ -166,11 +167,7 @@ export function draftFromSavedTrip(trip: SavedTrip): {
     trip.title.replace(/^Lộ trình\s+\d+:\s*/i, "").trim() || trip.title;
 
   const tripStatus: TripProgressStatus =
-    trip.tripStatus === "Done"
-      ? "Done"
-      : trip.tripStatus === "Pending"
-        ? "OnGoing" // legacy saved docs — Pending is only for unsaved proposals
-        : "OnGoing";
+    resolveTripProgressStatus(trip) || "OnGoing";
 
   const draft: AutoTripDraft = {
     ...DEFAULT_AUTO_TRIP_DRAFT,

@@ -2575,6 +2575,45 @@
   gap: 12px;
 }
 
+.optionCardWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.optionCardTop {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 0 2px;
+}
+
+.optionCheck {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--lt-muted);
+  cursor: pointer;
+}
+
+.optionCheck input {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--lt-teal);
+}
+
+.optionBatchBar {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  margin-top: 4px;
+}
+
 .optionCard {
   width: 100%;
   appearance: none;
@@ -3108,30 +3147,103 @@
   box-shadow: 0 8px 24px rgba(1, 40, 48, 0.12);
 }
 
-.detailCardMap {
+/* Viewport-centered place detail modal (portal → body) */
+.placeDetailModalRoot {
+  position: fixed;
+  inset: 0;
+  z-index: 12000;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+}
+
+.placeDetailModalBackdrop {
   position: absolute;
-  left: 16px;
-  right: 16px;
-  bottom: 20px;
-  z-index: 2;
-  padding: 16px 16px 14px;
-  border-radius: 18px;
+  inset: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: rgba(1, 40, 48, 0.48);
+  cursor: pointer;
+}
+
+.placeDetailModalSheet {
+  position: relative;
+  z-index: 1;
+  width: min(560px, 100%);
+  height: min(88vh, 780px);
+  max-height: min(88vh, 780px);
+  border-radius: 20px;
   background: #fff;
-  box-shadow: 0 16px 40px rgba(1, 40, 48, 0.18);
+  box-shadow: 0 28px 64px rgba(1, 40, 48, 0.32);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.placeAltBlock {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  max-width: 380px;
+  margin-top: 4px;
+  padding-top: 10px;
+  border-top: 1px solid color-mix(in srgb, var(--lt-ink) 8%, transparent);
+}
+
+.placeAltList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.placeAltItem {
+  appearance: none;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  text-align: left;
+  padding: 11px 12px;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--lt-ink) 10%, transparent);
+  background: var(--lt-field);
+  cursor: pointer;
+  font: inherit;
+  color: var(--lt-ink);
+}
+
+.placeAltItem:hover:not(:disabled) {
+  border-color: var(--lt-teal);
+  background: #fff;
+}
+
+.placeAltItem:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+
+.placeAltItem strong {
+  font-size: 14px;
+  color: var(--lt-deep);
+}
+
+.placeAltItem span,
+.placeAltItem em {
+  font-size: 12px;
+  color: var(--lt-muted);
+  font-style: normal;
+  line-height: 1.4;
+}
+
+.detailCardMap {
+  display: none;
 }
 
 .detailCardMobile {
   display: none;
-  padding: 16px;
-  border-radius: 18px;
-  background: #fff;
-  box-shadow: 0 8px 24px rgba(1, 40, 48, 0.08);
-  flex-direction: column;
-  gap: 8px;
 }
 
 .detailEyebrow {
@@ -3145,14 +3257,207 @@
 
 .detailCardMap h3,
 .detailCardMobile h3,
-.replaceSheet h3 {
+.replaceSheet h3,
+.placeDetailRoot h3 {
   margin: 0;
   font-family: var(--lt-font-display);
-  font-size: 17px;
+  font-size: 1.2rem;
   font-weight: 700;
   color: var(--lt-deep);
   letter-spacing: -0.02em;
   line-height: 1.25;
+}
+
+.placeDetailRoot {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  flex: 1;
+  height: 100%;
+  max-height: inherit;
+}
+
+.placeDetailRoot .detailCardHead {
+  flex: 0 0 auto;
+  padding: 14px 16px 8px;
+}
+
+.placeDetailScroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  padding: 0 16px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.placeDetailFooter {
+  flex: 0 0 auto;
+  padding: 12px 16px 14px;
+  border-top: 1px solid color-mix(in srgb, var(--lt-ink) 8%, transparent);
+  background: #fff;
+}
+
+.placeDetailFooter .btnPrimary {
+  width: 100%;
+}
+
+.placeDetailLoading {
+  display: flex;
+  justify-content: flex-start;
+  padding: 8px 0;
+}
+
+.placeDetailMuted {
+  margin: 0;
+  font-size: 12px;
+  color: var(--lt-muted);
+  line-height: 1.4;
+}
+
+.placeDetailThumb {
+  display: block;
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 14px;
+  background: var(--lt-field);
+}
+
+.placeDetailThumbEmpty {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 120px;
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--lt-ink) 5%, #fff);
+  color: var(--lt-muted);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.placeDetailLine {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 13px;
+  line-height: 1.45;
+  color: color-mix(in srgb, var(--lt-ink) 78%, transparent);
+}
+
+.placeDetailLine strong {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--lt-teal);
+}
+
+.placeDetailLinks {
+  list-style: none;
+  margin: 0;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--lt-teal) 6%, #fff);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.placeDetailLinks li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 10px;
+}
+
+.placeDetailLinkLabel {
+  flex: 0 0 5.5rem;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--lt-muted);
+}
+
+.placeDetailLinks a {
+  color: var(--lt-teal);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  word-break: break-all;
+}
+
+.placeReviewBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.placeReviewTitle {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--lt-teal);
+}
+
+.placeReviewList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.placeReviewList li {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: var(--lt-field);
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--lt-muted);
+}
+
+.placeReviewList strong {
+  color: var(--lt-deep);
+  font-size: 12px;
+}
+
+.replaceItemInner {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  width: 100%;
+}
+
+.replaceItemText {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  flex: 1;
+}
+
+.replaceThumb,
+.replaceThumbPlaceholder {
+  flex: 0 0 auto;
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  object-fit: cover;
+  background: color-mix(in srgb, var(--lt-ink) 8%, #fff);
 }
 
 .detailAddr {
@@ -3630,10 +3935,6 @@
   .itineraryPane {
     max-height: none;
     padding-bottom: 8px;
-  }
-
-  .detailCardMobile {
-    display: flex;
   }
 
   .mobileMapOverlay {

@@ -17,6 +17,39 @@ export type PlaceSearchHit = {
   latitude?: number;
   longitude?: number;
   tags?: string[];
+  thumbnail?: string;
+};
+
+/** Full place from GET /trips/places/:placeId */
+export type PlaceDetail = PlaceSearchHit & {
+  openHours?: unknown;
+  website?: string;
+  phone?: string;
+  reviewCount?: number;
+  priceRangeLow?: number;
+  priceRangeMax?: number;
+  reservations?: unknown;
+  orderOnline?: unknown;
+  menuLink?: string;
+  userReviews?: {
+    name?: string;
+    rating?: number;
+    text?: string;
+    publishedAt?: string;
+  }[];
+  emails?: string;
+  busyProfile?: {
+    peakHours?: string[];
+    peakDays?: string[];
+    liveliness?: string;
+  };
+  poiRole?: string;
+  poiRoleConfidence?: string;
+  estimatedVisitDurationMin?: number;
+  areaType?: string;
+  isActive?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
 };
 
 export type SavedTripSource = "cart" | "auto" | "manual";
@@ -85,6 +118,8 @@ export type CreateSavedTripBody = {
   showRoad?: boolean;
   startMode?: string;
   startId?: string;
+  /** Auto option id from generate response */
+  optionId?: number;
   generatePrefs?: TripGeneratePrefs;
 };
 
@@ -155,15 +190,54 @@ export function resolveTripDate(
   return undefined;
 }
 
+/** Today YYYY-MM-DD in Asia/Ho_Chi_Minh (matches LocalTrip Done derivation). */
+export function todayYmdHcm(): string {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Ho_Chi_Minh",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date());
+}
+
+/**
+ * Effective progress for UI: Done when travel date is before today (VN),
+ * even if the stored field still says OnGoing.
+ */
+export function resolveTripProgressStatus(
+  trip: Pick<SavedTrip, "tripStatus" | "date" | "tripDate" | "createdAt">,
+): TripProgressStatus | undefined {
+  const date = resolveTripDate(trip);
+  if (date && date < todayYmdHcm()) return "Done";
+  if (trip.tripStatus === "Pending" || trip.tripStatus === "OnGoing" || trip.tripStatus === "Done") {
+    return trip.tripStatus;
+  }
+  return trip.tripStatus;
+}
+
 function normalizeSavedTrip(trip: SavedTrip): SavedTrip {
   const date = resolveTripDate(trip);
-  return date ? { ...trip, date, tripDate: date } : trip;
+  const withDate = date ? { ...trip, date, tripDate: date } : trip;
+  const tripStatus = resolveTripProgressStatus(withDate);
+  return tripStatus ? { ...withDate, tripStatus } : withDate;
+}
+
+/** Map known LocalTrip English errors to Vietnamese. */
+export function localizeTripApiError(message: string): string {
+  const m = message.trim();
+  if (/cannot edit a done trip/i.test(m)) {
+    return "Chuyến đã hoàn thành — chỉ xem, không thay điểm được.";
+  }
+  if (/không thể thay đổi chuyến đi đã hoàn thành/i.test(m)) {
+    return "Chuyến đã hoàn thành — chỉ xem, không thay điểm được.";
+  }
+  return message;
 }
 
 async function readError(res: Response): Promise<string> {
   try {
     const data = (await res.json()) as { error?: string };
-    return data.error || `Lỗi ${res.status}`;
+    return localizeTripApiError(data.error || `Lỗi ${res.status}`);
   } catch {
     return `Lỗi ${res.status}`;
   }
@@ -400,10 +474,10 @@ export async function searchPlaces(
   return data.places ?? [];
 }
 
-/** Fetch one place (enrich lat/lng for alternatives). */
+/** Fetch one place — full document (incl. thumbnail, hours, reviews, …). */
 export async function getPlaceById(
   placeId: string,
-): Promise<PlaceSearchHit | null> {
+): Promise<PlaceDetail | null> {
   const res = await apiFetch(
     `/api/trips/places/${encodeURIComponent(placeId)}/`,
     {
@@ -414,11 +488,117 @@ export async function getPlaceById(
   );
   if (res.status === 404) return null;
   const data = (await res.json()) as {
-    place?: PlaceSearchHit;
+    place?: PlaceDetail;
     error?: string;
   };
   if (!res.ok) {
     throw new ApiError(await readError(res), res.status);
   }
   return data.place ?? null;
+}
+
+/** Alternative / suggest-replace hit from LocalTrip. */
+export type PlaceAlternative = {
+  placeId: string;
+  title: string;
+  category?: string;
+  address?: string;
+  reviewRating?: number;
+  latitude?: number;
+  longitude?: number;
+  tags?: string[];
+  distanceKm?: number;
+  score?: number;
+  thumbnail?: string;
+};
+
+export type SuggestReplaceBody = {
+  dayIndex: number;
+  scheduleIndex: number;
+  radiusKm?: number;
+  limit?: number;
+};
+
+export type ReplacePlaceBody = {
+  dayIndex: number;
+  scheduleIndex: number;
+  newPlaceId: string;
+};
+
+export type ReplacePlaceResult = {
+  message?: string;
+  itinerary: DayItinerary[];
+};
+
+/** Nearby alternatives → `GET /trips/places/:placeId/alternatives`. */
+export async function getPlaceAlternatives(
+  placeId: string,
+  opts?: { radiusKm?: number; limit?: number },
+): Promise<PlaceAlternative[]> {
+  const params = new URLSearchParams();
+  if (opts?.radiusKm != null) params.set("radius", String(opts.radiusKm));
+  if (opts?.limit != null) params.set("limit", String(opts.limit));
+  const qs = params.toString();
+  const path = `/api/trips/places/${encodeURIComponent(placeId)}/alternatives/`;
+  const res = await apiFetch(qs ? `${path}?${qs}` : path, {
+    method: "GET",
+    headers: { Accept: "application/json" },
+    cache: "no-store",
+  });
+  const data = (await res.json()) as {
+    alternatives?: PlaceAlternative[];
+    error?: string;
+  };
+  if (!res.ok) {
+    throw new ApiError(data.error || (await readError(res)), res.status);
+  }
+  return data.alternatives ?? [];
+}
+
+/** Context alternatives for a saved stop → `POST /trips/:tripId/suggest-replace`. */
+export async function suggestReplaceForTrip(
+  tripId: string,
+  body: SuggestReplaceBody,
+): Promise<PlaceAlternative[]> {
+  const res = await apiFetch(
+    `/api/trips/${encodeURIComponent(tripId)}/suggest-replace/`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+      cache: "no-store",
+    },
+  );
+  const data = (await res.json()) as {
+    alternatives?: PlaceAlternative[];
+    error?: string;
+  };
+  if (!res.ok) {
+    throw new ApiError(data.error || (await readError(res)), res.status);
+  }
+  return data.alternatives ?? [];
+}
+
+/** Persist stop replacement → `PUT /trips/:tripId/replace-place`. */
+export async function replacePlaceInTrip(
+  tripId: string,
+  body: ReplacePlaceBody,
+): Promise<ReplacePlaceResult> {
+  const res = await apiFetch(
+    `/api/trips/${encodeURIComponent(tripId)}/replace-place/`,
+    {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+      cache: "no-store",
+    },
+  );
+  const data = (await res.json()) as ReplacePlaceResult & { error?: string };
+  if (!res.ok) {
+    throw new ApiError(data.error || (await readError(res)), res.status);
+  }
+  if (!data.itinerary) {
+    throw new ApiError("Server không trả về lịch trình sau khi thay điểm", 502);
+  }
+  return data;
 }

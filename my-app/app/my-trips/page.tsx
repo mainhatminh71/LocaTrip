@@ -11,6 +11,7 @@ import {
   resolveTripDate,
   TRIP_PROGRESS_OPTIONS,
   type SavedTrip,
+  type TripProgressStatus,
 } from "@/lib/api/trips";
 import { ApiError } from "@/lib/api/http";
 import { labelForValue } from "@/lib/auto-trip-form";
@@ -170,7 +171,7 @@ function TripListCard({
           href={`/book-a-trip/?edit=${encodeURIComponent(trip.id)}`}
           className={styles.btnPrimary}
         >
-          Chỉnh
+          Bản đồ
         </Link>
         <Link href={`/my-trips/${trip.id}/`} className={styles.btnGhost}>
           Xem
@@ -188,10 +189,13 @@ function TripListCard({
   );
 }
 
+type StatusFilter = "all" | TripProgressStatus;
+
 function MyTripsInner() {
   const PAGE_SIZE = 3;
   const [trips, setTrips] = useState<SavedTrip[]>([]);
   const [page, setPage] = useState(1);
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -222,16 +226,25 @@ function MyTripsInner() {
     void load();
   }, [load]);
 
-  const totalPages = Math.max(1, Math.ceil(trips.length / PAGE_SIZE));
+  const filteredTrips = useMemo(() => {
+    if (statusFilter === "all") return trips;
+    return trips.filter((t) => t.tripStatus === statusFilter);
+  }, [trips, statusFilter]);
+
+  const totalPages = Math.max(1, Math.ceil(filteredTrips.length / PAGE_SIZE));
   const safePage = Math.min(page, totalPages);
   const pageTrips = useMemo(() => {
     const start = (safePage - 1) * PAGE_SIZE;
-    return trips.slice(start, start + PAGE_SIZE);
-  }, [trips, safePage]);
+    return filteredTrips.slice(start, start + PAGE_SIZE);
+  }, [filteredTrips, safePage]);
 
   useEffect(() => {
     if (page !== safePage) setPage(safePage);
   }, [page, safePage]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [statusFilter]);
 
   async function confirmDelete() {
     if (!pendingDelete) return;
@@ -262,8 +275,9 @@ function MyTripsInner() {
     }
   }
 
-  const rangeStart = trips.length === 0 ? 0 : (safePage - 1) * PAGE_SIZE + 1;
-  const rangeEnd = Math.min(safePage * PAGE_SIZE, trips.length);
+  const rangeStart =
+    filteredTrips.length === 0 ? 0 : (safePage - 1) * PAGE_SIZE + 1;
+  const rangeEnd = Math.min(safePage * PAGE_SIZE, filteredTrips.length);
 
   return (
     <main className={styles.page}>
@@ -293,7 +307,7 @@ function MyTripsInner() {
           <div className={styles.empty}>
             <p className={styles.emptyTitle}>Chưa có chuyến đi nào</p>
             <p>
-              Tạo lịch trên Book a trip rồi lưu — danh sách sẽ hiện tại đây.
+              Tạo lịch trên Book a trip rồi tạo nháp — danh sách sẽ hiện tại đây.
             </p>
             <Link href="/book-a-trip/" className={styles.btnPrimary}>
               Tạo chuyến đi đầu tiên
@@ -303,6 +317,49 @@ function MyTripsInner() {
 
         {!loading && trips.length > 0 ? (
           <>
+            <div
+              className={styles.statusTabs}
+              role="tablist"
+              aria-label="Lọc theo trạng thái"
+            >
+              <button
+                type="button"
+                role="tab"
+                aria-selected={statusFilter === "all"}
+                className={
+                  statusFilter === "all"
+                    ? styles.statusTabOn
+                    : styles.statusTab
+                }
+                onClick={() => setStatusFilter("all")}
+              >
+                Tất cả
+              </button>
+              {TRIP_PROGRESS_OPTIONS.map((opt) => (
+                <button
+                  key={opt.value}
+                  type="button"
+                  role="tab"
+                  aria-selected={statusFilter === opt.value}
+                  className={
+                    statusFilter === opt.value
+                      ? styles.statusTabOn
+                      : styles.statusTab
+                  }
+                  onClick={() => setStatusFilter(opt.value)}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+
+            {filteredTrips.length === 0 ? (
+              <div className={styles.empty}>
+                <p className={styles.emptyTitle}>Không có chuyến ở mục này</p>
+                <p>Thử tab khác hoặc tạo nháp từ Book a trip.</p>
+              </div>
+            ) : null}
+
             <ul className={styles.list}>
               {pageTrips.map((trip) => (
                 <TripListCard
@@ -316,7 +373,7 @@ function MyTripsInner() {
 
             <nav className={styles.pagination} aria-label="Phân trang chuyến đi">
               <p className={styles.pageInfo}>
-                {rangeStart}–{rangeEnd} / {trips.length} chuyến
+                {rangeStart}–{rangeEnd} / {filteredTrips.length} chuyến
               </p>
               <div className={styles.pageControls}>
                 <button

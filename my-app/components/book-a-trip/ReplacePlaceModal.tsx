@@ -3,10 +3,15 @@
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import {
+  getPlaceAlternatives,
   getPlaceById,
+  localizeTripApiError,
   searchPlaces,
+  suggestReplaceForTrip,
+  type PlaceAlternative,
   type PlaceSearchHit,
 } from "@/lib/api/trips";
+import { proxiedMediaUrl } from "@/lib/media-url";
 import type { AlternativePlaceSuggestion } from "@/lib/trip";
 import type { ItineraryStop } from "@/lib/itinerary-map";
 import { LtBrandLoader, LtButtonLoading } from "./LtBrandLoader";
@@ -14,17 +19,26 @@ import styles from "./book-a-trip.module.css";
 
 type ReplacePlaceModalProps = {
   stop: ItineraryStop;
+  /** When set, load suggest-replace / alternatives and expect server replace via onPickServer. */
+  tripId?: string | null;
+  dayIndex: number;
   onClose: () => void;
+  /** Local replace (no tripId yet). */
   onPick: (alt: AlternativePlaceSuggestion) => void;
+  /** Saved trip: persist via replace-place then update UI. */
+  onPickServer?: (newPlaceId: string) => Promise<void>;
 };
 
 function toAltFromHit(
-  hit: PlaceSearchHit,
+  hit: PlaceSearchHit | PlaceAlternative,
   rank: number,
 ): AlternativePlaceSuggestion {
+  const distanceKm =
+    "distanceKm" in hit && hit.distanceKm != null ? hit.distanceKm : 0;
+  const score = "score" in hit && hit.score != null ? hit.score : 0;
   return {
     rank,
-    score: 0,
+    score,
     placeId: hit.placeId,
     title: hit.title,
     category: hit.category,
@@ -33,8 +47,11 @@ function toAltFromHit(
     latitude: hit.latitude,
     longitude: hit.longitude,
     tags: hit.tags,
-    distanceKm: 0,
-    tradeOffMessage: "Kết quả tìm kiếm của bạn",
+    distanceKm,
+    tradeOffMessage:
+      distanceKm > 0
+        ? `Cách ~${distanceKm.toFixed(1)} km`
+        : "Kết quả tìm kiếm của bạn",
   };
 }
 
@@ -50,18 +67,118 @@ function hasCoords(p: {
   );
 }
 
+function AltRowContent({
+  title,
+  subtitle,
+  thumb,
+  note,
+}: {
+  title: string;
+  subtitle: string;
+  thumb?: string;
+  note?: string;
+}) {
+  return (
+    <span className={styles.replaceItemInner}>
+      {thumb ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={thumb} alt="" className={styles.replaceThumb} loading="lazy" />
+      ) : (
+        <span className={styles.replaceThumbPlaceholder} aria-hidden="true" />
+      )}
+      <span className={styles.replaceItemText}>
+        <strong>{title}</strong>
+        <span>{subtitle}</span>
+        {note ? <em>{note}</em> : null}
+      </span>
+    </span>
+  );
+}
+
 export function ReplacePlaceModal({
   stop,
+  tripId,
+  dayIndex,
   onClose,
   onPick,
+  onPickServer,
 }: ReplacePlaceModalProps) {
   const [query, setQuery] = useState("");
   const [hits, setHits] = useState<PlaceSearchHit[]>([]);
   const [searching, setSearching] = useState(false);
   const [searchError, setSearchError] = useState<string | null>(null);
   const [pickingKey, setPickingKey] = useState<string | null>(null);
+  const [serverAlts, setServerAlts] = useState<PlaceAlternative[]>([]);
+  const [altsLoading, setAltsLoading] = useState(false);
+  const [altsError, setAltsError] = useState<string | null>(null);
 
-  const alternatives = stop.alternatives ?? [];
+  const localAlternatives = stop.alternatives ?? [];
+  const useServer = Boolean(tripId);
+
+  useEffect(() => {
+    if (!useServer || !tripId) {
+      setServerAlts([]);
+      setAltsError(null);
+      setAltsLoading(false);
+      return;
+    }
+    if (dayIndex < 0) {
+      setAltsError("Không xác định được ngày trong lịch trình.");
+      return;
+    }
+
+    let cancelled = false;
+    setAltsLoading(true);
+    setAltsError(null);
+    void (async () => {
+      try {
+        let alts = await suggestReplaceForTrip(tripId, {
+          dayIndex,
+          scheduleIndex: stop.scheduleIndex,
+          limit: 10,
+        });
+        if ((!alts.length || cancelled) && stop.place.placeId) {
+          alts = await getPlaceAlternatives(stop.place.placeId, {
+            limit: 10,
+          });
+        }
+        if (!cancelled) setServerAlts(alts);
+      } catch (err) {
+        if (cancelled) return;
+        const raw =
+          err instanceof Error ? err.message : "Không tải được gợi ý thay thế";
+        const msg = localizeTripApiError(raw);
+        const isDoneBlocked =
+          /hoàn thành|done trip/i.test(raw) || /hoàn thành/i.test(msg);
+        // Do not fall back to nearby search when the trip itself is Done —
+        // that looks editable then fails on pick with a confusing API error.
+        if (!isDoneBlocked && stop.place.placeId) {
+          try {
+            const alts = await getPlaceAlternatives(stop.place.placeId, {
+              limit: 10,
+            });
+            if (!cancelled) {
+              setServerAlts(alts);
+              setAltsError(null);
+              return;
+            }
+          } catch {
+            /* use error below */
+          }
+        }
+        if (!cancelled) {
+          setServerAlts([]);
+          setAltsError(msg);
+        }
+      } finally {
+        if (!cancelled) setAltsLoading(false);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [useServer, tripId, dayIndex, stop.scheduleIndex, stop.place.placeId]);
 
   useEffect(() => {
     const q = query.trim();
@@ -113,6 +230,15 @@ export function ReplacePlaceModal({
   ) {
     setPickingKey(key);
     try {
+      if (useServer && onPickServer) {
+        if (!raw.placeId) {
+          setSearchError("Địa điểm thiếu mã — không thay được trên máy chủ.");
+          return;
+        }
+        await onPickServer(raw.placeId);
+        return;
+      }
+
       let alt = { ...raw };
       if (!hasCoords(alt) && alt.placeId) {
         try {
@@ -129,7 +255,7 @@ export function ReplacePlaceModal({
             };
           }
         } catch {
-          // fall through — applyReplace uses stop coords as fallback
+          // fall through
         }
       }
       if (hasCoords(alt)) {
@@ -137,10 +263,22 @@ export function ReplacePlaceModal({
         alt.longitude = Number(alt.longitude);
       }
       onPick(alt);
+    } catch (err) {
+      setSearchError(
+        localizeTripApiError(
+          err instanceof Error ? err.message : "Không thay được điểm dừng",
+        ),
+      );
     } finally {
       setPickingKey(null);
     }
   }
+
+  const suggestionRows: AlternativePlaceSuggestion[] = useServer
+    ? serverAlts
+        .filter((a) => a.placeId && !excludeIds.has(a.placeId))
+        .map((a, i) => toAltFromHit(a, i + 1))
+    : localAlternatives;
 
   return (
     <motion.div
@@ -182,7 +320,9 @@ export function ReplacePlaceModal({
 
         <h3 id="replace-title">{stop.place.title}</h3>
         <p className={styles.replaceHint}>
-          Thời gian giữ theo lịch gốc; tạo lại để tính lại lộ trình.
+          {useServer
+            ? "Gợi ý theo ngữ cảnh lịch trình đã lưu — chọn để cập nhật chuyến."
+            : "Thời gian giữ theo lịch gốc; tạo lại để tính lại lộ trình."}
         </p>
 
         <label className={styles.replaceSearch}>
@@ -227,16 +367,21 @@ export function ReplacePlaceModal({
                         {busy ? (
                           <LtButtonLoading label="Đang chọn…" onDark={false} />
                         ) : (
-                          <>
-                            <strong>{hit.title}</strong>
-                            <span>
-                              {hit.address || hit.category || "—"}
-                              {hit.reviewRating != null
-                                ? ` · ${hit.reviewRating.toFixed(1)}★`
-                                : ""}
-                              {!hasCoords(hit) ? " · sẽ lấy toạ độ khi chọn" : ""}
-                            </span>
-                          </>
+                          <AltRowContent
+                            title={hit.title}
+                            subtitle={[
+                              hit.address || hit.category || "—",
+                              hit.reviewRating != null
+                                ? `${hit.reviewRating.toFixed(1)}★`
+                                : null,
+                              !hasCoords(hit) && !useServer
+                                ? "sẽ lấy toạ độ khi chọn"
+                                : null,
+                            ]
+                              .filter(Boolean)
+                              .join(" · ")}
+                            thumb={proxiedMediaUrl(hit.thumbnail)}
+                          />
                         )}
                       </button>
                     </li>
@@ -249,16 +394,24 @@ export function ReplacePlaceModal({
 
         <div className={styles.replaceSection}>
           <p className={styles.replaceSectionTitle}>Gợi ý gần đây</p>
-          {alternatives.length === 0 ? (
+          {altsLoading ? (
+            <div className={styles.replaceSearchStatus}>
+              <LtBrandLoader size="sm" tone="onLight" label="Đang tải gợi ý…" />
+            </div>
+          ) : null}
+          {altsError ? <p className={styles.error}>{altsError}</p> : null}
+          {!altsLoading && suggestionRows.length === 0 ? (
             <p className={styles.autoHint}>
               Chưa có gợi ý — dùng ô tìm kiếm phía trên.
             </p>
           ) : (
             <ul className={styles.replaceList}>
-              {alternatives.map((alt) => {
+              {suggestionRows.map((alt) => {
                 const key = `alt-${alt.placeId ?? alt.title}-${alt.rank}`;
                 const busy = pickingKey === key;
-                const missing = !hasCoords(alt);
+                const serverHit = serverAlts.find(
+                  (a) => a.placeId === alt.placeId,
+                );
                 return (
                   <li key={key}>
                     <button
@@ -270,26 +423,22 @@ export function ReplacePlaceModal({
                       {busy ? (
                         <LtButtonLoading label="Đang chọn…" onDark={false} />
                       ) : (
-                        <>
-                          <strong>
-                            #{alt.rank} {alt.title}
-                          </strong>
-                          <span>
-                            {alt.distanceKm.toFixed(1)} km
-                            {alt.savedKm != null
-                              ? ` · gần hơn ${alt.savedKm} km`
-                              : ""}
-                            {alt.reviewRating != null
-                              ? ` · ${alt.reviewRating.toFixed(1)}★`
-                              : ""}
-                          </span>
-                          <em>{alt.tradeOffMessage}</em>
-                          {missing ? (
-                            <em>
-                              Thiếu toạ độ trong gợi ý — sẽ bổ sung khi chọn
-                            </em>
-                          ) : null}
-                        </>
+                        <AltRowContent
+                          title={`#${alt.rank} ${alt.title}`}
+                          subtitle={[
+                            `${(alt.distanceKm ?? 0).toFixed(1)} km`,
+                            alt.savedKm != null
+                              ? `gần hơn ${alt.savedKm} km`
+                              : null,
+                            alt.reviewRating != null
+                              ? `${alt.reviewRating.toFixed(1)}★`
+                              : null,
+                          ]
+                            .filter(Boolean)
+                            .join(" · ")}
+                          thumb={proxiedMediaUrl(serverHit?.thumbnail)}
+                          note={alt.tradeOffMessage}
+                        />
                       )}
                     </button>
                   </li>

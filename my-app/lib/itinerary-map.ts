@@ -45,6 +45,14 @@ export function extractStops(itinerary: DayItinerary[]): ItineraryStop[] {
   return stops;
 }
 
+/** 0-based index into `itinerary[]` for LocalTrip dayIndex APIs. */
+export function dayArrayIndex(
+  itinerary: DayItinerary[],
+  dayNumber: number,
+): number {
+  return itinerary.findIndex((d) => d.day === dayNumber);
+}
+
 /** Merge travel leg GeoJSON LineStrings into one FeatureCollection. */
 export type RouteFeatureCollection = {
   type: "FeatureCollection";
