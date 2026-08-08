@@ -141,7 +141,8 @@ section("draftFromSavedTrip: GPS restores saved coords (not browser)");
   const req = buildAutoTripRequest(draft, "dalat", locationOverride);
   assert.equal(req.startLatitude, 11.95);
   assert.equal(req.startLongitude, 108.44);
-  assert.equal(req.showRoad, false);
+  // Road polyline is always on (prefs toggle removed).
+  assert.equal(req.showRoad, true);
 }
 
 section("draftFromSavedTrip: nested generatePrefs wins when flat missing");

@@ -72,10 +72,20 @@ export function visitKindLabel(place: PlaceLike): string {
   return "Tham quan";
 }
 
+const GENERIC_STOP_TITLES = new Set([
+  "điểm dừng",
+  "diem dung",
+  "stop",
+  "break",
+  "rest",
+]);
+
 export function visitDisplayTitle(place: TripPlace | PlaceLike): string {
   const title = "title" in place ? place.title?.trim() : undefined;
-  if (title) return title;
-  if (place.category?.trim()) return place.category.trim();
-  return "Điểm dừng";
+  if (title && !GENERIC_STOP_TITLES.has(title.toLowerCase())) return title;
+  if (place.category?.trim() && !GENERIC_STOP_TITLES.has(place.category.trim().toLowerCase())) {
+    return place.category.trim();
+  }
+  return "Nghỉ ngơi";
 }
 

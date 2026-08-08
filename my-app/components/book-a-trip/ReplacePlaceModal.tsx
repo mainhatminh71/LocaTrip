@@ -15,6 +15,7 @@ import { proxiedMediaUrl } from "@/lib/media-url";
 import type { AlternativePlaceSuggestion } from "@/lib/trip";
 import type { ItineraryStop } from "@/lib/itinerary-map";
 import { LtBrandLoader, LtButtonLoading } from "./LtBrandLoader";
+import { PlaceThumb } from "./PlaceThumb";
 import styles from "./book-a-trip.module.css";
 
 type ReplacePlaceModalProps = {
@@ -80,12 +81,7 @@ function AltRowContent({
 }) {
   return (
     <span className={styles.replaceItemInner}>
-      {thumb ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img src={thumb} alt="" className={styles.replaceThumb} loading="lazy" />
-      ) : (
-        <span className={styles.replaceThumbPlaceholder} aria-hidden="true" />
-      )}
+      <PlaceThumb src={thumb} variant="tile" className={styles.replaceThumb} />
       <span className={styles.replaceItemText}>
         <strong>{title}</strong>
         <span>{subtitle}</span>

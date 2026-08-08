@@ -88,7 +88,7 @@ export function buildAutoTripRequest(
     budgetLevel: draft.budgetLevel,
     preferences: buildPreferences(draft),
     pace: draft.pace,
-    showRoad: draft.showRoad,
+    showRoad: true,
     maxDistance,
     isRoundTrip: draft.isRoundTrip,
   };

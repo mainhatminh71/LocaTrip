@@ -142,7 +142,8 @@ export const DEFAULT_AUTO_TRIP_DRAFT: AutoTripDraft = {
   food: [],
   activities: [],
   constraints: [],
-  showRoad: false,
+  /** Always request road polyline — not user-toggleable. */
+  showRoad: true,
 };
 
 const LABEL_MAP = new Map<string, string>(

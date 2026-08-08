@@ -15,6 +15,7 @@ import { tagChips } from "@/lib/itinerary-map";
 import type { ItineraryStop } from "@/lib/itinerary-map";
 import type { AlternativePlaceSuggestion } from "@/lib/trip";
 import { LtBrandLoader, LtButtonLoading } from "./LtBrandLoader";
+import { PlaceThumb } from "./PlaceThumb";
 import styles from "./book-a-trip.module.css";
 
 function summarizeOpenHours(openHours: unknown): string | null {
@@ -363,19 +364,11 @@ export function PlaceStopDetail({
             <p className={styles.placeDetailMuted}>{error}</p>
           ) : null}
 
-          {thumb ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={thumb}
-              alt=""
-              className={styles.placeDetailThumb}
-              loading="lazy"
-            />
-          ) : !loading ? (
-            <div className={styles.placeDetailThumbEmpty} aria-hidden="true">
-              Không có ảnh
-            </div>
-          ) : null}
+          {loading ? (
+            <PlaceThumb src={null} variant="detail" />
+          ) : (
+            <PlaceThumb src={thumb} variant="detail" />
+          )}
 
           <h3>{title}</h3>
           {address ? <p className={styles.detailAddr}>{address}</p> : null}

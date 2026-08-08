@@ -56,9 +56,6 @@ function PrefsSummary({ trip }: { trip: SavedTrip }) {
   if (prefs.maxDistance != null) {
     chips.push(`Khoảng cách điểm ≤ ${prefs.maxDistance} km`);
   }
-  if (prefs.showRoad === true) chips.push("Hiện đường trên map");
-  if (prefs.showRoad === false) chips.push("Không hiện đường");
-
   const soft = (prefs.preferences || [])
     .slice(0, 8)
     .map((p) => labelForValue(p));

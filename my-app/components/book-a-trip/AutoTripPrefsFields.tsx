@@ -271,24 +271,6 @@ export function AutoTripPrefsFields({
       </div>
 
       <div className={styles.autoSection}>
-        <h3 className={styles.autoSectionTitle}>Bản đồ</h3>
-        <label className={styles.startModeOption}>
-          <input
-            type="checkbox"
-            className={styles.startModeCheck}
-            checked={draft.showRoad}
-            onChange={(e) => onPatch({ showRoad: e.target.checked })}
-          />
-          <span className={styles.startModeCopy}>
-            <span className={styles.startModeTitle}>Hiện đường trên map</span>
-            <span className={styles.autoHint}>
-              Bật để lấy polyline đường đi (response nặng hơn).
-            </span>
-          </span>
-        </label>
-      </div>
-
-      <div className={styles.autoSection}>
         <h3 className={styles.autoSectionTitle}>
           Ngân sách (ước tính / người)
         </h3>
