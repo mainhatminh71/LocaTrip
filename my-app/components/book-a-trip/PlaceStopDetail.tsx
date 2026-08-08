@@ -142,6 +142,10 @@ export function PlaceStopDetail({
   const [altsLoading, setAltsLoading] = useState(false);
   const [altsError, setAltsError] = useState<string | null>(null);
   const [pickingKey, setPickingKey] = useState<string | null>(null);
+  const [pendingPick, setPendingPick] = useState<{
+    alt: AlternativePlaceSuggestion;
+    key: string;
+  } | null>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -151,14 +155,19 @@ export function PlaceStopDetail({
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      if (e.key !== "Escape") return;
+      if (pendingPick) {
+        setPendingPick(null);
+        return;
+      }
+      onClose();
     };
     window.addEventListener("keydown", onKey);
     return () => {
       document.body.style.overflow = prev;
       window.removeEventListener("keydown", onKey);
     };
-  }, [onClose]);
+  }, [onClose, pendingPick]);
 
   useEffect(() => {
     if (!placeId) {
@@ -276,6 +285,11 @@ export function PlaceStopDetail({
     placeId,
   ]);
 
+  function requestPick(alt: AlternativePlaceSuggestion, key: string) {
+    if (readOnly || pickingKey) return;
+    setPendingPick({ alt, key });
+  }
+
   async function pickAlt(alt: AlternativePlaceSuggestion, key: string) {
     if (readOnly || pickingKey) return;
     setPickingKey(key);
@@ -295,6 +309,13 @@ export function PlaceStopDetail({
     } finally {
       setPickingKey(null);
     }
+  }
+
+  async function confirmPendingPick() {
+    if (!pendingPick || pickingKey) return;
+    const { alt, key } = pendingPick;
+    setPendingPick(null);
+    await pickAlt(alt, key);
   }
 
   const title = detail?.title || stop.place.title;
@@ -495,7 +516,7 @@ export function PlaceStopDetail({
                           type="button"
                           className={styles.placeAltItem}
                           disabled={!!pickingKey}
-                          onClick={() => void pickAlt(alt, key)}
+                          onClick={() => requestPick(alt, key)}
                         >
                           {busyPick ? (
                             <LtButtonLoading
@@ -569,9 +590,56 @@ export function PlaceStopDetail({
         type="button"
         className={styles.placeDetailModalBackdrop}
         aria-label="Đóng chi tiết địa điểm"
-        onClick={onClose}
+        onClick={() => {
+          if (pendingPick) {
+            setPendingPick(null);
+            return;
+          }
+          onClose();
+        }}
       />
       {sheet}
+      {pendingPick ? (
+        <div
+          className={styles.pickConfirmOverlay}
+          role="presentation"
+          onClick={() => {
+            if (!pickingKey) setPendingPick(null);
+          }}
+        >
+          <div
+            className={styles.pickConfirmCard}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="pick-confirm-title"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 id="pick-confirm-title">Thay thế địa điểm?</h3>
+            <p>
+              Bạn muốn chọn “{pendingPick.alt.title}” thay cho “
+              {stop.place.title}”?
+            </p>
+            <div className={styles.pickConfirmActions}>
+              <button
+                type="button"
+                className={styles.btnGhost}
+                disabled={!!pickingKey}
+                onClick={() => setPendingPick(null)}
+              >
+                Hủy
+              </button>
+              <button
+                type="button"
+                className={styles.btnPrimary}
+                disabled={!!pickingKey}
+                onClick={() => void confirmPendingPick()}
+              >
+                Xác nhận
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>,
     document.body,
   );

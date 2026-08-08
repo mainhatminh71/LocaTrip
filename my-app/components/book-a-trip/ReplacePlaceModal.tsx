@@ -103,6 +103,10 @@ export function ReplacePlaceModal({
   const [searching, setSearching] = useState(false);
   const [searchError, setSearchError] = useState<string | null>(null);
   const [pickingKey, setPickingKey] = useState<string | null>(null);
+  const [pendingPick, setPendingPick] = useState<{
+    alt: AlternativePlaceSuggestion;
+    key: string;
+  } | null>(null);
   const [serverAlts, setServerAlts] = useState<PlaceAlternative[]>([]);
   const [altsLoading, setAltsLoading] = useState(false);
   const [altsError, setAltsError] = useState<string | null>(null);
@@ -219,6 +223,11 @@ export function ReplacePlaceModal({
     (h) => !h.placeId || !excludeIds.has(h.placeId),
   );
 
+  function requestPick(raw: AlternativePlaceSuggestion, key: string) {
+    if (pickingKey) return;
+    setPendingPick({ alt: raw, key });
+  }
+
   async function resolveAndPick(
     raw: AlternativePlaceSuggestion,
     key: string,
@@ -269,6 +278,13 @@ export function ReplacePlaceModal({
     }
   }
 
+  async function confirmPendingPick() {
+    if (!pendingPick || pickingKey) return;
+    const { alt, key } = pendingPick;
+    setPendingPick(null);
+    await resolveAndPick(alt, key);
+  }
+
   const suggestionRows: AlternativePlaceSuggestion[] = useServer
     ? serverAlts
         .filter((a) => a.placeId && !excludeIds.has(a.placeId))
@@ -284,7 +300,13 @@ export function ReplacePlaceModal({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      onClick={onClose}
+      onClick={() => {
+        if (pendingPick) {
+          setPendingPick(null);
+          return;
+        }
+        onClose();
+      }}
     >
       <motion.div
         className={styles.replaceSheet}
@@ -356,7 +378,7 @@ export function ReplacePlaceModal({
                         className={styles.replaceItem}
                         disabled={!!pickingKey}
                         onClick={() =>
-                          void resolveAndPick(toAltFromHit(hit, idx + 1), key)
+                          requestPick(toAltFromHit(hit, idx + 1), key)
                         }
                       >
                         {busy ? (
@@ -413,7 +435,7 @@ export function ReplacePlaceModal({
                       type="button"
                       className={styles.replaceItem}
                       disabled={!!pickingKey}
-                      onClick={() => void resolveAndPick(alt, key)}
+                      onClick={() => requestPick(alt, key)}
                     >
                       {busy ? (
                         <LtButtonLoading label="Đang chọn…" onDark={false} />
@@ -452,6 +474,49 @@ export function ReplacePlaceModal({
           Đóng
         </button>
       </motion.div>
+
+      {pendingPick ? (
+        <div
+          className={styles.pickConfirmOverlay}
+          role="presentation"
+          onClick={(e) => {
+            e.stopPropagation();
+            if (!pickingKey) setPendingPick(null);
+          }}
+        >
+          <div
+            className={styles.pickConfirmCard}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="replace-pick-confirm-title"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 id="replace-pick-confirm-title">Thay thế địa điểm?</h3>
+            <p>
+              Bạn muốn chọn “{pendingPick.alt.title}” thay cho “
+              {stop.place.title}”?
+            </p>
+            <div className={styles.pickConfirmActions}>
+              <button
+                type="button"
+                className={styles.btnGhost}
+                disabled={!!pickingKey}
+                onClick={() => setPendingPick(null)}
+              >
+                Hủy
+              </button>
+              <button
+                type="button"
+                className={styles.btnPrimary}
+                disabled={!!pickingKey}
+                onClick={() => void confirmPendingPick()}
+              >
+                Xác nhận
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </motion.div>
   );
 }
