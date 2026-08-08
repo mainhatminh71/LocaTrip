@@ -11,7 +11,6 @@ import {
   type PlaceAlternative,
   type PlaceSearchHit,
 } from "@/lib/api/trips";
-import { proxiedMediaUrl } from "@/lib/media-url";
 import type { AlternativePlaceSuggestion } from "@/lib/trip";
 import type { ItineraryStop } from "@/lib/itinerary-map";
 import { LtBrandLoader, LtButtonLoading } from "./LtBrandLoader";
@@ -376,7 +375,7 @@ export function ReplacePlaceModal({
                             ]
                               .filter(Boolean)
                               .join(" · ")}
-                            thumb={proxiedMediaUrl(hit.thumbnail)}
+                            thumb={hit.thumbnail}
                           />
                         )}
                       </button>
@@ -432,7 +431,7 @@ export function ReplacePlaceModal({
                           ]
                             .filter(Boolean)
                             .join(" · ")}
-                          thumb={proxiedMediaUrl(serverHit?.thumbnail)}
+                          thumb={serverHit?.thumbnail}
                           note={alt.tradeOffMessage}
                         />
                       )}

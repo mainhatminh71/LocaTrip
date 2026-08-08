@@ -32,13 +32,17 @@ export async function GET(request: Request) {
   }
 
   try {
+    // Browser-like headers: Google photo URLs often 403/404 bare bots.
+    // Do not force-cache failures — only successful bodies get Cache-Control.
     const upstream = await fetch(target.toString(), {
       headers: {
-        Accept: "image/*,*/*",
-        "User-Agent": "LocaTripMediaProxy/1.0",
+        Accept: "image/avif,image/webp,image/apng,image/*,*/*;q=0.8",
+        "Accept-Language": "vi-VN,vi;q=0.9,en;q=0.8",
+        "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+        Referer: "https://www.google.com/",
       },
-      cache: "force-cache",
-      next: { revalidate: 86400 },
+      cache: "no-store",
     });
     if (!upstream.ok) {
       return NextResponse.json(
@@ -46,12 +50,21 @@ export async function GET(request: Request) {
         { status: 502 },
       );
     }
+    const type = upstream.headers.get("content-type") || "";
+    if (type && !type.toLowerCase().startsWith("image/")) {
+      return NextResponse.json(
+        { error: `not an image (${type})` },
+        { status: 502 },
+      );
+    }
     const buf = await upstream.arrayBuffer();
-    const type = upstream.headers.get("content-type") || "image/jpeg";
+    if (!buf.byteLength || buf.byteLength < 32) {
+      return NextResponse.json({ error: "empty image" }, { status: 502 });
+    }
     return new NextResponse(buf, {
       status: 200,
       headers: {
-        "Content-Type": type,
+        "Content-Type": type || "image/jpeg",
         "Cache-Control": "public, max-age=86400, stale-while-revalidate=604800",
       },
     });

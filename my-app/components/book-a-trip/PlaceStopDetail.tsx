@@ -10,7 +10,6 @@ import {
   type PlaceAlternative,
   type PlaceDetail,
 } from "@/lib/api/trips";
-import { proxiedMediaUrl } from "@/lib/media-url";
 import { tagChips } from "@/lib/itinerary-map";
 import type { ItineraryStop } from "@/lib/itinerary-map";
 import type { AlternativePlaceSuggestion } from "@/lib/trip";
@@ -303,7 +302,8 @@ export function PlaceStopDetail({
   const category = detail?.category || stop.place.category;
   const rating = detail?.reviewRating ?? stop.place.reviewRating;
   const tags = tagChips(detail?.tags ?? stop.place.tags, 10);
-  const thumb = proxiedMediaUrl(detail?.thumbnail);
+  // Prefer full detail thumb; itinerary snapshot may also carry one.
+  const rawThumb = detail?.thumbnail || stop.place.thumbnail || null;
   const hours = summarizeOpenHours(detail?.openHours);
   const price = detail ? priceLabel(detail) : null;
   const busy = detail ? busySummary(detail) : null;
@@ -364,11 +364,12 @@ export function PlaceStopDetail({
             <p className={styles.placeDetailMuted}>{error}</p>
           ) : null}
 
-          {loading ? (
-            <PlaceThumb src={null} variant="detail" />
-          ) : (
-            <PlaceThumb src={thumb} variant="detail" />
-          )}
+          <PlaceThumb
+            key={stop.place.placeId || stop.key}
+            src={loading ? null : rawThumb}
+            variant="detail"
+            alt={title || ""}
+          />
 
           <h3>{title}</h3>
           {address ? <p className={styles.detailAddr}>{address}</p> : null}

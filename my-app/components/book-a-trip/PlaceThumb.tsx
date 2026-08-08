@@ -1,9 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { proxiedMediaUrl } from "@/lib/media-url";
 import styles from "./book-a-trip.module.css";
 
 type PlaceThumbProps = {
+  /** Raw place thumbnail URL (will be proxied when needed). */
   src?: string | null;
   alt?: string;
   /** `detail` = large modal hero; `tile` = replace/search thumbs */
@@ -13,6 +15,7 @@ type PlaceThumbProps = {
 
 /**
  * Place image with polished skeleton when missing or broken.
+ * Tries same-origin media-proxy first, then the original URL.
  */
 export function PlaceThumb({
   src,
@@ -20,16 +23,34 @@ export function PlaceThumb({
   variant = "detail",
   className,
 }: PlaceThumbProps) {
-  const [failed, setFailed] = useState(false);
+  const candidates = useMemo(() => {
+    const raw = src?.trim() || "";
+    if (!raw) return [] as string[];
+    const proxied = proxiedMediaUrl(raw);
+    const list: string[] = [];
+    if (proxied) list.push(proxied);
+    if (raw && raw !== proxied) list.push(raw);
+    return list;
+  }, [src]);
+
+  const [index, setIndex] = useState(0);
   const [loaded, setLoaded] = useState(false);
-  const url = src?.trim() || "";
-  const showImg = Boolean(url) && !failed;
+
+  useEffect(() => {
+    setIndex(0);
+    setLoaded(false);
+  }, [src]);
+
+  const url = candidates[index] || "";
+  const exhausted = candidates.length === 0 || index >= candidates.length;
+  const showImg = Boolean(url) && !exhausted;
 
   const shellClass =
     variant === "tile" ? styles.placeThumbTile : styles.placeThumbDetail;
   const merged = [shellClass, styles.placeThumbFrame, className]
     .filter(Boolean)
     .join(" ");
+  const minH = variant === "tile" ? 44 : 200;
 
   const skeleton = (
     <div className={styles.placeThumbSkeleton} aria-hidden="true">
@@ -65,22 +86,27 @@ export function PlaceThumb({
   );
 
   if (!showImg) {
-    return <div className={merged}>{skeleton}</div>;
+    return (
+      <div className={merged} style={{ minHeight: minH }}>
+        {skeleton}
+      </div>
+    );
   }
 
   return (
-    <div className={merged}>
+    <div className={merged} style={{ minHeight: minH }}>
       {!loaded ? skeleton : null}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
+        key={url}
         src={url}
         alt={alt}
         className={styles.placeThumbImg}
         loading="lazy"
         onLoad={() => setLoaded(true)}
         onError={() => {
-          setFailed(true);
           setLoaded(false);
+          setIndex((i) => i + 1);
         }}
         style={{ opacity: loaded ? 1 : 0 }}
       />

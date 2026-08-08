@@ -33,6 +33,7 @@ export type TripPlace = {
   latitude?: number;
   longitude?: number;
   tags?: string[];
+  thumbnail?: string;
 };
 
 export type AlternativePlaceSuggestion = {
