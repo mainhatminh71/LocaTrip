@@ -164,14 +164,22 @@ export type SavedTrip = {
   prefsId?: string;
 };
 
-/** YYYY-MM-DD from trip.date / tripDate / createdAt (Asia/Ho_Chi_Minh). */
-export function resolveTripDate(
-  trip: Pick<SavedTrip, "date" | "tripDate" | "createdAt">,
+function explicitTravelDate(
+  trip: Pick<SavedTrip, "date" | "tripDate">,
 ): string | undefined {
   const raw = trip.date || trip.tripDate;
   if (typeof raw === "string" && /^\d{4}-\d{2}-\d{2}/.test(raw)) {
     return raw.slice(0, 10);
   }
+  return undefined;
+}
+
+/** YYYY-MM-DD from trip.date / tripDate / createdAt (Asia/Ho_Chi_Minh). */
+export function resolveTripDate(
+  trip: Pick<SavedTrip, "date" | "tripDate" | "createdAt">,
+): string | undefined {
+  const travel = explicitTravelDate(trip);
+  if (travel) return travel;
   if (trip.createdAt) {
     try {
       const d = new Date(trip.createdAt);
@@ -201,24 +209,31 @@ export function todayYmdHcm(): string {
 }
 
 /**
- * Effective progress for UI: Done when travel date is before today (VN),
- * even if the stored field still says OnGoing.
+ * Effective progress for UI.
+ * Pending drafts stay editable even if createdAt/date is in the past.
+ * OnGoing becomes Done only when the stored travel date (not createdAt) is before today.
  */
 export function resolveTripProgressStatus(
   trip: Pick<SavedTrip, "tripStatus" | "date" | "tripDate" | "createdAt">,
 ): TripProgressStatus | undefined {
-  const date = resolveTripDate(trip);
-  if (date && date < todayYmdHcm()) return "Done";
-  if (trip.tripStatus === "Pending" || trip.tripStatus === "OnGoing" || trip.tripStatus === "Done") {
-    return trip.tripStatus;
+  const stored = trip.tripStatus;
+  if (stored === "Pending") return "Pending";
+  const travelDate = explicitTravelDate(trip);
+  if (
+    (stored === "OnGoing" || stored === "Done") &&
+    travelDate &&
+    travelDate < todayYmdHcm()
+  ) {
+    return "Done";
   }
-  return trip.tripStatus;
+  if (stored === "OnGoing" || stored === "Done") return stored;
+  return stored;
 }
 
 function normalizeSavedTrip(trip: SavedTrip): SavedTrip {
+  const tripStatus = resolveTripProgressStatus(trip);
   const date = resolveTripDate(trip);
   const withDate = date ? { ...trip, date, tripDate: date } : trip;
-  const tripStatus = resolveTripProgressStatus(withDate);
   return tripStatus ? { ...withDate, tripStatus } : withDate;
 }
 

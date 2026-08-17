@@ -180,25 +180,19 @@ function TripDetailInner() {
               </section>
             ))}
 
-            {trip.tripStatus === "Done" ? (
-              <p className={styles.doneNote}>Chuyến đã hoàn thành — chỉ xem</p>
-            ) : null}
-
             <div className={styles.actionsRow}>
               <Link
                 href={`/book-a-trip/?edit=${encodeURIComponent(trip.id)}`}
                 className={styles.btnPrimary}
               >
-                Bản đồ
+                Xem và chỉnh sửa
               </Link>
-              {trip.tripStatus !== "Done" ? (
-                <Link
-                  href={`/book-a-trip/?from=${encodeURIComponent(trip.id)}`}
-                  className={styles.btnGhost}
-                >
-                  Tạo lại với prefs này
-                </Link>
-              ) : null}
+              <Link
+                href={`/book-a-trip/?from=${encodeURIComponent(trip.id)}`}
+                className={styles.btnGhost}
+              >
+                Tạo lại với prefs này
+              </Link>
               <Link href="/book-a-trip/" className={styles.btnGhost}>
                 Tạo chuyến mới
               </Link>

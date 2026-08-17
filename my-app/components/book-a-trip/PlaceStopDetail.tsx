@@ -225,18 +225,8 @@ export function PlaceStopDetail({
               limit: 8,
             });
             rows = serverAlts.map((a, i) => toAlt(a, i + 1));
-          } catch (err) {
-            const msg = localizeTripApiError(
-              err instanceof Error ? err.message : "Không tải được gợi ý",
-            );
-            if (/hoàn thành|done trip/i.test(msg)) {
-              if (!cancelled) {
-                setAltsError(msg);
-                setAlts([]);
-              }
-              return;
-            }
-            // fall through to place alternatives
+          } catch {
+            // fall through to place alternatives — keep the same edit UI
           }
         }
 

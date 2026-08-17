@@ -12,7 +12,6 @@ import {
   getSavedTrip,
   replacePlaceInTrip,
   resolveTripProgressStatus,
-  todayYmdHcm,
   TRIP_PROGRESS_OPTIONS,
   updateSavedTrip,
   updateTripPrefs,
@@ -616,19 +615,10 @@ export function BookATripView({
   }
 
   const activeTripId = editingTripId || savedTripId;
-  const dateIsPast =
-    Boolean(activeTripId) &&
-    Boolean(draft.date) &&
-    draft.date.trim().slice(0, 10) < todayYmdHcm();
-  const isTripDone = editingTripStatus === "Done" || dateIsPast;
-  const isTripPending = !isTripDone && editingTripStatus === "Pending";
+  const isTripPending = editingTripStatus === "Pending";
   const progressLabel =
     TRIP_PROGRESS_OPTIONS.find(
-      (o) =>
-        o.value ===
-        (isTripDone
-          ? "Done"
-          : editingTripStatus || "Pending"),
+      (o) => o.value === (editingTripStatus || "Pending"),
     )?.label || "Đề xuất";
 
   function applyReplace(alt: AlternativePlaceSuggestion) {
@@ -1392,11 +1382,6 @@ export function BookATripView({
                       {progressLabel}
                     </p>
                   ) : null}
-                  {isTripDone ? (
-                    <p className={styles.routeStaleNote}>
-                      Chuyến đã hoàn thành — chỉ xem
-                    </p>
-                  ) : null}
                   {selectedOption.summary ? (
                     <p className={styles.autoHint}>{selectedOption.summary}</p>
                   ) : null}
@@ -1528,19 +1513,7 @@ export function BookATripView({
                       Đổi lộ trình khác
                     </button>
                   ) : null}
-                  {isTripDone ? (
-                    <button
-                      type="button"
-                      className={styles.btnPrimary}
-                      onClick={() =>
-                        router.push(
-                          `/my-trips/${encodeURIComponent(activeTripId || "")}/`,
-                        )
-                      }
-                    >
-                      Xem chuyến đã lưu
-                    </button>
-                  ) : isTripPending && editingTripId ? (
+                  {isTripPending && editingTripId ? (
                     <>
                       <button
                         type="button"
@@ -1737,10 +1710,6 @@ export function BookATripView({
                     selectedOption.itinerary,
                     selectedStop.day,
                   )}
-                  readOnly={isTripDone}
-                  replaceBlockedLabel={
-                    isTripDone ? "Chuyến đã hoàn thành — chỉ xem" : undefined
-                  }
                   onClose={() => setSelectedStopKey(null)}
                   onPickLocal={applyReplace}
                   onPickServer={
@@ -1748,14 +1717,10 @@ export function BookATripView({
                       ? (newPlaceId) => applyServerReplace(newPlaceId)
                       : undefined
                   }
-                  onSearchMore={
-                    isTripDone
-                      ? undefined
-                      : () => {
-                          setReplaceTargetKey(selectedStop.key);
-                          setSelectedStopKey(null);
-                        }
-                  }
+                  onSearchMore={() => {
+                    setReplaceTargetKey(selectedStop.key);
+                    setSelectedStopKey(null);
+                  }}
                 />
               ) : null}
 
@@ -1801,7 +1766,7 @@ export function BookATripView({
               </AnimatePresence>
 
               <AnimatePresence>
-                {replaceStop && !isTripDone ? (
+                {replaceStop ? (
                   <ReplacePlaceModal
                     key="replace-modal"
                     stop={replaceStop}

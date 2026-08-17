@@ -171,10 +171,7 @@ function TripListCard({
           href={`/book-a-trip/?edit=${encodeURIComponent(trip.id)}`}
           className={styles.btnPrimary}
         >
-          Bản đồ
-        </Link>
-        <Link href={`/my-trips/${trip.id}/`} className={styles.btnGhost}>
-          Xem
+          Xem và chỉnh sửa
         </Link>
         <button
           type="button"

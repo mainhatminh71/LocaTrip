@@ -147,11 +147,7 @@ export function ReplacePlaceModal({
         const raw =
           err instanceof Error ? err.message : "Không tải được gợi ý thay thế";
         const msg = localizeTripApiError(raw);
-        const isDoneBlocked =
-          /hoàn thành|done trip/i.test(raw) || /hoàn thành/i.test(msg);
-        // Do not fall back to nearby search when the trip itself is Done —
-        // that looks editable then fails on pick with a confusing API error.
-        if (!isDoneBlocked && stop.place.placeId) {
+        if (stop.place.placeId) {
           try {
             const alts = await getPlaceAlternatives(stop.place.placeId, {
               limit: 10,
