@@ -1,10 +1,13 @@
+import type { Metadata } from "next";
 import { Suspense } from "react";
 import { SampleTourMapView } from "@/components/map/SampleTourMapView";
+import { buildPageMetadata } from "@/lib/seo";
 
-export const metadata = {
-  title: "Bản đồ mẫu | LocaTrip",
-  description: "Xem lịch trình mẫu trên bản đồ Đà Lạt",
-};
+export const metadata: Metadata = buildPageMetadata({
+  title: "Bản đồ mẫu",
+  description: "Xem lịch trình mẫu trên bản đồ Đà Lạt với LocaTrip.",
+  path: "/map/",
+});
 
 export default function MapPage() {
   return (
