@@ -144,8 +144,8 @@ function TripListCard({
 
       {preview.length > 0 ? (
         <ol className={styles.stopPreview}>
-          {preview.map((title) => (
-            <li key={title}>{title}</li>
+          {preview.map((title, idx) => (
+            <li key={`${title}-${idx}`}>{title}</li>
           ))}
           {more > 0 ? (
             <li className={styles.stopMore}>+{more} điểm nữa</li>

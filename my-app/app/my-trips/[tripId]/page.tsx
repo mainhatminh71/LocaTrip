@@ -6,6 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import { MarketingChrome } from "@/components/layout/MarketingChrome";
 import { RequireAuth } from "@/components/auth/RequireAuth";
 import { LtBrandLoader } from "@/components/book-a-trip/LtBrandLoader";
+import { TripWeatherAdvisoryWidget } from "@/components/weather/TripWeatherAdvisoryWidget";
 import {
   getSavedTrip,
   resolveTripDate,
@@ -79,6 +80,42 @@ function PrefsSummary({ trip }: { trip: SavedTrip }) {
   );
 }
 
+function resolveWeatherCoords(trip: SavedTrip): {
+  latitude: number;
+  longitude: number;
+} | null {
+  const prefs = pickSavedTripPrefs(trip);
+  const candidates = [
+    prefs.startCoords,
+    trip.startCoords,
+    trip.startLatitude != null && trip.startLongitude != null
+      ? { latitude: trip.startLatitude, longitude: trip.startLongitude }
+      : null,
+  ];
+  for (const c of candidates) {
+    if (
+      c &&
+      Number.isFinite(Number(c.latitude)) &&
+      Number.isFinite(Number(c.longitude))
+    ) {
+      return { latitude: Number(c.latitude), longitude: Number(c.longitude) };
+    }
+  }
+  // First place with coords on day 1
+  for (const day of trip.itinerary || []) {
+    for (const item of day.schedule || []) {
+      if (item.type === "visit" && item.place) {
+        const lat = Number(item.place.latitude);
+        const lng = Number(item.place.longitude);
+        if (Number.isFinite(lat) && Number.isFinite(lng)) {
+          return { latitude: lat, longitude: lng };
+        }
+      }
+    }
+  }
+  return null;
+}
+
 function TripDetailInner() {
   const params = useParams();
   const tripId = String(params.tripId || "");
@@ -113,6 +150,12 @@ function TripDetailInner() {
       cancelled = true;
     };
   }, [tripId]);
+
+  const weatherCoords = trip ? resolveWeatherCoords(trip) : null;
+  const weatherDays = Math.min(
+    16,
+    Math.max(1, trip?.durationDays || trip?.itinerary?.length || 1),
+  );
 
   return (
     <main className={styles.page}>
@@ -151,6 +194,15 @@ function TripDetailInner() {
 
             <PrefsSummary trip={trip} />
 
+            {weatherCoords ? (
+              <TripWeatherAdvisoryWidget
+                latitude={weatherCoords.latitude}
+                longitude={weatherCoords.longitude}
+                date={resolveTripDate(trip) || null}
+                days={weatherDays}
+              />
+            ) : null}
+
             {(trip.itinerary || []).map((day) => (
               <section key={day.day} className={styles.dayBlock}>
                 <h2>Ngày {day.day}</h2>
@@ -187,17 +239,8 @@ function TripDetailInner() {
               >
                 Xem và chỉnh sửa
               </Link>
-              <Link
-                href={`/book-a-trip/?from=${encodeURIComponent(trip.id)}`}
-                className={styles.btnGhost}
-              >
-                Tạo lại với prefs này
-              </Link>
-              <Link href="/book-a-trip/" className={styles.btnGhost}>
-                Tạo chuyến mới
-              </Link>
               <Link href="/my-trips/" className={styles.btnGhost}>
-                Về danh sách
+                Quay lại
               </Link>
             </div>
           </article>
@@ -207,12 +250,10 @@ function TripDetailInner() {
   );
 }
 
-export default function MyTripDetailPage() {
-  const params = useParams();
-  const tripId = String(params.tripId || "");
+export default function TripDetailPage() {
   return (
-    <MarketingChrome hideConversion>
-      <RequireAuth nextPath={`/my-trips/${tripId}/`}>
+    <MarketingChrome>
+      <RequireAuth>
         <TripDetailInner />
       </RequireAuth>
     </MarketingChrome>

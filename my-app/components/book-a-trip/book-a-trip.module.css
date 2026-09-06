@@ -2013,7 +2013,10 @@
   }
 
   .focusMeta {
-    justify-self: start;
+    justify-self: stretch;
+    width: 100%;
+    justify-content: flex-end;
+    gap: 0.5rem;
   }
 
   .sheetFocus {
@@ -2856,6 +2859,14 @@
   background: #eef3f1;
 }
 
+/* Weather widget must not shrink in the flex column. */
+.weatherInPane {
+  flex-shrink: 0 !important;
+  min-height: min-content;
+  align-self: stretch;
+  width: 100%;
+}
+
 .itineraryHead {
   display: flex;
   flex-direction: column;
@@ -3170,15 +3181,208 @@
 .placeDetailModalSheet {
   position: relative;
   z-index: 1;
-  width: min(560px, 100%);
-  height: min(88vh, 780px);
-  max-height: min(88vh, 780px);
+  width: min(920px, 100%);
+  height: min(90vh, 820px);
+  max-height: min(90vh, 820px);
   border-radius: 20px;
   background: #fff;
   box-shadow: 0 28px 64px rgba(1, 40, 48, 0.32);
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  transition: width 0.22s ease;
+}
+
+.placeDetailModalSheetWide {
+  width: min(1180px, 100%);
+}
+
+.placeDetailBody {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
+  gap: 0;
+}
+
+.placeDetailBodyTriple {
+  grid-template-columns: minmax(0, 1.05fr) minmax(240px, 0.85fr) minmax(0, 1.05fr);
+}
+
+.placeDetailBody:has(> :only-child) {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.placeDetailHalf {
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.placeDetailHalfAlts {
+  border-top: 0;
+  border-left: 1px solid color-mix(in srgb, var(--lt-ink) 10%, transparent);
+  background: color-mix(in srgb, var(--lt-field) 65%, #fff);
+}
+
+.placeDetailHalfPreview {
+  border-left: 1px solid color-mix(in srgb, var(--lt-ink) 10%, transparent);
+  background: #fff;
+}
+
+.placePreviewActions {
+  flex: 0 0 auto;
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  padding: 12px 16px 14px;
+  border-top: 1px solid color-mix(in srgb, var(--lt-ink) 10%, transparent);
+  background: color-mix(in srgb, var(--lt-field) 40%, #fff);
+}
+
+@media (max-width: 960px) {
+  .placeDetailModalSheet,
+  .placeDetailModalSheetWide {
+    width: min(720px, 100%);
+  }
+
+  .placeDetailBody,
+  .placeDetailBodyTriple {
+    grid-template-columns: 1fr;
+    grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
+  }
+
+  .placeDetailBodyTriple {
+    grid-template-rows: minmax(180px, 0.85fr) minmax(160px, 0.7fr) minmax(220px, 1fr);
+  }
+
+  .placeDetailBody:has(> :only-child) {
+    grid-template-rows: minmax(0, 1fr);
+  }
+
+  .placeDetailHalfAlts,
+  .placeDetailHalfPreview {
+    border-left: 0;
+    border-top: 1px solid color-mix(in srgb, var(--lt-ink) 10%, transparent);
+  }
+}
+
+@media (max-width: 720px) {
+  .placeDetailModalSheet,
+  .placeDetailModalSheetWide {
+    width: min(560px, 100%);
+  }
+}
+
+.placeHalfLabel {
+  flex: 0 0 auto;
+  margin: 0;
+  padding: 10px 16px 6px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--lt-teal);
+}
+
+.placeAltPane {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  padding: 4px 16px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.placeAltSection {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.placeAltSectionFollow {
+  margin-top: 8px;
+  padding-top: 12px;
+  border-top: 1px dashed color-mix(in srgb, var(--lt-ink) 14%, transparent);
+}
+
+.placeAltSectionHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.placeAltSectionTitle {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 750;
+  color: var(--lt-deep);
+}
+
+.placeAltBadgeManual,
+.placeAltBadgeSuggest,
+.placeAltItemBadge,
+.placeAltItemBadgeSuggest {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  line-height: 1.4;
+}
+
+.placeAltBadgeManual,
+.placeAltItemBadge {
+  background: color-mix(in srgb, #0a6b7c 12%, #fff);
+  color: #0a6b7c;
+  border: 1px solid color-mix(in srgb, #0a6b7c 28%, transparent);
+}
+
+.placeAltBadgeSuggest,
+.placeAltItemBadgeSuggest {
+  background: color-mix(in srgb, #c45c26 12%, #fff);
+  color: #9a3f12;
+  border: 1px solid color-mix(in srgb, #c45c26 28%, transparent);
+}
+
+.placeAltItemManual {
+  border-color: color-mix(in srgb, #0a6b7c 18%, transparent);
+}
+
+.placeAltItemSuggest {
+  border-color: color-mix(in srgb, #c45c26 18%, transparent);
+}
+
+.placeAltItemBadge,
+.placeAltItemBadgeSuggest {
+  align-self: flex-start;
+  margin-bottom: 2px;
+}
+
+.placeAltIdle {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: center;
+  gap: 12px;
+  min-height: 120px;
+  padding: 8px 0 4px;
+}
+
+.placeAltIdle .btnPrimary,
+.placeAltIdle .btnGhost {
+  width: 100%;
 }
 
 .placeAltBlock {
@@ -3218,6 +3422,12 @@
 .placeAltItem:hover:not(:disabled) {
   border-color: var(--lt-teal);
   background: #fff;
+}
+
+.placeAltItemSelected {
+  border-color: var(--lt-teal);
+  background: #fff;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--lt-teal) 55%, transparent);
 }
 
 .placeAltItem:disabled {
@@ -3304,6 +3514,40 @@
 
 .placeDetailFooter .btnPrimary {
   width: 100%;
+}
+
+.placeManualSearch {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+}
+
+.placeManualSearchLabel {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--lt-muted);
+}
+
+.placeManualSearchInput {
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 46px;
+  padding: 10px 14px;
+  border-radius: 14px;
+  border: 1px solid color-mix(in srgb, var(--lt-ink) 14%, transparent);
+  background: var(--lt-field);
+  font: inherit;
+  font-size: 15px;
+  color: var(--lt-ink);
+}
+
+.placeManualSearchInput:focus {
+  outline: 2px solid color-mix(in srgb, var(--lt-teal) 45%, transparent);
+  outline-offset: 1px;
+  border-color: var(--lt-teal);
 }
 
 .placeDetailLoading {
@@ -3676,6 +3920,18 @@
   gap: 4px;
 }
 
+.visitLabelRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.weatherBadgeInRow {
+  display: inline-flex;
+  vertical-align: middle;
+}
+
 .visitLabel {
   display: inline-flex;
   align-self: flex-start;
@@ -3889,6 +4145,42 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
+}
+
+.replaceSheetSplit {
+  width: min(920px, 100%);
+  height: min(90vh, 820px);
+  max-height: min(90vh, 820px);
+  overflow: hidden;
+  padding: 0 0 12px;
+  gap: 0;
+}
+
+@media (max-width: 720px) {
+  .replaceSheetSplit {
+    width: min(560px, 100%);
+  }
+}
+
+.replaceSheetSplit .detailCardHead {
+  padding: 14px 16px 8px;
+}
+
+.replaceSheetSplit > .btnGhost {
+  margin: 0 16px;
+}
+
+.replaceHalfScroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  padding: 0 16px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .replaceSearch {

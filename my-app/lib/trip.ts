@@ -19,6 +19,8 @@ export type AutoTripRequest = {
   maxDistance?: number;
   /** Return to start at end of day. */
   isRoundTrip?: boolean;
+  /** Prefer higher xu cost (prefs “tạo lại”). */
+  regenerate?: boolean;
 };
 
 export type TripPlace = {

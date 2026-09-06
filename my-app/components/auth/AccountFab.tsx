@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useId, useRef, useState } from "react";
 import { useAuthActions } from "@/components/auth/useAuthActions";
 import { useImmersiveUi } from "@/components/layout/ImmersiveUiContext";
+import { WalletBalanceBadge } from "@/components/wallet/WalletBalanceBadge";
 import { BOOK_TRIP_ASSETS } from "@/lib/book-a-trip-assets";
 import styles from "./account-fab.module.css";
 
@@ -31,6 +32,12 @@ const MENU_ITEMS: MenuItem[] = [
     label: "Chuyến đi của tôi",
     description: "Danh sách lịch trình đã lưu",
     icon: "trips",
+  },
+  {
+    href: "/wallet",
+    label: "Ví xu",
+    description: "Số dư xu và nạp qua QR",
+    icon: "account",
   },
   {
     href: "/account/",
@@ -108,6 +115,9 @@ export function AccountMenu({ variant = "fab" }: AccountMenuProps) {
           <div className={styles.panelHead}>
             <p className={styles.eyebrow}>Đã đăng nhập</p>
             <p className={styles.name}>{displayName}</p>
+            <div className={styles.walletRow}>
+              <WalletBalanceBadge size="md" showLabel />
+            </div>
           </div>
           <ul className={styles.list}>
             {MENU_ITEMS.map((item) => (

@@ -10,11 +10,11 @@ export const SITE_NAME = "LocaTrip";
 export const SITE_DEFAULT_DESCRIPTION =
   "Lên kế hoạch chuyến đi Đà Lạt thông minh — gợi ý địa điểm, lộ trình và bản đồ theo tiêu chí của bạn.";
 
-/** Absolute URL for Open Graph / JSON-LD (respects trailingSlash on paths). */
+/** Absolute URL for Open Graph / JSON-LD / Sitemap (no trailing slash except root). */
 export function absoluteUrl(path = "/"): string {
   if (!path || path === "/") return `${SITE_URL}/`;
   const withSlash = path.startsWith("/") ? path : `/${path}`;
-  const normalized = withSlash.endsWith("/") ? withSlash : `${withSlash}/`;
+  const normalized = withSlash.replace(/\/+$/, "");
   return `${SITE_URL}${normalized}`;
 }
 

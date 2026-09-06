@@ -4,6 +4,7 @@ import { AuthModalProvider } from "@/components/auth/AuthModalProvider";
 import { AccountFab } from "@/components/auth/AccountFab";
 import { ImmersiveUiProvider } from "@/components/layout/ImmersiveUiContext";
 import { ToastProvider } from "@/components/ui/ToastProvider";
+import { WalletProvider } from "@/components/wallet/WalletProvider";
 import { JsonLd } from "@/components/seo/JsonLd";
 import {
   DEFAULT_OG_IMAGE,
@@ -80,8 +81,10 @@ export default function RootLayout({
           <AuthModalProvider>
             <ImmersiveUiProvider>
               <ToastProvider>
-                {children}
-                <AccountFab />
+                <WalletProvider>
+                  {children}
+                  <AccountFab />
+                </WalletProvider>
               </ToastProvider>
             </ImmersiveUiProvider>
           </AuthModalProvider>

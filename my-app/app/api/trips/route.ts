@@ -8,18 +8,20 @@ import {
 
 export const dynamic = "force-dynamic";
 
-/** Proxy → LocalTrip `GET /trips` (list) and `POST /trips` (save). */
+/** Proxy → LocalTrip gateway `GET /trips/` (list) and `POST /trips/` (save).
+ *  Nginx redirects `/trips` → `/trips/` (301); POST must hit the slash form or body is lost. */
 export async function GET(request: Request) {
   const base = getUpstreamBase();
   const url = new URL(request.url);
   const qs = url.searchParams.toString();
   try {
     const upstream = await fetch(
-      `${base}/trips${qs ? `?${qs}` : ""}`,
+      `${base}/trips/${qs ? `?${qs}` : ""}`,
       {
         method: "GET",
         headers: upstreamHeaders(request),
         cache: "no-store",
+        redirect: "manual",
       },
     );
     return proxyJsonResponse(upstream);
@@ -38,13 +40,14 @@ export async function POST(request: Request) {
   }
 
   try {
-    const upstream = await fetch(`${base}/trips`, {
+    const upstream = await fetch(`${base}/trips/`, {
       method: "POST",
       headers: upstreamHeaders(request, {
         "Content-Type": "application/json",
       }),
       body: JSON.stringify(body),
       cache: "no-store",
+      redirect: "manual",
     });
     return proxyJsonResponse(upstream);
   } catch (err) {

@@ -1,7 +1,11 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { proxiedMediaUrl } from "@/lib/media-url";
+import {
+  getCachedThumbBlob,
+  setCachedThumbBlob,
+} from "@/lib/place-detail-cache";
 import styles from "./book-a-trip.module.css";
 
 type PlaceThumbProps = {
@@ -13,9 +17,47 @@ type PlaceThumbProps = {
   className?: string;
 };
 
+async function resolveDisplayUrl(raw: string): Promise<string> {
+  const cached = getCachedThumbBlob(raw);
+  if (cached) return cached;
+
+  const candidates = [
+    proxiedMediaUrl(raw),
+    raw !== proxiedMediaUrl(raw) ? raw : null,
+  ].filter(Boolean) as string[];
+
+  let lastErr: unknown = null;
+  for (const candidate of candidates) {
+    try {
+      const res = await fetch(candidate, { cache: "force-cache" });
+      if (!res.ok) {
+        lastErr = new Error(`HTTP ${res.status}`);
+        continue;
+      }
+      const type = res.headers.get("content-type") || "";
+      if (type && !type.toLowerCase().startsWith("image/")) {
+        lastErr = new Error(`not image: ${type}`);
+        continue;
+      }
+      const blob = await res.blob();
+      if (!blob.size) {
+        lastErr = new Error("empty");
+        continue;
+      }
+      const objectUrl = URL.createObjectURL(blob);
+      setCachedThumbBlob(raw, objectUrl);
+      return objectUrl;
+    } catch (err) {
+      lastErr = err;
+    }
+  }
+  throw lastErr instanceof Error ? lastErr : new Error("thumb failed");
+}
+
 /**
  * Place image with polished skeleton when missing or broken.
- * Tries same-origin media-proxy first, then the original URL.
+ * Fetches via media-proxy into a blob URL and caches by raw src so
+ * reopening the modal does not re-hit Google / flash “Chưa có ảnh”.
  */
 export function PlaceThumb({
   src,
@@ -23,27 +65,49 @@ export function PlaceThumb({
   variant = "detail",
   className,
 }: PlaceThumbProps) {
-  const candidates = useMemo(() => {
-    const raw = src?.trim() || "";
-    if (!raw) return [] as string[];
-    const proxied = proxiedMediaUrl(raw);
-    const list: string[] = [];
-    if (proxied) list.push(proxied);
-    if (raw && raw !== proxied) list.push(raw);
-    return list;
-  }, [src]);
-
-  const [index, setIndex] = useState(0);
-  const [loaded, setLoaded] = useState(false);
+  const raw = src?.trim() || "";
+  const [displayUrl, setDisplayUrl] = useState<string | null>(() =>
+    raw ? getCachedThumbBlob(raw) : null,
+  );
+  const [failed, setFailed] = useState(false);
 
   useEffect(() => {
-    setIndex(0);
-    setLoaded(false);
-  }, [src]);
+    if (!raw) {
+      setDisplayUrl(null);
+      setFailed(false);
+      return;
+    }
 
-  const url = candidates[index] || "";
-  const exhausted = candidates.length === 0 || index >= candidates.length;
-  const showImg = Boolean(url) && !exhausted;
+    const cached = getCachedThumbBlob(raw);
+    if (cached) {
+      setDisplayUrl(cached);
+      setFailed(false);
+      return;
+    }
+
+    let cancelled = false;
+    setDisplayUrl(null);
+    setFailed(false);
+
+    void (async () => {
+      try {
+        const url = await resolveDisplayUrl(raw);
+        if (!cancelled) {
+          setDisplayUrl(url);
+          setFailed(false);
+        }
+      } catch {
+        if (!cancelled) {
+          setDisplayUrl(null);
+          setFailed(true);
+        }
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [raw]);
 
   const shellClass =
     variant === "tile" ? styles.placeThumbTile : styles.placeThumbDetail;
@@ -79,13 +143,15 @@ export function PlaceThumb({
           />
         </svg>
         {variant === "detail" ? (
-          <span className={styles.placeThumbSkeletonLabel}>Chưa có ảnh</span>
+          <span className={styles.placeThumbSkeletonLabel}>
+            {failed ? "Chưa có ảnh" : "Đang tải ảnh…"}
+          </span>
         ) : null}
       </div>
     </div>
   );
 
-  if (!showImg) {
+  if (!raw || failed || !displayUrl) {
     return (
       <div className={merged} style={{ minHeight: minH }}>
         {skeleton}
@@ -95,20 +161,19 @@ export function PlaceThumb({
 
   return (
     <div className={merged} style={{ minHeight: minH }}>
-      {!loaded ? skeleton : null}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        key={url}
-        src={url}
+        src={displayUrl}
         alt={alt}
         className={styles.placeThumbImg}
-        loading="lazy"
-        onLoad={() => setLoaded(true)}
+        loading="eager"
+        decoding="async"
+        style={{ opacity: 1 }}
         onError={() => {
-          setLoaded(false);
-          setIndex((i) => i + 1);
+          /* Blob URLs should not fail; mark failed so UI recovers cleanly. */
+          setFailed(true);
+          setDisplayUrl(null);
         }}
-        style={{ opacity: loaded ? 1 : 0 }}
       />
     </div>
   );

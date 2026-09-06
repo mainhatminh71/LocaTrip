@@ -118,6 +118,14 @@
   filter: brightness(0.96);
 }
 
+/* Always-visible balance — outside hamburger so mobile sees it too */
+.walletSlot {
+  display: flex;
+  flex: none;
+  align-items: center;
+  flex-shrink: 0;
+}
+
 .menuLabel {
   display: none;
   font-family: "Manrope", "Manrope Placeholder", sans-serif;

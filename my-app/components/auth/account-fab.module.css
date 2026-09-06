@@ -198,6 +198,10 @@
   white-space: nowrap;
 }
 
+.walletRow {
+  margin-top: 0.65rem;
+}
+
 .list {
   list-style: none;
   margin: 0;

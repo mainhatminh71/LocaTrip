@@ -1,0 +1,961 @@
+/* ==========================================================================
+   Weather Advisory UI — Glassmorphism & LocaTrip Brand Theme
+   ========================================================================== */
+
+.weatherCard {
+  margin: 0.25rem 0 0.5rem;
+  padding: 1.25rem 1.35rem;
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.15rem;
+  transition: box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.25s ease;
+  position: relative;
+  /* visible: overflow:hidden makes flex min-size 0 and crushes this card
+     inside itineraryPane (flex column + max-height) to a thin header strip */
+  overflow: visible;
+  flex-shrink: 0;
+  min-height: min-content;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Marker class for itinerary pane flex rules (survives CSS modules hashing). */
+.weatherMount {
+  flex-shrink: 0;
+  min-height: min-content;
+  width: 100%;
+  align-self: stretch;
+}
+
+.weatherGlass {
+  background: rgba(255, 255, 255, 0.78);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(10, 107, 124, 0.14);
+  box-shadow:
+    0 10px 30px -10px rgba(10, 107, 124, 0.08),
+    0 1px 3px rgba(0, 0, 0, 0.02);
+}
+
+/* Header */
+.weatherHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.weatherTitleWrap {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.titleIconBadge {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(10, 107, 124, 0.12) 0%, rgba(61, 220, 151, 0.16) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.weatherTitleIcon {
+  font-size: 1.4rem;
+}
+
+.weatherTitle {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--lt-deep, #012830);
+  letter-spacing: -0.01em;
+  line-height: 1.35;
+}
+
+.weatherTitleWrap > div {
+  min-width: 0;
+}
+
+.weatherSubtitle {
+  margin: 0.15rem 0 0 0;
+  font-size: 0.8rem;
+  color: var(--lt-muted, #5f7478);
+}
+
+/* Refresh Button */
+.refreshBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0.85rem;
+  border-radius: 999px;
+  border: 1px solid rgba(10, 107, 124, 0.18);
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--lt-teal, #0a6b7c);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease,
+    box-shadow 0.2s ease;
+  flex-shrink: 0;
+}
+
+.refreshBtn:hover:not(:disabled) {
+  background: var(--lt-teal, #0a6b7c);
+  color: #ffffff;
+  border-color: var(--lt-teal, #0a6b7c);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(10, 107, 124, 0.2);
+}
+
+.refreshBtn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.refreshIcon {
+  transition: transform 0.6s linear;
+}
+
+.refreshing .refreshIcon {
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Summary Box */
+.weatherSummary {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin: 0;
+  background: linear-gradient(135deg, rgba(240, 253, 249, 0.9) 0%, rgba(235, 248, 255, 0.8) 100%);
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  border-left: 3.5px solid var(--lt-teal, #0a6b7c);
+  border-top: 1px solid rgba(10, 107, 124, 0.08);
+  border-right: 1px solid rgba(10, 107, 124, 0.08);
+  border-bottom: 1px solid rgba(10, 107, 124, 0.08);
+}
+
+.summaryBadge {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--lt-teal, #0a6b7c);
+  background: rgba(10, 107, 124, 0.1);
+  padding: 0.2rem 0.5rem;
+  border-radius: 6px;
+  letter-spacing: 0.04em;
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+
+.summaryText {
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.5;
+  color: var(--lt-ink, #191919);
+}
+
+/* Days Section */
+.daysContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.daysHeaderRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.daysSectionTitle {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--lt-deep, #012830);
+}
+
+.daysHint {
+  font-size: 0.75rem;
+  color: var(--lt-muted, #758a8e);
+}
+
+.clearDayFilterBtn {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--lt-teal, #0a6b7c);
+  background: transparent;
+  border: none;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0;
+}
+
+.clearDayFilterBtn:hover {
+  color: var(--lt-deep, #012830);
+}
+
+.daysGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 0.75rem;
+}
+
+/* Day Card */
+.dayCard {
+  background: #ffffff;
+  border: 1.5px solid rgba(0, 0, 0, 0.06);
+  border-radius: 14px;
+  padding: 0.85rem 0.65rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.35rem;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.dayCard:hover {
+  transform: translateY(-2px);
+  border-color: rgba(10, 107, 124, 0.3);
+  box-shadow: 0 6px 16px rgba(10, 107, 124, 0.08);
+}
+
+.dayCardActive {
+  background: linear-gradient(180deg, #ffffff 0%, #f0fdf9 100%);
+  border-color: var(--lt-teal, #0a6b7c) !important;
+  box-shadow: 0 0 0 2px rgba(10, 107, 124, 0.2), 0 8px 20px rgba(10, 107, 124, 0.12) !important;
+  transform: translateY(-2px);
+}
+
+.dayName {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--lt-teal, #0a6b7c);
+}
+
+.dayDate {
+  font-size: 0.75rem;
+  color: var(--lt-muted, #758a8e);
+}
+
+.dayIcon {
+  font-size: 1.75rem;
+  margin: 0.2rem 0;
+}
+
+.tempRangeWrap {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.dayTemp {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--lt-ink, #191919);
+}
+
+.tempBarTrack {
+  width: 70%;
+  height: 4px;
+  background: #f1f5f9;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.tempBarFill {
+  height: 100%;
+  background: linear-gradient(90deg, #38bdf8 0%, #f59e0b 100%);
+  border-radius: 999px;
+}
+
+.dayCondition {
+  font-size: 0.75rem;
+  color: #475569;
+  line-height: 1.25;
+  min-height: 1.8rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dayRain {
+  margin-top: 0.15rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #0284c7;
+  background: #e0f2fe;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid rgba(2, 132, 199, 0.15);
+}
+
+.dayRainLow {
+  color: #059669;
+  background: #ecfdf5;
+  border-color: rgba(5, 150, 105, 0.15);
+}
+
+/* Alerts Section */
+.alertsSection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  margin-top: 0.25rem;
+}
+
+.alertsHeaderRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.alertsHeader {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--lt-deep, #012830);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.alertHeaderIcon {
+  font-size: 1.1rem;
+}
+
+.alertsBadge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  background: var(--lt-deep, #012830);
+  color: #ffffff;
+  padding: 0.1rem 0.45rem;
+  border-radius: 999px;
+  margin-left: 0.25rem;
+}
+
+/* Filter Tabs */
+.filterTabs {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.filterTab {
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: #ffffff;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.filterTab:hover {
+  background: #f8fafc;
+  color: var(--lt-deep, #012830);
+}
+
+.filterTabActive {
+  background: var(--lt-teal, #0a6b7c) !important;
+  color: #ffffff !important;
+  border-color: var(--lt-teal, #0a6b7c) !important;
+  box-shadow: 0 2px 8px rgba(10, 107, 124, 0.25);
+}
+
+/* Alerts List */
+.alertsList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* Alert Item Card */
+.alertItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  padding: 0.9rem 1rem;
+  border-radius: 14px;
+  background: #ffffff;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.alertItem:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
+}
+
+.alertWarning {
+  border-left: 4px solid #f59e0b;
+  border-top: 1px solid rgba(245, 158, 11, 0.2);
+  border-right: 1px solid rgba(245, 158, 11, 0.2);
+  border-bottom: 1px solid rgba(245, 158, 11, 0.2);
+  background: linear-gradient(135deg, #fffbeb 0%, #ffffff 100%);
+}
+
+.alertInfo {
+  border-left: 4px solid var(--lt-teal, #0a6b7c);
+  border-top: 1px solid rgba(10, 107, 124, 0.16);
+  border-right: 1px solid rgba(10, 107, 124, 0.16);
+  border-bottom: 1px solid rgba(10, 107, 124, 0.16);
+  background: linear-gradient(135deg, #f0fdf9 0%, #ffffff 100%);
+}
+
+.alertIconBadge {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+  flex-shrink: 0;
+}
+
+.alertContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.alertMetaRow {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+}
+
+.alertDayTag,
+.alertTimeTag,
+.alertPlaceTag {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #475569;
+  background: rgba(0, 0, 0, 0.04);
+  padding: 0.15rem 0.45rem;
+  border-radius: 6px;
+}
+
+.alertSeverityChip {
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 0.15rem 0.45rem;
+  border-radius: 999px;
+  text-transform: uppercase;
+}
+
+.severityWarning {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.severityInfo {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+
+.alertMessage {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--lt-ink, #191919);
+  line-height: 1.4;
+}
+
+.alertAdviceBox {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.4rem;
+  margin-top: 0.2rem;
+  background: rgba(255, 255, 255, 0.85);
+  padding: 0.45rem 0.65rem;
+  border-radius: 8px;
+  border: 1px dashed rgba(0, 0, 0, 0.1);
+}
+
+.alertAdviceIcon {
+  font-size: 0.85rem;
+  flex-shrink: 0;
+  margin-top: 0.05rem;
+}
+
+.alertAdviceText {
+  margin: 0;
+  font-size: 0.82rem;
+  color: #334155;
+  line-height: 1.4;
+}
+
+.noAlertsForFilter {
+  padding: 1.25rem;
+  text-align: center;
+  color: #64748b;
+  font-size: 0.88rem;
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px dashed rgba(0, 0, 0, 0.1);
+}
+
+.goodWeatherBanner {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.9rem 1.15rem;
+  background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  border-radius: 14px;
+  color: #065f46;
+  font-size: 0.88rem;
+  font-weight: 500;
+}
+
+.goodWeatherIcon {
+  font-size: 1.4rem;
+}
+
+.weatherErrorState {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.85rem 1rem;
+  border-radius: 12px;
+  background: #fff7ed;
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  color: #9a3412;
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+.weatherErrorState p {
+  margin: 0;
+}
+
+.weatherRetryBtn {
+  appearance: none;
+  border: 1px solid rgba(154, 52, 18, 0.35);
+  background: #fff;
+  color: #9a3412;
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 650;
+  padding: 0.4rem 0.85rem;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.weatherRetryBtn:hover:not(:disabled) {
+  background: #ffedd5;
+}
+
+.weatherRetryBtn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+/* ==========================================================================
+   Timeline Stop Mini-Badge & Popover
+   ========================================================================== */
+
+.stopBadgeContainer {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.stopWeatherBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.15s ease;
+  line-height: 1.2;
+}
+
+.stopWeatherWarning {
+  background: #fef3c7;
+  color: #92400e;
+  border-color: rgba(245, 158, 11, 0.35);
+}
+
+.stopWeatherWarning:hover {
+  background: #fde68a;
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.25);
+}
+
+.stopWeatherInfo {
+  background: #e0f2fe;
+  color: #075985;
+  border-color: rgba(2, 132, 199, 0.3);
+}
+
+.stopWeatherInfo:hover {
+  background: #bae6fd;
+  box-shadow: 0 2px 8px rgba(2, 132, 199, 0.25);
+}
+
+.stopWeatherCompact {
+  padding: 0.15rem 0.4rem;
+}
+
+.stopBadgeIcon {
+  font-size: 0.85rem;
+}
+
+.stopBadgeText {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 220px;
+}
+
+.stopBadgePopover {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 40;
+  width: 260px;
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 12px;
+  padding: 0.75rem;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  animation: popoverFadeIn 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes popoverFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.stopBadgePopoverHeader {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.4rem;
+  font-size: 0.82rem;
+  color: var(--lt-deep, #012830);
+  line-height: 1.35;
+}
+
+.stopBadgePopoverIcon {
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.stopBadgePopoverAdvice {
+  margin: 0;
+  font-size: 0.78rem;
+  color: #475569;
+  line-height: 1.35;
+  background: #f8fafc;
+  padding: 0.4rem 0.55rem;
+  border-radius: 6px;
+  border-left: 2.5px solid var(--lt-teal, #0a6b7c);
+}
+
+/* ==========================================================================
+   Skeleton Shimmer
+   ========================================================================== */
+
+.skeletonLine {
+  background: linear-gradient(
+    90deg,
+    rgba(226, 232, 240, 0.7) 0%,
+    rgba(241, 245, 249, 0.9) 50%,
+    rgba(226, 232, 240, 0.7) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 6px;
+}
+
+.skeletonCircle {
+  background: linear-gradient(
+    90deg,
+    rgba(226, 232, 240, 0.7) 0%,
+    rgba(241, 245, 249, 0.9) 50%,
+    rgba(226, 232, 240, 0.7) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 50%;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.skeletonHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.skeletonTitle {
+  width: 220px;
+  height: 24px;
+}
+
+.skeletonBtn {
+  width: 90px;
+  height: 30px;
+  border-radius: 999px;
+}
+
+.skeletonSummary {
+  width: 100%;
+  height: 48px;
+  border-radius: 12px;
+}
+
+.skeletonDayCard {
+  height: 160px;
+  justify-content: center;
+}
+
+.skeletonDayName {
+  width: 50px;
+  height: 14px;
+}
+
+.skeletonIcon {
+  width: 40px;
+  height: 40px;
+  margin: 0.35rem 0;
+}
+
+.skeletonTemp {
+  width: 70px;
+  height: 16px;
+}
+
+.skeletonText {
+  width: 60px;
+  height: 12px;
+}
+
+.skeletonAlertHeader {
+  width: 180px;
+  height: 20px;
+}
+
+.skeletonAlertItem {
+  width: 100%;
+  height: 64px;
+  border-radius: 14px;
+}
+
+/* ==========================================================================
+   Responsive
+   ========================================================================== */
+
+@media (max-width: 640px) {
+  .weatherCard {
+    padding: 1.15rem;
+    border-radius: 16px;
+  }
+
+  .weatherTitle {
+    font-size: 1rem;
+  }
+
+  .daysGrid {
+    grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+    gap: 0.5rem;
+  }
+
+  .dayCard {
+    padding: 0.65rem 0.5rem;
+  }
+
+  .stopBadgePopover {
+    width: 220px;
+  }
+}
+
+/* ==========================================================================
+   Forecast banner (Open-Meteo /weather/forecast)
+   ========================================================================== */
+
+.advisoryBanner {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  padding: 0.9rem 1rem;
+  border-radius: 14px;
+  border: 1px solid transparent;
+}
+
+.bannerIcon {
+  font-size: 1.55rem;
+  line-height: 1;
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+
+.bannerBody {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.bannerEyebrow {
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--lt-muted, #5f7478);
+}
+
+.bannerMessage {
+  margin: 0.35rem 0 0;
+  font-size: 0.95rem;
+  font-weight: 650;
+  color: var(--lt-deep, #012830);
+  line-height: 1.45;
+}
+
+.bannerPeak {
+  margin: 0.4rem 0 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.28rem 0.55rem;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 750;
+  color: var(--lt-deep, #012830);
+  background: color-mix(in srgb, #0a6b7c 12%, #fff);
+  border: 1px solid color-mix(in srgb, #0a6b7c 22%, transparent);
+}
+
+.bannerMeta {
+  margin: 0.35rem 0 0;
+  font-size: 0.8rem;
+  color: var(--lt-muted, #5f7478);
+}
+
+.bannerClear {
+  background: color-mix(in srgb, #f5c542 14%, #fff);
+  border-color: color-mix(in srgb, #e0a800 28%, transparent);
+}
+
+.bannerCloudy {
+  background: color-mix(in srgb, #8fa3ad 16%, #fff);
+  border-color: color-mix(in srgb, #6b7f88 25%, transparent);
+}
+
+.bannerRain {
+  background: color-mix(in srgb, #0a6b7c 12%, #fff);
+  border-color: color-mix(in srgb, #0a6b7c 28%, transparent);
+}
+
+.bannerStorm {
+  background: color-mix(in srgb, #5b4fcf 12%, #fff);
+  border-color: color-mix(in srgb, #4a3fb5 30%, transparent);
+}
+
+.bannerOther {
+  background: color-mix(in srgb, var(--lt-field, #eef3f4) 80%, #fff);
+  border-color: color-mix(in srgb, var(--lt-ink, #012830) 10%, transparent);
+}
+
+.daysStrip {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 0.15rem;
+}
+
+.dayChip {
+  appearance: none;
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.15rem;
+  min-width: 5.6rem;
+  padding: 0.55rem 0.65rem;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--lt-ink, #012830) 10%, transparent);
+  background: color-mix(in srgb, var(--lt-field, #eef3f4) 55%, #fff);
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+  color: var(--lt-ink, #012830);
+}
+
+.dayChipOn {
+  box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--lt-teal, #0a6b7c) 70%, transparent);
+  border-color: color-mix(in srgb, var(--lt-teal, #0a6b7c) 45%, transparent);
+}
+
+.dayChipIcon {
+  font-size: 1.05rem;
+  line-height: 1;
+}
+
+.dayChipDate {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--lt-muted, #5f7478);
+}
+
+.dayChipTemp {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--lt-deep, #012830);
+}

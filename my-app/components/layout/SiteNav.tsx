@@ -7,6 +7,7 @@ import { useEffect, useMemo } from "react";
 import { BOOK_TRIP_ASSETS } from "@/lib/book-a-trip-assets";
 import { useAuthActions } from "@/components/auth/useAuthActions";
 import { useAuthModal } from "@/components/auth/AuthModalProvider";
+import { WalletBalanceBadge } from "@/components/wallet/WalletBalanceBadge";
 import styles from "./site-nav.module.css";
 
 /** Framer bird logo — shared with book-a-trip assets. */
@@ -52,6 +53,7 @@ export function SiteNav({ open, onOpenChange }: SiteNavProps) {
     }
     if (isAuthenticated) {
       links.push({ label: "Chuyến đi của tôi", href: "/my-trips/" });
+      links.push({ label: "Ví xu", href: "/wallet" });
       links.push({ label: "Tài khoản", href: "/account/" });
       links.push({ label: "Đăng xuất", href: "#logout", action: "logout" });
     } else if (!isLoading) {
@@ -146,6 +148,12 @@ export function SiteNav({ open, onOpenChange }: SiteNavProps) {
                 {INLINE_CTA.label}
               </Link>
             </nav>
+
+            {isAuthenticated ? (
+              <div className={styles.walletSlot}>
+                <WalletBalanceBadge tone="dark" size="md" showLabel />
+              </div>
+            ) : null}
 
             <button
               type="button"

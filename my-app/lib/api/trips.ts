@@ -6,7 +6,7 @@ import type {
   Pace,
   ScheduleItem,
 } from "@/lib/trip";
-import { apiFetch, ApiError } from "@/lib/api/http";
+import { apiFetch, apiErrorFromBody, ApiError } from "@/lib/api/http";
 
 export type PlaceSearchHit = {
   placeId?: string;
@@ -162,6 +162,15 @@ export type SavedTrip = {
   generatePrefs?: TripGeneratePrefs;
   /** Linked doc in Mongo `trip_prefs` when present */
   prefsId?: string;
+  /**
+   * Slots already paid for suggest-replace (from BE).
+   * FE uses this after reload to show “Đã trả — xem lại” without re-charging.
+   */
+  paidSuggestSlots?: Array<{
+    dayIndex: number;
+    scheduleIndex: number;
+    placeId: string;
+  }>;
 };
 
 function explicitTravelDate(
@@ -233,9 +242,27 @@ export function resolveTripProgressStatus(
 function normalizeSavedTrip(trip: SavedTrip): SavedTrip {
   const tripStatus = resolveTripProgressStatus(trip);
   const date = resolveTripDate(trip);
+  const slots = Array.isArray(trip.paidSuggestSlots)
+    ? trip.paidSuggestSlots
+        .map((s) => ({
+          dayIndex: Number(s.dayIndex),
+          scheduleIndex: Number(s.scheduleIndex),
+          placeId: String(s.placeId || "").trim(),
+        }))
+        .filter(
+          (s) =>
+            Number.isFinite(s.dayIndex) &&
+            Number.isFinite(s.scheduleIndex) &&
+            s.placeId.length > 0,
+        )
+    : [];
   const withDate = date ? { ...trip, date, tripDate: date } : trip;
-  return tripStatus ? { ...withDate, tripStatus } : withDate;
+  const withSlots = { ...withDate, paidSuggestSlots: slots };
+  return tripStatus ? { ...withSlots, tripStatus } : withSlots;
 }
+
+/** @deprecated import from `@/lib/paid-suggest-slots` */
+export { isPaidSuggestSlot } from "@/lib/paid-suggest-slots";
 
 /** Map known LocalTrip English errors to Vietnamese. */
 export function localizeTripApiError(message: string): string {
@@ -280,15 +307,19 @@ export function slimItineraryForSave(itinerary: DayItinerary[]): DayItinerary[] 
 export async function generateAutoTrip(
   request: AutoTripRequest,
 ): Promise<AutoTripResult> {
-  const res = await apiFetch("/api/trips/generate/auto/", {
+  const res = await apiFetch("/api/trips/generate/auto", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(request),
   });
 
-  const data = (await res.json()) as AutoTripResult & { error?: string };
+  const data = (await res.json()) as AutoTripResult & {
+    error?: string;
+    required?: number;
+    balance?: number;
+  };
   if (!res.ok) {
-    throw new ApiError(data.error || `Lỗi ${res.status}`, res.status);
+    throw apiErrorFromBody(data, res.status, `Lỗi ${res.status}`);
   }
   if (!data.itineraries?.length) {
     throw new Error(
@@ -309,17 +340,29 @@ export async function createSavedTrip(
     tripDate: body.tripDate || date,
     itinerary: slimItineraryForSave(body.itinerary),
   };
-  const res = await apiFetch("/api/trips/", {
+  const res = await apiFetch("/api/trips", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
   });
-  const data = (await res.json()) as { trip?: SavedTrip; error?: string };
+  const data = (await res.json()) as {
+    trip?: SavedTrip;
+    error?: string;
+    required?: number;
+    balance?: number;
+  };
   if (!res.ok) {
-    throw new ApiError(data.error || (await readError(res)), res.status);
+    throw apiErrorFromBody(
+      data,
+      res.status,
+      data.error || (await readError(res)),
+    );
   }
   if (!data.trip?.id) {
-    throw new ApiError("Server không trả về chuyến đi đã lưu", 502);
+    throw new ApiError(
+      "Server không trả về chuyến đi đã lưu (thiếu trip.id). Kiểm tra gateway /trips/.",
+      502,
+    );
   }
   return normalizeSavedTrip(data.trip);
 }
@@ -338,7 +381,7 @@ export async function updateSavedTrip(
   if (payload.date && !payload.tripDate) {
     payload.tripDate = payload.date;
   }
-  const res = await apiFetch(`/api/trips/${encodeURIComponent(tripId)}/`, {
+  const res = await apiFetch(`/api/trips/${encodeURIComponent(tripId)}`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
@@ -376,7 +419,7 @@ export async function listSavedTrips(
 
 /** Get one trip → `GET /trips/:id`. */
 export async function getSavedTrip(tripId: string): Promise<SavedTrip> {
-  const res = await apiFetch(`/api/trips/${encodeURIComponent(tripId)}/`, {
+  const res = await apiFetch(`/api/trips/${encodeURIComponent(tripId)}`, {
     method: "GET",
     headers: { Accept: "application/json" },
     cache: "no-store",
@@ -393,7 +436,7 @@ export async function getSavedTrip(tripId: string): Promise<SavedTrip> {
 
 /** Delete trip → `DELETE /trips/:id`. */
 export async function deleteSavedTrip(tripId: string): Promise<void> {
-  const res = await apiFetch(`/api/trips/${encodeURIComponent(tripId)}/`, {
+  const res = await apiFetch(`/api/trips/${encodeURIComponent(tripId)}`, {
     method: "DELETE",
     cache: "no-store",
   });
@@ -425,7 +468,7 @@ export type SavedTripPrefs = TripPrefsBody & {
 export async function createTripPrefs(
   body: TripPrefsBody,
 ): Promise<SavedTripPrefs> {
-  const res = await apiFetch("/api/trips/prefs/", {
+  const res = await apiFetch("/api/trips/prefs", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
@@ -447,7 +490,7 @@ export async function updateTripPrefs(
   body: TripPrefsBody,
 ): Promise<SavedTripPrefs> {
   const res = await apiFetch(
-    `/api/trips/prefs/${encodeURIComponent(prefsId)}/`,
+    `/api/trips/prefs/${encodeURIComponent(prefsId)}`,
     {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -474,7 +517,7 @@ export async function searchPlaces(
     q: q.trim(),
     limit: String(limit),
   });
-  const res = await apiFetch(`/api/trips/places/search/?${params}`, {
+  const res = await apiFetch(`/api/trips/places/search?${params}`, {
     method: "GET",
     headers: { Accept: "application/json" },
     cache: "no-store",
@@ -571,10 +614,18 @@ export async function getPlaceAlternatives(
 }
 
 /** Context alternatives for a saved stop → `POST /trips/:tripId/suggest-replace`. */
+export type SuggestReplaceResult = {
+  alternatives: PlaceAlternative[];
+  /** Xu debited this call (0 when served from BE paid cache). */
+  charged: number;
+  /** True when BE returned a previously paid slot cache. */
+  fromCache: boolean;
+};
+
 export async function suggestReplaceForTrip(
   tripId: string,
   body: SuggestReplaceBody,
-): Promise<PlaceAlternative[]> {
+): Promise<SuggestReplaceResult> {
   const res = await apiFetch(
     `/api/trips/${encodeURIComponent(tripId)}/suggest-replace/`,
     {
@@ -586,12 +637,30 @@ export async function suggestReplaceForTrip(
   );
   const data = (await res.json()) as {
     alternatives?: PlaceAlternative[];
+    charged?: number;
+    fromCache?: boolean;
     error?: string;
+    required?: number;
+    balance?: number;
   };
   if (!res.ok) {
-    throw new ApiError(data.error || (await readError(res)), res.status);
+    throw apiErrorFromBody(
+      data,
+      res.status,
+      data.error || (await readError(res)),
+    );
   }
-  return data.alternatives ?? [];
+  const alternatives = Array.isArray(data.alternatives) ? data.alternatives : [];
+  const fromCache = data.fromCache === true;
+  const charged =
+    typeof data.charged === "number" && Number.isFinite(data.charged)
+      ? data.charged
+      : fromCache
+        ? 0
+        : alternatives.length
+          ? 2
+          : 0;
+  return { alternatives, charged, fromCache };
 }
 
 /** Persist stop replacement → `PUT /trips/:tripId/replace-place`. */
@@ -617,3 +686,4 @@ export async function replacePlaceInTrip(
   }
   return data;
 }
+

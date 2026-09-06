@@ -9,7 +9,7 @@ const nextConfig: NextConfig = {
       process.env.NEXT_PUBLIC_MAPBOX_STYLE ??
       "mapbox://styles/mapbox/outdoors-v12",
   },
-  trailingSlash: true,
+  trailingSlash: false,
   allowedDevOrigins: ["127.0.0.1", "localhost"],
   // Avoid Turbopack mis-detecting monorepo root.
   turbopack: {

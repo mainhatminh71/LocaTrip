@@ -1,13 +1,71 @@
 import { User, UserManager } from "oidc-client-ts";
 import { getUserManager } from "@/lib/auth/user-manager";
 
+export type ApiErrorDetails = {
+  required?: number;
+  balance?: number;
+  [key: string]: unknown;
+};
+
+function looksLikeHtml(text: string): boolean {
+  const t = text.trimStart().slice(0, 64).toLowerCase();
+  return t.startsWith("<!doctype") || t.startsWith("<html") || t.includes("<head");
+}
+
+/** Never surface raw nginx/HTML error pages in the UI. */
+export function sanitizeApiErrorMessage(
+  message: string,
+  status?: number,
+): string {
+  const msg = (message || "").trim();
+  if (!msg || looksLikeHtml(msg)) {
+    if (status === 502 || status === 503 || status === 504) {
+      return "Dịch vụ tạm thời không phản hồi. Kiểm tra gateway rồi thử lại.";
+    }
+    return status
+      ? `Máy chủ trả lỗi ${status}. Vui lòng thử lại sau.`
+      : "Có lỗi xảy ra. Vui lòng thử lại sau.";
+  }
+  if (msg.length > 280) return `${msg.slice(0, 277)}…`;
+  return msg;
+}
+
 export class ApiError extends Error {
   status: number;
-  constructor(message: string, status: number) {
-    super(message);
+  details?: ApiErrorDetails;
+
+  constructor(message: string, status: number, details?: ApiErrorDetails) {
+    super(sanitizeApiErrorMessage(message, status));
     this.name = "ApiError";
     this.status = status;
+    this.details = details;
   }
+}
+
+/** Build ApiError from a JSON error body; preserves 402 xu fields. */
+export function apiErrorFromBody(
+  data: {
+    error?: string;
+    required?: number;
+    balance?: number;
+    [key: string]: unknown;
+  },
+  status: number,
+  fallbackMessage?: string,
+): ApiError {
+  const raw =
+    (typeof data.error === "string" && data.error) ||
+    fallbackMessage ||
+    `Lỗi ${status}`;
+  const message = sanitizeApiErrorMessage(raw, status);
+  if (status === 402) {
+    return new ApiError(message, 402, {
+      required:
+        typeof data.required === "number" ? data.required : undefined,
+      balance: typeof data.balance === "number" ? data.balance : undefined,
+    });
+  }
+  return new ApiError(message, status);
 }
 
 export type ApiFetchOptions = RequestInit & {
