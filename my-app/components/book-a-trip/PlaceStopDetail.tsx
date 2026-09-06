@@ -260,6 +260,8 @@ function toAlt(
   hit: PlaceAlternative | AlternativePlaceSuggestion | PlaceSearchHit,
   rank: number,
 ): AlternativePlaceSuggestion {
+  const distanceKm =
+    "distanceKm" in hit && hit.distanceKm != null ? Number(hit.distanceKm) : 0;
   return {
     rank,
     score: "score" in hit && hit.score != null ? hit.score : 0,
@@ -271,13 +273,12 @@ function toAlt(
     latitude: hit.latitude,
     longitude: hit.longitude,
     tags: hit.tags,
-    distanceKm:
-      "distanceKm" in hit && hit.distanceKm != null ? hit.distanceKm : 0,
+    distanceKm,
     tradeOffMessage:
       "tradeOffMessage" in hit && hit.tradeOffMessage
         ? hit.tradeOffMessage
-        : hit.distanceKm != null
-          ? `Cách ~${Number(hit.distanceKm).toFixed(1)} km`
+        : distanceKm > 0
+          ? `Cách ~${distanceKm.toFixed(1)} km`
           : "Gợi ý thay thế",
   };
 }

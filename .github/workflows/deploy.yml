@@ -1,10 +1,24 @@
+# CI and Deploy
+#
+# Production (main) → Worker `locatrip` + https://locatrip.app
+# Staging (staging) → Worker `locatrip-staging` + workers.dev URL in secret STAGING_APP_URL
+#
+# Bootstrap staging (once):
+# 1. From my-app: npm ci && npm run build:cf && npm run deploy:cf:staging
+# 2. Copy the printed https://locatrip-staging.<subdomain>.workers.dev URL
+# 3. GitHub → Settings → Secrets → Actions: add STAGING_APP_URL (no trailing slash)
+# 4. Keycloak client `localtrip-app`: add Valid Redirect URIs
+#    ${STAGING_APP_URL}/auth/callback , ${STAGING_APP_URL}/auth/silent
+#    and Web Origin ${STAGING_APP_URL}
+# 5. Push to branch `staging` (or re-run this workflow) so the build bakes the correct URL
+
 name: CI and Deploy
 
 on:
   push:
-    branches: [main]
+    branches: [main, staging]
   pull_request:
-    branches: [main]
+    branches: [main, staging]
 
 concurrency:
   group: ci-${{ github.ref }}
@@ -43,10 +57,30 @@ jobs:
             exit 1
           fi
 
+      - name: Resolve NEXT_PUBLIC_APP_URL
+        id: app_url
+        env:
+          STAGING_APP_URL: ${{ secrets.STAGING_APP_URL }}
+        run: |
+          REF="${{ github.ref }}"
+          BASE="${{ github.base_ref }}"
+          if [ "$REF" = "refs/heads/staging" ] || [ "$BASE" = "staging" ]; then
+            if [ -n "$STAGING_APP_URL" ]; then
+              URL="${STAGING_APP_URL%/}"
+            else
+              URL="https://locatrip-staging.workers.dev"
+              echo "::warning::STAGING_APP_URL secret not set; using placeholder $URL for check build. Deploy-staging requires the real workers.dev URL."
+            fi
+          else
+            URL="https://locatrip.app"
+          fi
+          echo "url=$URL" >> "$GITHUB_OUTPUT"
+          echo "Using NEXT_PUBLIC_APP_URL=$URL"
+
       - name: Build (OpenNext Cloudflare)
         run: npm run build:cf
         env:
-          NEXT_PUBLIC_APP_URL: https://locatrip.app
+          NEXT_PUBLIC_APP_URL: ${{ steps.app_url.outputs.url }}
           NEXT_PUBLIC_KEYCLOAK_URL: https://auth.locatrip.app
           NEXT_PUBLIC_KEYCLOAK_REALM: localtrip
           NEXT_PUBLIC_KEYCLOAK_CLIENT_ID: localtrip-app
@@ -107,6 +141,80 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           NEXT_PUBLIC_APP_URL: https://locatrip.app
+          NEXT_PUBLIC_KEYCLOAK_URL: https://auth.locatrip.app
+          NEXT_PUBLIC_KEYCLOAK_REALM: localtrip
+          NEXT_PUBLIC_KEYCLOAK_CLIENT_ID: localtrip-app
+          NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN: ${{ secrets.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN }}
+          NEXT_PUBLIC_MAPBOX_STYLE: mapbox://styles/mapbox/outdoors-v12
+          LOCALTRIP_USE_PUBLIC_API: "true"
+
+  deploy-staging:
+    name: Deploy staging to Cloudflare Workers
+    needs: check
+    if: github.event_name == 'push' && github.ref == 'refs/heads/staging'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: my-app/package-lock.json
+
+      - name: Require Cloudflare API token
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          if [ -z "$CLOUDFLARE_API_TOKEN" ]; then
+            echo "::error::Missing secret CLOUDFLARE_API_TOKEN. Create a Cloudflare API token (Workers Edit) and add it in GitHub → Settings → Secrets."
+            exit 1
+          fi
+
+      - name: Require STAGING_APP_URL
+        env:
+          STAGING_APP_URL: ${{ secrets.STAGING_APP_URL }}
+        run: |
+          if [ -z "$STAGING_APP_URL" ]; then
+            echo "::error::Missing secret STAGING_APP_URL."
+            echo "Bootstrap once from my-app:"
+            echo "  npm ci && npm run build:cf && npm run deploy:cf:staging"
+            echo "Then set GitHub Actions secret STAGING_APP_URL to the workers.dev URL (no trailing slash),"
+            echo "add Keycloak redirect URIs for that origin, and re-run this workflow."
+            exit 1
+          fi
+          echo "STAGING_APP_URL=${STAGING_APP_URL%/}"
+
+      - name: Install
+        run: npm ci
+
+      - name: Require Mapbox public token
+        env:
+          NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN: ${{ secrets.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN }}
+        run: |
+          if [ -z "$NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN" ]; then
+            echo "::error::Missing secret NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN (Mapbox pk.*). Add it in GitHub → Settings → Secrets."
+            exit 1
+          fi
+
+      - name: Build
+        run: npm run build:cf
+        env:
+          NEXT_PUBLIC_APP_URL: ${{ secrets.STAGING_APP_URL }}
+          NEXT_PUBLIC_KEYCLOAK_URL: https://auth.locatrip.app
+          NEXT_PUBLIC_KEYCLOAK_REALM: localtrip
+          NEXT_PUBLIC_KEYCLOAK_CLIENT_ID: localtrip-app
+          NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN: ${{ secrets.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN }}
+          NEXT_PUBLIC_MAPBOX_STYLE: mapbox://styles/mapbox/outdoors-v12
+          LOCALTRIP_USE_PUBLIC_API: "true"
+
+      - name: Deploy staging
+        run: npm run deploy:cf:staging
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          NEXT_PUBLIC_APP_URL: ${{ secrets.STAGING_APP_URL }}
           NEXT_PUBLIC_KEYCLOAK_URL: https://auth.locatrip.app
           NEXT_PUBLIC_KEYCLOAK_REALM: localtrip
           NEXT_PUBLIC_KEYCLOAK_CLIENT_ID: localtrip-app
