@@ -150,7 +150,7 @@ export function ReplacePlaceModal({
         setServerAlts(
           hit.serverAlts.length
             ? hit.serverAlts
-            : hit.rows.map((r, i) => ({
+            : hit.rows.map((r) => ({
                 placeId: r.placeId || "",
                 title: r.title,
                 category: r.category,

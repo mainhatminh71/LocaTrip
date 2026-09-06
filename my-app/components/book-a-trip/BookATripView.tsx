@@ -25,7 +25,6 @@ import { ApiError } from "@/lib/api/http";
 import { COSTS, withXuCost } from "@/lib/api/wallet";
 import {
   handleInsufficientXu,
-  isInsufficientXu,
   openInsufficientXuModal,
   requestWalletRefresh,
 } from "@/lib/wallet/xu";

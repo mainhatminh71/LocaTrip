@@ -265,14 +265,13 @@ export function TripWeatherAdvisoryWidget({
       </div>
 
       {forecast.days.length > 1 ? (
-        <div className={styles.daysStrip} role="list">
+        <div className={styles.daysStrip} role="group" aria-label="Chọn ngày dự báo">
           {forecast.days.map((day) => {
             const on = day.date === activeDay.date;
             return (
               <button
                 key={day.date}
                 type="button"
-                role="listitem"
                 className={`${styles.dayChip} ${on ? styles.dayChipOn : ""} ${advisoryToneClass(day.advisory)}`}
                 aria-pressed={on}
                 onClick={() => setSelectedDate(day.date)}

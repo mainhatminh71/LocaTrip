@@ -135,7 +135,7 @@ function PaymentDetailInner() {
       void load();
     }, POLL_MS);
     return () => clearInterval(t);
-  }, [payment?.status, payment?.paymentId, load]);
+  }, [payment, load]);
 
   useEffect(() => {
     if (!waiting || !countdown.expired || expiredRefreshDone.current) return;
