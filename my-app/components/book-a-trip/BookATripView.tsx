@@ -56,10 +56,14 @@ import {
   dayArrayIndex,
   enrichItineraryCoords,
   extractStops,
+  isSyntheticRoute,
+  routeWaypoints,
   stopsForMap,
   summarizeOptionForCard,
   swapVisitPlace,
+  type RouteFeatureCollection,
 } from "@/lib/itinerary-map";
+import { fetchDrivingRouteGeoJSON } from "@/lib/mapbox-directions";
 import { visitDisplayTitle, visitKindLabel } from "@/lib/place-type";
 import { useAuthActions } from "@/components/auth/useAuthActions";
 import { TripWeatherAdvisoryWidget } from "@/components/weather/TripWeatherAdvisoryWidget";
@@ -124,6 +128,9 @@ export function BookATripView({
   const [replaceTargetKey, setReplaceTargetKey] = useState<string | null>(null);
   const [mobileMapOpen, setMobileMapOpen] = useState(false);
   const [routeStale, setRouteStale] = useState(false);
+  /** Road-following line for the map (OSRM from generate or Mapbox Directions). */
+  const [routeGeoJSON, setRouteGeoJSON] =
+    useState<RouteFeatureCollection | null>(null);
   const [isNarrow, setIsNarrow] = useState(false);
   const [locating, setLocating] = useState(false);
   const [lastLocationOverride, setLastLocationOverride] = useState<{
@@ -352,16 +359,38 @@ export function BookATripView({
     ];
   }, [selectedOption, lastLocationOverride, activeStart, draft.startMode]);
 
-  const routeGeoJSON = useMemo(() => {
-    if (!selectedOption || routeStale) return null;
+  useEffect(() => {
+    if (!selectedOption) {
+      setRouteGeoJSON(null);
+      return;
+    }
     const start =
       lastLocationOverride ??
       ({
         latitude: activeStart.latitude,
         longitude: activeStart.longitude,
       } as const);
-    return buildRouteGeoJSON(selectedOption.itinerary, start);
-  }, [selectedOption, routeStale, lastLocationOverride, activeStart]);
+    const built = buildRouteGeoJSON(selectedOption.itinerary, start);
+    let cancelled = false;
+
+    async function resolveRoute() {
+      // Prefer OSRM polylines from generate when present.
+      if (built && !isSyntheticRoute(built)) {
+        if (!cancelled) setRouteGeoJSON(built);
+        return;
+      }
+      const points = routeWaypoints(selectedOption!.itinerary, start);
+      const road = await fetchDrivingRouteGeoJSON(points);
+      if (cancelled) return;
+      // Prefer Mapbox roads; last resort crow-flies if Directions fails.
+      setRouteGeoJSON(road ?? built);
+    }
+
+    void resolveRoute();
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedOption, lastLocationOverride, activeStart]);
 
   const replaceStop = useMemo(
     () => itineraryStops.find((s) => s.key === replaceTargetKey) ?? null,
@@ -1438,8 +1467,8 @@ export function BookATripView({
                   ) : null}
                   {routeStale ? (
                     <p className={styles.routeStaleNote}>
-                      Thời gian giữ theo lịch gốc; tạo lại để tính lại lộ trình
-                      trên bản đồ.
+                      Thời gian giữ theo lịch gốc; đường trên bản đồ đã vẽ lại
+                      theo chỗ mới — tạo lại để tính lại thời gian di chuyển.
                     </p>
                   ) : null}
                 </header>

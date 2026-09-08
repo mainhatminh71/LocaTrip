@@ -79,7 +79,7 @@ export function buildRouteGeoJSON(
       if (!coords || coords.length < 2) continue;
       features.push({
         type: "Feature",
-        properties: {},
+        properties: { source: "osrm" },
         geometry: {
           type: "LineString",
           coordinates: coords,
@@ -91,7 +91,8 @@ export function buildRouteGeoJSON(
     return { type: "FeatureCollection", features };
   }
 
-  // Saved trips strip OSRM polylines — connect stop coords (straight segments).
+  // No OSRM polylines (e.g. saved trips stripped them) — crow-flies placeholder.
+  // Callers should replace with Mapbox driving via `fetchDrivingRouteGeoJSON`.
   const stops = stopsForMap(itinerary);
   if (stops.length === 0) return null;
 
@@ -118,6 +119,36 @@ export function buildRouteGeoJSON(
       },
     ],
   };
+}
+
+/** True when FeatureCollection is crow-flies (needs road fetch). */
+export function isSyntheticRoute(
+  geo: RouteFeatureCollection | null,
+): boolean {
+  if (!geo?.features.length) return false;
+  return geo.features.every((f) => Boolean(f.properties?.synthetic));
+}
+
+/** Ordered waypoints (start + visits) for Directions API. */
+export function routeWaypoints(
+  itinerary: DayItinerary[],
+  startCoords?: { latitude: number; longitude: number } | null,
+): Array<{ lng: number; lat: number }> {
+  const points: Array<{ lng: number; lat: number }> = [];
+  if (
+    startCoords &&
+    Number.isFinite(startCoords.latitude) &&
+    Number.isFinite(startCoords.longitude)
+  ) {
+    points.push({
+      lng: startCoords.longitude,
+      lat: startCoords.latitude,
+    });
+  }
+  for (const stop of stopsForMap(itinerary)) {
+    points.push({ lng: stop.lng, lat: stop.lat });
+  }
+  return points;
 }
 
 export function cloneOption(opt: ItineraryOption): ItineraryOption {
