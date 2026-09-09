@@ -28,8 +28,12 @@ type ItineraryMapProps = {
   className?: string;
   stops: MapStop[];
   selectedKey: string | null;
+  /** Sidebar travel row key (`day-scheduleIndex`) — highlights that leg. */
+  selectedTravelKey?: string | null;
   routeGeoJSON: RouteFeatureCollection | null;
   onSelectStop: (key: string) => void;
+  /** Clear travel highlight (click map empty / outside). */
+  onClearTravel?: () => void;
   /** Parent busy (e.g. regenerating trip) — shows branded overlay. */
   busy?: boolean;
   busyLabel?: string;
@@ -37,6 +41,30 @@ type ItineraryMapProps = {
 
 const ROUTE_SOURCE = "itinerary-route";
 const ROUTE_LAYER = "itinerary-route-line";
+const ROUTE_ARROW_LAYER = "itinerary-route-arrows";
+const ROUTE_ARROW_IMAGE = "itinerary-route-arrow-sdf";
+
+/** White chevron as SDF so `icon-color` can match each leg. */
+function ensureRouteArrowImage(map: mapboxgl.Map): void {
+  if (map.hasImage(ROUTE_ARROW_IMAGE)) return;
+  const size = 128;
+  const canvas = document.createElement("canvas");
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return;
+  ctx.clearRect(0, 0, size, size);
+  ctx.fillStyle = "#ffffff";
+  ctx.beginPath();
+  // Triangle pointing right
+  ctx.moveTo(size * 0.22, size * 0.2);
+  ctx.lineTo(size * 0.82, size * 0.5);
+  ctx.lineTo(size * 0.22, size * 0.8);
+  ctx.closePath();
+  ctx.fill();
+  const data = ctx.getImageData(0, 0, size, size);
+  map.addImage(ROUTE_ARROW_IMAGE, data, { pixelRatio: 2, sdf: true });
+}
 
 function truncateLabel(text: string, max = 22): string {
   const t = text.trim();
@@ -93,8 +121,10 @@ export function ItineraryMap({
   className,
   stops,
   selectedKey,
+  selectedTravelKey = null,
   routeGeoJSON,
   onSelectStop,
+  onClearTravel,
   busy = false,
   busyLabel = "Đang dựng lộ trình…",
 }: ItineraryMapProps) {
@@ -103,6 +133,8 @@ export function ItineraryMap({
   const markersRef = useRef<mapboxgl.Marker[]>([]);
   const onSelectRef = useRef(onSelectStop);
   onSelectRef.current = onSelectStop;
+  const onClearTravelRef = useRef(onClearTravel);
+  onClearTravelRef.current = onClearTravel;
   const [mapReady, setMapReady] = useState(false);
   const [mapError, setMapError] = useState<string | null>(null);
 
@@ -125,6 +157,11 @@ export function ItineraryMap({
     });
     map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), "top-right");
     mapRef.current = map;
+
+    const onMapClick = () => {
+      onClearTravelRef.current?.();
+    };
+    map.on("click", onMapClick);
 
     const onReady = () => {
       suppressBlockedSeaLabels(map);
@@ -154,10 +191,14 @@ export function ItineraryMap({
 
     return () => {
       ro?.disconnect();
+      map.off("click", onMapClick);
       map.off("styledata", onStyleData);
       map.off("error", onError);
       markersRef.current.forEach((m) => m.remove());
       markersRef.current = [];
+      if (map.getLayer(ROUTE_ARROW_LAYER)) map.removeLayer(ROUTE_ARROW_LAYER);
+      if (map.getLayer(ROUTE_LAYER)) map.removeLayer(ROUTE_LAYER);
+      if (map.getSource(ROUTE_SOURCE)) map.removeSource(ROUTE_SOURCE);
       map.remove();
       mapRef.current = null;
       setMapReady(false);
@@ -201,15 +242,18 @@ export function ItineraryMap({
     }
   }, [stops, selectedKey, mapReady]);
 
-  // Route polyline
+  // Route polyline + direction arrows (per-leg colors)
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !mapReady) return;
 
+    if (map.getLayer(ROUTE_ARROW_LAYER)) map.removeLayer(ROUTE_ARROW_LAYER);
     if (map.getLayer(ROUTE_LAYER)) map.removeLayer(ROUTE_LAYER);
     if (map.getSource(ROUTE_SOURCE)) map.removeSource(ROUTE_SOURCE);
 
     if (!routeGeoJSON || routeGeoJSON.features.length === 0) return;
+
+    ensureRouteArrowImage(map);
 
     map.addSource(ROUTE_SOURCE, {
       type: "geojson",
@@ -224,12 +268,90 @@ export function ItineraryMap({
         "line-cap": "round",
       },
       paint: {
-        "line-color": "#0a6b7c",
+        "line-color": ["coalesce", ["get", "color"], "#0a6b7c"],
         "line-width": 4,
-        "line-opacity": 0.85,
+        "line-opacity": 1,
+      },
+    });
+    map.addLayer({
+      id: ROUTE_ARROW_LAYER,
+      type: "symbol",
+      source: ROUTE_SOURCE,
+      layout: {
+        "symbol-placement": "line",
+        "symbol-spacing": 56,
+        "icon-image": ROUTE_ARROW_IMAGE,
+        "icon-size": 0.45,
+        "icon-allow-overlap": true,
+        "icon-ignore-placement": true,
+        "icon-rotation-alignment": "map",
+        "icon-pitch-alignment": "map",
+        "symbol-z-order": "viewport-y",
+      },
+      paint: {
+        "icon-color": ["coalesce", ["get", "color"], "#0a6b7c"],
+        "icon-opacity": 1,
       },
     });
   }, [routeGeoJSON, mapReady]);
+
+  // Highlight selected travel leg + fit that segment
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !mapReady || !map.getLayer(ROUTE_LAYER)) return;
+
+    const hasSelection = Boolean(selectedTravelKey);
+    if (!hasSelection) {
+      // Click outside / no selection — full color, no dimming
+      map.setPaintProperty(ROUTE_LAYER, "line-width", 4);
+      map.setPaintProperty(ROUTE_LAYER, "line-opacity", 1);
+      if (map.getLayer(ROUTE_ARROW_LAYER)) {
+        map.setPaintProperty(ROUTE_ARROW_LAYER, "icon-opacity", 1);
+      }
+      return;
+    }
+
+    map.setPaintProperty(ROUTE_LAYER, "line-width", [
+      "case",
+      ["==", ["get", "travelKey"], selectedTravelKey ?? ""],
+      7,
+      2.5,
+    ]);
+    map.setPaintProperty(ROUTE_LAYER, "line-opacity", [
+      "case",
+      ["==", ["get", "travelKey"], selectedTravelKey ?? ""],
+      1,
+      0.22,
+    ]);
+    if (map.getLayer(ROUTE_ARROW_LAYER)) {
+      map.setPaintProperty(ROUTE_ARROW_LAYER, "icon-opacity", [
+        "case",
+        ["==", ["get", "travelKey"], selectedTravelKey ?? ""],
+        1,
+        0.15,
+      ]);
+    }
+
+    if (!routeGeoJSON) return;
+    const feature = routeGeoJSON.features.find(
+      (f) => f.properties?.travelKey === selectedTravelKey,
+    );
+    const coords = feature?.geometry?.coordinates;
+    if (!coords || coords.length < 2) return;
+    const bounds = new mapboxgl.LngLatBounds();
+    for (const c of coords) {
+      if (
+        Array.isArray(c) &&
+        Number.isFinite(c[0]) &&
+        Number.isFinite(c[1])
+      ) {
+        bounds.extend([c[0] as number, c[1] as number]);
+      }
+    }
+    if (!bounds.isEmpty()) {
+      map.fitBounds(bounds, { padding: 80, maxZoom: 15, duration: 550 });
+    }
+  }, [selectedTravelKey, routeGeoJSON, mapReady]);
 
   if (!mapboxToken) {
     return (

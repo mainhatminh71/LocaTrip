@@ -21,8 +21,11 @@ import {
   HOURS_CHIP_OPTIONS,
   HOURS_CUSTOM_VALUE,
   PACE_OPTIONS,
+  START_PRESET_CATEGORY_OPTIONS,
   type StartPreset,
+  type StartPresetCategory,
 } from "@/lib/trip";
+import { useMemo, useState } from "react";
 import styles from "./book-a-trip.module.css";
 
 function ChipRow({
@@ -77,12 +80,37 @@ export function AutoTripPrefsFields({
   const { start: startTime, end: endTime } = parseDraftHours(draft.hours);
   const hoursError = validateSameDayHours(startTime, endTime);
 
+  const selectedCategory = useMemo<StartPresetCategory>(() => {
+    const fromDraft = startPresets.find((p) => p.id === draft.startId)?.category;
+    return fromDraft ?? "landmark";
+  }, [draft.startId, startPresets]);
+
+  const [browseCategory, setBrowseCategory] = useState<StartPresetCategory | null>(
+    null,
+  );
+  const startCategory = browseCategory ?? selectedCategory;
+
+  const categoryPresets = useMemo(
+    () => startPresets.filter((p) => p.category === startCategory),
+    [startPresets, startCategory],
+  );
+
   function patchStartTime(value: string) {
     onPatch({ hours: joinDraftHours(value, endTime) });
   }
 
   function patchEndTime(value: string) {
     onPatch({ hours: joinDraftHours(startTime, value) });
+  }
+
+  function pickStartCategory(cat: StartPresetCategory) {
+    setBrowseCategory(cat);
+    const stillVisible = startPresets.some(
+      (p) => p.id === draft.startId && p.category === cat,
+    );
+    if (stillVisible) return;
+    const first = startPresets.find((p) => p.category === cat);
+    if (first) onPatch({ startId: first.id, startMode: "preset" });
   }
 
   return (
@@ -163,18 +191,42 @@ export function AutoTripPrefsFields({
 
         {(draft.startMode ?? "preset") === "preset" ? (
           <>
+            <div
+              className={styles.chipRow}
+              role="tablist"
+              aria-label="Nhóm địa điểm đề xuất"
+            >
+              {START_PRESET_CATEGORY_OPTIONS.map((opt) => {
+                const active = startCategory === opt.id;
+                return (
+                  <button
+                    key={opt.id}
+                    type="button"
+                    role="tab"
+                    aria-selected={active}
+                    className={active ? styles.chipOn : styles.chip}
+                    onClick={() => pickStartCategory(opt.id)}
+                  >
+                    {opt.label}
+                  </button>
+                );
+              })}
+            </div>
             {!compact ? (
               <p className={styles.autoHint}>{activeStart.description}</p>
             ) : null}
             <div className={styles.startGrid}>
-              {startPresets.map((p) => {
+              {categoryPresets.map((p) => {
                 const on = draft.startId === p.id;
                 return (
                   <button
                     key={p.id}
                     type="button"
                     className={on ? styles.startCardOn : styles.startCard}
-                    onClick={() => onPatch({ startId: p.id, startMode: "preset" })}
+                    onClick={() => {
+                      setBrowseCategory(p.category);
+                      onPatch({ startId: p.id, startMode: "preset" });
+                    }}
                   >
                     <span className={styles.startThumb}>
                       <Image

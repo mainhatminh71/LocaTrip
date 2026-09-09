@@ -241,8 +241,12 @@ export function isPaymentQrImage(url: string): boolean {
 /** Prefer showing as <img>; otherwise open link. */
 export function paymentDetailPath(
   paymentId: string,
-  opts?: { fromWallet?: boolean },
+  opts?: { fromWallet?: boolean; returnTo?: string },
 ): string {
   const base = `/payments/${encodeURIComponent(paymentId)}`;
-  return opts?.fromWallet ? `${base}?from=wallet` : base;
+  const q = new URLSearchParams();
+  if (opts?.fromWallet) q.set("from", "wallet");
+  if (opts?.returnTo?.startsWith("/")) q.set("returnTo", opts.returnTo);
+  const qs = q.toString();
+  return qs ? `${base}?${qs}` : base;
 }

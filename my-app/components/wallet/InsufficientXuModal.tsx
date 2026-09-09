@@ -3,10 +3,24 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import {
+  BOOK_A_TRIP_RESUME_PATH,
+  hasPendingGenerateResume,
+} from "@/lib/auto-trip-pending";
+import {
   INSUFFICIENT_XU_EVENT,
   type InsufficientXuDetail,
 } from "@/lib/wallet/xu";
 import styles from "./insufficient-xu.module.css";
+
+function walletHrefWithReturn(): string {
+  const returnTo =
+    typeof window !== "undefined"
+      ? hasPendingGenerateResume()
+        ? BOOK_A_TRIP_RESUME_PATH
+        : `${window.location.pathname}${window.location.search}`
+      : BOOK_A_TRIP_RESUME_PATH;
+  return `/wallet?returnTo=${encodeURIComponent(returnTo)}`;
+}
 
 export function InsufficientXuModal() {
   const [detail, setDetail] = useState<InsufficientXuDetail | null>(null);
@@ -61,7 +75,7 @@ export function InsufficientXuModal() {
             Đóng
           </button>
           <Link
-            href="/wallet"
+            href={walletHrefWithReturn()}
             className={styles.btnPrimary}
             onClick={() => setDetail(null)}
           >

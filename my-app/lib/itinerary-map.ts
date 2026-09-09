@@ -7,6 +7,7 @@ import type {
   ScheduledVisit,
   TripPlace,
 } from "@/lib/trip";
+import { routeLegColor } from "@/lib/route-leg-colors";
 
 export type ItineraryStop = {
   key: string;
@@ -71,28 +72,35 @@ export function buildRouteGeoJSON(
   startCoords?: { latitude: number; longitude: number } | null,
 ): RouteFeatureCollection | null {
   const features: RouteFeatureCollection["features"] = [];
+  let legIndex = 0;
   for (const day of itinerary) {
-    for (const item of day.schedule || []) {
-      if (item.type !== "travel") continue;
+    (day.schedule || []).forEach((item, scheduleIndex) => {
+      if (item.type !== "travel") return;
       const travel = item as ScheduledTravel;
       const coords = travel.routeGeometry?.coordinates;
-      if (!coords || coords.length < 2) continue;
+      if (!coords || coords.length < 2) return;
+      const travelKey = `${day.day}-${scheduleIndex}`;
       features.push({
         type: "Feature",
-        properties: { source: "osrm" },
+        properties: {
+          source: "osrm",
+          legIndex,
+          travelKey,
+          color: routeLegColor(legIndex),
+        },
         geometry: {
           type: "LineString",
           coordinates: coords,
         },
       });
-    }
+      legIndex += 1;
+    });
   }
   if (features.length > 0) {
     return { type: "FeatureCollection", features };
   }
 
-  // No OSRM polylines (e.g. saved trips stripped them) — crow-flies placeholder.
-  // Callers should replace with Mapbox driving via `fetchDrivingRouteGeoJSON`.
+  // No OSRM polylines — crow-flies per segment (Mapbox Directions preferred).
   const stops = stopsForMap(itinerary);
   if (stops.length === 0) return null;
 
@@ -109,16 +117,74 @@ export function buildRouteGeoJSON(
   }
   if (line.length < 2) return null;
 
+  const travelKeys = listTravelKeys(itinerary);
+  const segmentFeatures: RouteFeatureCollection["features"] = [];
+  for (let i = 0; i < line.length - 1; i++) {
+    segmentFeatures.push({
+      type: "Feature",
+      properties: {
+        synthetic: true,
+        legIndex: i,
+        travelKey: travelKeys[i] ?? `leg-${i}`,
+        color: routeLegColor(i),
+      },
+      geometry: {
+        type: "LineString",
+        coordinates: [line[i]!, line[i + 1]!],
+      },
+    });
+  }
+
+  return { type: "FeatureCollection", features: segmentFeatures };
+}
+
+/** Schedule keys (`day-scheduleIndex`) for each travel item, in order. */
+export function listTravelKeys(itinerary: DayItinerary[]): string[] {
+  const keys: string[] = [];
+  for (const day of itinerary) {
+    (day.schedule || []).forEach((item, scheduleIndex) => {
+      if (item.type === "travel") keys.push(`${day.day}-${scheduleIndex}`);
+    });
+  }
+  return keys;
+}
+
+/** Attach legIndex / travelKey / color so map + sidebar stay in sync. */
+export function annotateRouteLegs(
+  geo: RouteFeatureCollection | null,
+  itinerary: DayItinerary[],
+): RouteFeatureCollection | null {
+  if (!geo?.features.length) return geo;
+  const travelKeys = listTravelKeys(itinerary);
   return {
     type: "FeatureCollection",
-    features: [
-      {
-        type: "Feature",
-        properties: { synthetic: true },
-        geometry: { type: "LineString", coordinates: line },
+    features: geo.features.map((f, i) => ({
+      ...f,
+      properties: {
+        ...f.properties,
+        legIndex: i,
+        travelKey: travelKeys[i] ?? String(f.properties?.travelKey ?? `leg-${i}`),
+        color: routeLegColor(i),
       },
-    ],
+    })),
   };
+}
+
+/** True when every travel leg has usable OSRM LineString geometry. */
+export function hasCompleteTravelGeometry(
+  itinerary: DayItinerary[],
+): boolean {
+  let travelCount = 0;
+  let withGeom = 0;
+  for (const day of itinerary) {
+    for (const item of day.schedule || []) {
+      if (item.type !== "travel") continue;
+      travelCount += 1;
+      const coords = (item as ScheduledTravel).routeGeometry?.coordinates;
+      if (coords && coords.length >= 2) withGeom += 1;
+    }
+  }
+  return travelCount > 0 && travelCount === withGeom;
 }
 
 /** True when FeatureCollection is crow-flies (needs road fetch). */

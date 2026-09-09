@@ -7,7 +7,6 @@ import { DestinationsSection } from "@/components/sections/DestinationsSection";
 import { ToursSection } from "@/components/sections/ToursSection";
 import { WhyUsSection } from "@/components/sections/WhyUsSection";
 import { TestimonialsSection } from "@/components/sections/TestimonialsSection";
-import { PricingSection } from "@/components/sections/PricingSection";
 import { BlogsSection } from "@/components/sections/BlogsSection";
 import { StoriesSection } from "@/components/sections/StoriesSection";
 import { buildPageMetadata, SITE_DEFAULT_DESCRIPTION, SITE_NAME } from "@/lib/seo";
@@ -33,7 +32,6 @@ export default function HomePage() {
         <ToursSection />
         <WhyUsSection />
         <TestimonialsSection />
-        <PricingSection />
         <BlogsSection />
         <StoriesSection />
       </main>

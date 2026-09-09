@@ -299,7 +299,9 @@ type PlaceStopDetailProps = {
     scheduleIndex: number;
     placeId: string;
   }) => void;
-  onPickLocal: (alt: AlternativePlaceSuggestion) => void;
+  onPickLocal: (
+    alt: AlternativePlaceSuggestion,
+  ) => void | Promise<void>;
   onPickServer?: (newPlaceId: string) => Promise<void>;
 };
 
@@ -655,7 +657,7 @@ export function PlaceStopDetail({
       if (tripId && onPickServer && alt.placeId) {
         await onPickServer(alt.placeId);
       } else {
-        onPickLocal(alt);
+        await Promise.resolve(onPickLocal(alt));
       }
       onClose();
     } catch (err) {

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useParams, useSearchParams } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { MarketingChrome } from "@/components/layout/MarketingChrome";
 import { RequireAuth } from "@/components/auth/RequireAuth";
 import { LtBrandLoader } from "@/components/book-a-trip/LtBrandLoader";
@@ -17,6 +17,12 @@ import {
   type PaymentStatus,
 } from "@/lib/api/payments";
 import { ApiError } from "@/lib/api/http";
+import {
+  BOOK_A_TRIP_RESUME_PATH,
+  hasPendingGenerateResume,
+  loadPendingAutoTripForm,
+  savePendingAutoTripForm,
+} from "@/lib/auto-trip-pending";
 import { useToast } from "@/components/ui/ToastProvider";
 import { requestWalletRefresh } from "@/lib/wallet/xu";
 import styles from "../payments.module.css";
@@ -77,8 +83,16 @@ function formatWhen(iso?: string) {
 
 function PaymentDetailInner() {
   const params = useParams();
+  const router = useRouter();
   const searchParams = useSearchParams();
   const fromWallet = searchParams.get("from") === "wallet";
+  const returnToRaw = searchParams.get("returnTo")?.trim() || "";
+  const returnTo =
+    returnToRaw.startsWith("/") && !returnToRaw.startsWith("//")
+      ? returnToRaw
+      : hasPendingGenerateResume()
+        ? BOOK_A_TRIP_RESUME_PATH
+        : null;
   const paymentId = resolvePaymentId(params);
   const { toastSuccess, toastError } = useToast();
   const [payment, setPayment] = useState<Payment | null>(() =>
@@ -87,12 +101,14 @@ function PaymentDetailInner() {
   const [loading, setLoading] = useState(!payment);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [confirmCancel, setConfirmCancel] = useState(false);
   const [imgBroken, setImgBroken] = useState(false);
   const waiting = payment?.status === "awaiting_transfer";
   const isPaid = payment?.status === "paid";
   const countdown = useCountdown(waiting ? payment?.expiresAt : undefined);
   const expiredRefreshDone = useRef(false);
   const celebratedPaid = useRef(false);
+  const redirectedAfterPay = useRef(false);
   const prevStatus = useRef<PaymentStatus | null>(null);
 
   const load = useCallback(async () => {
@@ -165,11 +181,24 @@ function PaymentDetailInner() {
           : "Thanh toán thành công — đã ghi nhận chuyển khoản",
       );
     }
-  }, [payment, toastSuccess, fromWallet]);
+    if (returnTo && !redirectedAfterPay.current) {
+      redirectedAfterPay.current = true;
+      // Ensure generate resumes after top-up even if resume flag was cleared.
+      const pending = loadPendingAutoTripForm();
+      if (pending?.draft) {
+        savePendingAutoTripForm({
+          ...pending,
+          resumeGenerate: true,
+        });
+      }
+      router.replace(returnTo);
+    }
+  }, [payment, toastSuccess, fromWallet, returnTo, router]);
 
   async function onCancel() {
     if (!payment || busy || payment.status !== "awaiting_transfer") return;
     setBusy(true);
+    setConfirmCancel(false);
     try {
       const { payment: next } = await cancelPayment(payment.paymentId);
       setPayment(next);
@@ -179,6 +208,11 @@ function PaymentDetailInner() {
     } finally {
       setBusy(false);
     }
+  }
+
+  function requestCancel() {
+    if (!payment || busy || payment.status !== "awaiting_transfer") return;
+    setConfirmCancel(true);
   }
 
   if (loading) {
@@ -270,7 +304,11 @@ function PaymentDetailInner() {
             </dl>
 
             <div className={styles.actions}>
-              {fromWallet ? (
+              {returnTo ? (
+                <Link href={returnTo} className={styles.btnPrimary}>
+                  Tiếp tục tạo lịch trình
+                </Link>
+              ) : fromWallet ? (
                 <Link href="/wallet" className={styles.btnPrimary}>
                   Về ví xu
                 </Link>
@@ -344,6 +382,17 @@ function PaymentDetailInner() {
                 Đang chờ xác nhận chuyển khoản (SePay)… màn hình sẽ tự cập nhật
                 khi thanh toán thành công.
               </p>
+              <p className={styles.paySupportBanner} role="note">
+                Nếu chuyển khoản lỗi, liên hệ Zalo hỗ trợ:{" "}
+                <a
+                  href="https://zalo.me/0973330800"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={styles.paySupportLink}
+                >
+                  0973330800
+                </a>
+              </p>
             </div>
           ) : null}
 
@@ -389,7 +438,7 @@ function PaymentDetailInner() {
                 type="button"
                 className={styles.btnDanger}
                 disabled={busy}
-                onClick={() => void onCancel()}
+                onClick={requestCancel}
               >
                 {busy ? "Đang hủy…" : "Hủy"}
               </button>
@@ -403,6 +452,49 @@ function PaymentDetailInner() {
           </div>
         </div>
       </div>
+
+      {confirmCancel ? (
+        <div
+          className={styles.modalBackdrop}
+          role="presentation"
+          onClick={() => {
+            if (!busy) setConfirmCancel(false);
+          }}
+        >
+          <div
+            className={styles.modalCard}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="cancel-pay-title"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 id="cancel-pay-title" className={styles.modalTitle}>
+              Hủy thanh toán?
+            </h2>
+            <p className={styles.modalBody}>
+              Bạn có chắc muốn hủy không? Dữ liệu sẽ mất.
+            </p>
+            <div className={styles.modalActions}>
+              <button
+                type="button"
+                className={styles.btnGhost}
+                disabled={busy}
+                onClick={() => setConfirmCancel(false)}
+              >
+                Quay lại
+              </button>
+              <button
+                type="button"
+                className={styles.btnDanger}
+                disabled={busy}
+                onClick={() => void onCancel()}
+              >
+                {busy ? "Đang hủy…" : "Hủy"}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </main>
   );
 }

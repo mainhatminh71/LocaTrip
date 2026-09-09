@@ -34,7 +34,7 @@ type ReplacePlaceModalProps = {
   dayIndex: number;
   onClose: () => void;
   /** Local replace (no tripId yet). */
-  onPick: (alt: AlternativePlaceSuggestion) => void;
+  onPick: (alt: AlternativePlaceSuggestion) => void | Promise<void>;
   /** Saved trip: persist via replace-place then update UI. */
   onPickServer?: (newPlaceId: string) => Promise<void>;
 };
@@ -357,7 +357,7 @@ export function ReplacePlaceModal({
         alt.latitude = Number(alt.latitude);
         alt.longitude = Number(alt.longitude);
       }
-      onPick(alt);
+      await Promise.resolve(onPick(alt));
     } catch (err) {
       setSearchError(
         localizeTripApiError(

@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { FormEvent, Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import { MarketingChrome } from "@/components/layout/MarketingChrome";
 import { RequireAuth } from "@/components/auth/RequireAuth";
 import { LtBrandLoader } from "@/components/book-a-trip/LtBrandLoader";
@@ -25,6 +25,10 @@ import {
   type Payment,
   type PaymentStatus,
 } from "@/lib/api/payments";
+import {
+  BOOK_A_TRIP_RESUME_PATH,
+  hasPendingGenerateResume,
+} from "@/lib/auto-trip-pending";
 import { useToast } from "@/components/ui/ToastProvider";
 import { requestWalletRefresh } from "@/lib/wallet/xu";
 import styles from "./wallet.module.css";
@@ -52,6 +56,14 @@ function badgeClass(status: PaymentStatus): string {
 
 function WalletInner() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const returnToRaw = searchParams.get("returnTo")?.trim() || "";
+  const returnToAfterPay =
+    returnToRaw.startsWith("/") && !returnToRaw.startsWith("//")
+      ? returnToRaw
+      : hasPendingGenerateResume()
+        ? BOOK_A_TRIP_RESUME_PATH
+        : undefined;
   const { toastSuccess, toastError } = useToast();
   const { balance, rate, loading: walletLoading, refresh } = useWallet();
 
@@ -157,7 +169,12 @@ function WalletInner() {
         note: "Nap xu",
       });
       toastSuccess("Đã tạo mã QR nạp xu");
-      router.push(paymentDetailPath(payment.paymentId, { fromWallet: true }));
+      router.push(
+        paymentDetailPath(payment.paymentId, {
+          fromWallet: true,
+          returnTo: returnToAfterPay,
+        }),
+      );
     } catch (err) {
       const msg =
         err instanceof ApiError
@@ -476,7 +493,17 @@ export default function WalletPage() {
   return (
     <MarketingChrome>
       <RequireAuth>
-        <WalletInner />
+        <Suspense
+          fallback={
+            <main className={styles.page}>
+              <div className={styles.center}>
+                <LtBrandLoader size="lg" tone="onLight" label="Đang tải…" />
+              </div>
+            </main>
+          }
+        >
+          <WalletInner />
+        </Suspense>
       </RequireAuth>
     </MarketingChrome>
   );

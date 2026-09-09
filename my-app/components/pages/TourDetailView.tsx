@@ -32,8 +32,8 @@ export function TourDetailView({ tour }: { tour: TourCard }) {
           />
         </div>
         <p className={styles.articleLead}>
-          Lịch trình mẫu cố định — xem điểm dừng trên bản đồ. Không chỉnh tiêu
-          chí và không gọi API.
+          Xem lịch trình mẫu trên bản đồ — điểm dừng, thời gian nghỉ và lộ trình
+          theo đường thật. Muốn chỉnh tiêu chí riêng, hãy tạo lịch trình của bạn.
         </p>
         <div
           style={{ display: "flex", gap: 12, flexWrap: "wrap", marginTop: 28 }}

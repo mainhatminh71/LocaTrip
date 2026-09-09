@@ -115,21 +115,35 @@ export const CITY_OPTIONS = [
 
 export type CityId = (typeof CITY_OPTIONS)[number]["id"];
 
+export type StartPresetCategory = "landmark" | "bus" | "hotel";
+
 export type StartPreset = {
   id: string;
   label: string;
+  category: StartPresetCategory;
   latitude: number;
   longitude: number;
   description: string;
   thumbnail: string;
 };
 
+export const START_PRESET_CATEGORY_OPTIONS: readonly {
+  id: StartPresetCategory;
+  label: string;
+}[] = [
+  { id: "landmark", label: "Địa điểm nổi bật" },
+  { id: "bus", label: "Bến xe" },
+  { id: "hotel", label: "Khách sạn" },
+] as const;
+
 /** Start points keyed by city — only Đà Lạt for now. */
 export const START_PRESETS_BY_CITY: Record<CityId, readonly StartPreset[]> = {
   dalat: [
+    // —— Địa điểm nổi bật ——
     {
       id: "center",
       label: "Trung tâm Đà Lạt",
+      category: "landmark",
       latitude: 11.9404,
       longitude: 108.4583,
       description:
@@ -139,6 +153,7 @@ export const START_PRESETS_BY_CITY: Record<CityId, readonly StartPreset[]> = {
     {
       id: "xuan-huong",
       label: "Hồ Xuân Hương",
+      category: "landmark",
       latitude: 11.9415,
       longitude: 108.438,
       description:
@@ -148,6 +163,7 @@ export const START_PRESETS_BY_CITY: Record<CityId, readonly StartPreset[]> = {
     {
       id: "ga",
       label: "Ga Đà Lạt",
+      category: "landmark",
       latitude: 11.925,
       longitude: 108.451,
       description:
@@ -157,6 +173,7 @@ export const START_PRESETS_BY_CITY: Record<CityId, readonly StartPreset[]> = {
     {
       id: "tuyen-lam",
       label: "Hồ Tuyền Lâm",
+      category: "landmark",
       latitude: 11.889,
       longitude: 108.432,
       description:
@@ -166,11 +183,146 @@ export const START_PRESETS_BY_CITY: Record<CityId, readonly StartPreset[]> = {
     {
       id: "langbiang",
       label: "Langbiang / Lạc Dương",
+      category: "landmark",
       latitude: 12.04,
       longitude: 108.44,
       description:
         "Đỉnh núi biểu tượng phía Bắc thành phố — khí hậu mát, săn mây và view cao nguyên; điểm bắt đầu cho lịch trình hướng ngoại ô.",
       thumbnail: "/media/starts/langbiang.jpg",
+    },
+
+    // —— Bến xe / văn phòng nhà xe nổi bật (Đà Lạt) ——
+    {
+      id: "bus-lien-tinh",
+      label: "Bến xe liên tỉnh Đà Lạt",
+      category: "bus",
+      latitude: 11.9268818,
+      longitude: 108.4455138,
+      description:
+        "Bến hạng I tại 01 Tô Hiến Thành — cửa ngõ xe khách liên tỉnh (HCM, Nha Trang, Buôn Ma Thuột…). Tiện bắt đầu lịch ngay khi xuống xe.",
+      thumbnail: "/media/starts/bus-lien-tinh.jpg",
+    },
+    {
+      id: "bus-phuong-trang",
+      label: "VP Phương Trang (Lê Quý Đôn)",
+      category: "bus",
+      latitude: 11.9411068,
+      longitude: 108.4311997,
+      description:
+        "Văn phòng / điểm đón trả FUTA gần trung tâm — thuận nếu bạn đi xe Phương Trang và muốn xuất phát quanh khu Cam Ly / Hồ Xuân Hương.",
+      thumbnail: "/media/starts/bus-phuong-trang.jpg",
+    },
+    {
+      id: "bus-thanh-buoi-lu-gia",
+      label: "VP Thành Bưởi (Lữ Gia)",
+      category: "bus",
+      latitude: 11.9539927,
+      longitude: 108.4669027,
+      description:
+        "Trụ sở Thành Bưởi tại Lữ Gia — điểm đón trả quen thuộc phía Đông Bắc trung tâm, gần khu Lâm Viên.",
+      thumbnail: "/media/starts/bus-thanh-buoi.jpg",
+    },
+    {
+      id: "bus-thanh-buoi-pbc",
+      label: "VP Thành Bưởi (Phan Bội Châu)",
+      category: "bus",
+      latitude: 11.9439993,
+      longitude: 108.4384544,
+      description:
+        "Điểm Thành Bưởi gần hồ Xuân Hương / Golf Valley — dễ kết nối cafe, chợ và các điểm check-in trung tâm.",
+      thumbnail: "/media/starts/bus-thanh-buoi-pbc.jpg",
+    },
+
+    // —— Khách sạn / resort nổi bật ——
+    {
+      id: "hotel-dalat-palace",
+      label: "Dalat Palace Heritage",
+      category: "hotel",
+      latitude: 11.9375798,
+      longitude: 108.4403914,
+      description:
+        "Biểu tượng di sản nhìn ra Hồ Xuân Hương — điểm bắt đầu sang trọng ngay trung tâm phố núi.",
+      thumbnail: "/media/starts/dalat-palace.jpg",
+    },
+    {
+      id: "hotel-ana-mandara",
+      label: "Ana Mandara Villas",
+      category: "hotel",
+      latitude: 11.9442284,
+      longitude: 108.4236004,
+      description:
+        "Quần thể biệt thự Pháp phục chế trên đồi thông Cam Ly — xuất phát yên tĩnh, cách trung tâm khoảng 10 phút.",
+      thumbnail: "/media/starts/ana-mandara.jpg",
+    },
+    {
+      id: "hotel-terracotta",
+      label: "Terracotta Hotel & Resort",
+      category: "hotel",
+      latitude: 11.8952539,
+      longitude: 108.4375041,
+      description:
+        "Resort lớn bên Hồ Tuyền Lâm — phù hợp lịch trình nghỉ dưỡng, thiên nhiên và hoạt động quanh hồ.",
+      thumbnail: "/media/starts/terracotta.jpg",
+    },
+    {
+      id: "hotel-swiss-belresort",
+      label: "Swiss-Belresort Tuyền Lâm",
+      category: "hotel",
+      latitude: 11.8978,
+      longitude: 108.4428,
+      description:
+        "Resort view sân golf / thung lũng thông phía Nam thành phố — điểm xuất phát hướng Tuyền Lâm & thác.",
+      thumbnail: "/media/starts/swiss-belresort.jpg",
+    },
+    {
+      id: "hotel-mercure",
+      label: "Mercure Dalat Resort",
+      category: "hotel",
+      latitude: 11.9454247,
+      longitude: 108.4595463,
+      description:
+        "Resort khu Lâm Viên — gần trung tâm nhưng không gian xanh, thuận lịch trình nửa ngày phố núi.",
+      thumbnail: "/media/starts/mercure.jpg",
+    },
+    {
+      id: "hotel-saigon-dalat",
+      label: "Saigon – Dalat Hotel",
+      category: "hotel",
+      latitude: 11.9392953,
+      longitude: 108.4296304,
+      description:
+        "Khách sạn quen thuộc gần trung tâm — xuất phát tiện cho chợ, nhà thờ và vòng quanh Hồ Xuân Hương.",
+      thumbnail: "/media/starts/saigon-dalat.jpg",
+    },
+    {
+      id: "hotel-edensee",
+      label: "Dalat Edensee Lake Resort",
+      category: "hotel",
+      latitude: 11.8856405,
+      longitude: 108.4236024,
+      description:
+        "Resort sát mặt nước Hồ Tuyền Lâm — điểm bắt đầu cho hành trình phía Nam thành phố, chậm rãi và riêng tư.",
+      thumbnail: "/media/starts/edensee.jpg",
+    },
+    {
+      id: "hotel-muong-thanh",
+      label: "Mường Thanh Đà Lạt",
+      category: "hotel",
+      latitude: 11.9439,
+      longitude: 108.4376,
+      description:
+        "Chuỗi khách sạn gần trung tâm / Golf Valley — dễ kết nối điểm ăn uống và tham quan trong phố.",
+      thumbnail: "/media/starts/muong-thanh.jpg",
+    },
+    {
+      id: "hotel-best-western",
+      label: "Best Western Premier Đà Lạt",
+      category: "hotel",
+      latitude: 11.949,
+      longitude: 108.4345,
+      description:
+        "Khách sạn khu Golf Valley — view đồi thông, thuận lịch trình cao cấp quanh trung tâm phía Bắc hồ.",
+      thumbnail: "/media/starts/best-western-premier.jpg",
     },
   ],
 };

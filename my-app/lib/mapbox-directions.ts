@@ -1,18 +1,13 @@
 import { mapboxToken } from "@/lib/mapbox";
 import type { RouteFeatureCollection } from "@/lib/itinerary-map";
-
-/** Mapbox Directions allows up to 25 coordinates per request. */
-const MAX_WAYPOINTS = 25;
+import { routeLegColor } from "@/lib/route-leg-colors";
 
 type LngLat = { lng: number; lat: number };
 
-function encodeWaypoints(points: LngLat[]): string {
-  return points.map((p) => `${p.lng},${p.lat}`).join(";");
-}
-
 /**
  * Driving geometry via Mapbox Directions (roads), not crow-flies.
- * Returns one LineString feature, or null on failure / missing token.
+ * Fetches each consecutive pair so a place-swap still redraws the full path
+ * even when older multi-stop OSRM polylines are incomplete/cleared.
  */
 export async function fetchDrivingRouteGeoJSON(
   points: LngLat[],
@@ -27,18 +22,17 @@ export async function fetchDrivingRouteGeoJSON(
 
   const features: RouteFeatureCollection["features"] = [];
 
-  for (let i = 0; i < cleaned.length - 1; ) {
-    const end = Math.min(i + MAX_WAYPOINTS - 1, cleaned.length - 1);
-    const chunk = cleaned.slice(i, end + 1);
-    if (chunk.length < 2) break;
-
+  for (let i = 0; i < cleaned.length - 1; i++) {
+    const a = cleaned[i]!;
+    const b = cleaned[i + 1]!;
+    const path = `${a.lng},${a.lat};${b.lng},${b.lat}`;
     const url =
-      `https://api.mapbox.com/directions/v5/mapbox/driving/${encodeWaypoints(chunk)}` +
+      `https://api.mapbox.com/directions/v5/mapbox/driving/${path}` +
       `?geometries=geojson&overview=full&access_token=${encodeURIComponent(token)}`;
 
     try {
       const res = await fetch(url);
-      if (!res.ok) break;
+      if (!res.ok) continue;
       const data = (await res.json()) as {
         routes?: Array<{ geometry?: { coordinates?: [number, number][] } }>;
       };
@@ -46,17 +40,17 @@ export async function fetchDrivingRouteGeoJSON(
       if (coords && coords.length >= 2) {
         features.push({
           type: "Feature",
-          properties: { source: "mapbox-driving" },
+          properties: {
+            source: "mapbox-driving",
+            legIndex: i,
+            color: routeLegColor(i),
+          },
           geometry: { type: "LineString", coordinates: coords },
         });
       }
     } catch {
-      break;
+      /* skip this leg; keep drawing others */
     }
-
-    // Advance with overlap so chunks connect (last point of previous chunk).
-    i = end;
-    if (i >= cleaned.length - 1) break;
   }
 
   if (features.length === 0) return null;

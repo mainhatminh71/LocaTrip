@@ -3850,17 +3850,59 @@
   align-items: start;
 }
 
-.travelItem {
-  padding: 6px 10px 10px;
-  margin: 0 2px;
+.travelItem,
+.visitItem {
+  list-style: none;
 }
 
-.travelItem > .time,
 .stopRow > .time,
 .stopRowActive > .time {
   padding-top: 2px;
   white-space: normal;
   line-height: 1.25;
+}
+
+.travelRow,
+.travelRowActive {
+  display: grid;
+  grid-template-columns: 76px 22px minmax(0, 1fr);
+  column-gap: 10px;
+  align-items: start;
+  width: 100%;
+  text-align: left;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  padding: 8px 10px 10px;
+  background: color-mix(in srgb, var(--travel-leg-color, var(--lt-teal)) 8%, white);
+  cursor: pointer;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+.travelRow:hover {
+  border-color: color-mix(in srgb, var(--travel-leg-color, var(--lt-teal)) 45%, transparent);
+}
+
+.travelRowActive {
+  border-color: var(--travel-leg-color, var(--lt-teal));
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--travel-leg-color, var(--lt-teal)) 28%, transparent);
+  background: color-mix(in srgb, var(--travel-leg-color, var(--lt-teal)) 14%, white);
+}
+
+.travelRow > .time,
+.travelRowActive > .time {
+  padding-top: 2px;
+  white-space: normal;
+  line-height: 1.25;
+}
+
+.travelSwatch {
+  width: 14px;
+  height: 14px;
+  margin-top: 4px;
+  justify-self: center;
+  border-radius: 999px;
+  background: var(--travel-leg-color, var(--lt-teal));
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--travel-leg-color, var(--lt-teal)) 22%, transparent);
 }
 
 .travelRail {
@@ -3895,7 +3937,7 @@
   font-weight: 750;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: var(--lt-teal);
+  color: var(--travel-leg-color, var(--lt-teal));
   line-height: 1.3;
 }
 

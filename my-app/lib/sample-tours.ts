@@ -1,23 +1,27 @@
 /**
- * Hardcoded sample itineraries for /tours → /map.
- * No LocalTrip API — demo schedule + map route only.
+ * Sample itineraries for /tours → /map.
+ * Structured like generated trips: visits, travel legs, rest breaks.
  */
 
 import type { RouteFeatureCollection } from "@/lib/itinerary-map";
+import { routeLegColor } from "@/lib/route-leg-colors";
 
 export type SampleStop = {
   title: string;
-  latitude: number;
-  longitude: number;
-  /** Category chip, e.g. Cà phê / Tham quan */
+  /** Omit / leave unset for rest breaks (no map pin). */
+  latitude?: number;
+  longitude?: number;
+  /** Category chip, e.g. Cà phê / Tham quan / Nghỉ ngơi */
   kind: string;
   address?: string;
   rating?: number;
   /** Visit window "HH:MM – HH:MM" */
   time: string;
-  /** Travel minutes from previous stop (0 for first). */
+  /** Travel minutes from previous map stop (0 for first visit; ignore for rest). */
   travelMin: number;
   note?: string;
+  /** Rest / break — sidebar only, not plotted on map. */
+  isRest?: boolean;
 };
 
 export type SampleTour = {
@@ -33,7 +37,7 @@ export type SampleTour = {
 
 function stop(
   partial: Omit<SampleStop, "kind" | "time" | "travelMin"> &
-    Partial<Pick<SampleStop, "kind" | "time" | "travelMin">>,
+    Partial<Pick<SampleStop, "kind" | "time" | "travelMin" | "isRest">>,
 ): SampleStop {
   return {
     kind: "Tham quan",
@@ -41,6 +45,34 @@ function stop(
     travelMin: 0,
     ...partial,
   };
+}
+
+function rest(partial: {
+  title?: string;
+  time: string;
+  note?: string;
+}): SampleStop {
+  return {
+    title: partial.title ?? "Nghỉ ngơi",
+    kind: "Nghỉ ngơi",
+    time: partial.time,
+    travelMin: 0,
+    isRest: true,
+    note: partial.note,
+  };
+}
+
+export function isSampleMapStop(s: SampleStop): boolean {
+  return (
+    !s.isRest &&
+    Number.isFinite(s.latitude) &&
+    Number.isFinite(s.longitude)
+  );
+}
+
+/** Map-plotted stops only (excludes rest). */
+export function sampleMapStops(tour: SampleTour): SampleStop[] {
+  return tour.stops.filter(isSampleMapStop);
 }
 
 const SAMPLES: SampleTour[] = [
@@ -81,8 +113,13 @@ const SAMPLES: SampleTour[] = [
         kind: "Tham quan",
         address: "Trần Phú, Đà Lạt",
         rating: 4.7,
-        time: "11:40 – 12:20",
+        time: "11:45 – 12:30",
         travelMin: 8,
+      }),
+      rest({
+        title: "Nghỉ ăn trưa",
+        time: "12:30 – 13:30",
+        note: "Buffet thời gian tự do quanh trung tâm",
       }),
       stop({
         title: "Quảng trường Lâm Viên",
@@ -91,7 +128,7 @@ const SAMPLES: SampleTour[] = [
         kind: "Check-in",
         address: "Đà Lạt, Lâm Đồng",
         rating: 4.6,
-        time: "12:30 – 13:30",
+        time: "13:45 – 14:45",
         travelMin: 7,
       }),
     ],
@@ -126,6 +163,10 @@ const SAMPLES: SampleTour[] = [
         time: "10:45 – 12:00",
         travelMin: 35,
       }),
+      rest({
+        time: "12:00 – 13:00",
+        note: "Nghỉ trưa, bổ sung nước trước khi xuống hồ",
+      }),
       stop({
         title: "Hồ Tuyền Lâm",
         latitude: 11.889,
@@ -133,7 +174,7 @@ const SAMPLES: SampleTour[] = [
         kind: "Hồ",
         address: "Phường 3, Đà Lạt",
         rating: 4.7,
-        time: "12:40 – 14:30",
+        time: "13:30 – 15:00",
         travelMin: 28,
       }),
       stop({
@@ -143,7 +184,7 @@ const SAMPLES: SampleTour[] = [
         kind: "Thiên nhiên",
         address: "Cầu Đất, Đà Lạt",
         rating: 4.4,
-        time: "15:10 – 17:00",
+        time: "15:40 – 17:15",
         travelMin: 32,
       }),
     ],
@@ -174,12 +215,17 @@ const SAMPLES: SampleTour[] = [
         time: "07:30 – 09:00",
         travelMin: 15,
       }),
+      rest({
+        title: "Nghỉ sáng / cafe",
+        time: "09:00 – 09:45",
+        note: "Ấm người sau săn mây",
+      }),
       stop({
         title: "Hồ Xuân Hương",
         latitude: 11.9415,
         longitude: 108.438,
         kind: "Công viên",
-        time: "09:30 – 11:00",
+        time: "10:00 – 11:30",
         travelMin: 18,
       }),
       stop({
@@ -187,7 +233,7 @@ const SAMPLES: SampleTour[] = [
         latitude: 11.925,
         longitude: 108.451,
         kind: "Tham quan",
-        time: "11:20 – 12:30",
+        time: "11:50 – 13:00",
         travelMin: 12,
       }),
     ],
@@ -217,12 +263,16 @@ const SAMPLES: SampleTour[] = [
         time: "10:00 – 11:15",
         travelMin: 14,
       }),
+      rest({
+        title: "Nghỉ ăn trưa",
+        time: "11:15 – 12:15",
+      }),
       stop({
         title: "Thiền Viện Trúc Lâm",
         latitude: 11.899,
         longitude: 108.436,
         kind: "Tham quan",
-        time: "11:50 – 13:00",
+        time: "12:40 – 14:00",
         travelMin: 20,
       }),
       stop({
@@ -230,7 +280,7 @@ const SAMPLES: SampleTour[] = [
         latitude: 11.889,
         longitude: 108.432,
         kind: "Hồ",
-        time: "13:20 – 15:00",
+        time: "14:20 – 16:00",
         travelMin: 10,
       }),
     ],
@@ -260,12 +310,17 @@ const SAMPLES: SampleTour[] = [
         time: "10:40 – 12:30",
         travelMin: 30,
       }),
+      rest({
+        title: "Nghỉ trưa",
+        time: "12:30 – 13:30",
+        note: "Nghỉ ven hồ trước khi về trung tâm",
+      }),
       stop({
         title: "Vườn hoa thành phố",
         latitude: 11.9428,
         longitude: 108.4412,
         kind: "Vườn hoa",
-        time: "13:10 – 14:30",
+        time: "14:00 – 15:20",
         travelMin: 25,
       }),
       stop({
@@ -273,7 +328,7 @@ const SAMPLES: SampleTour[] = [
         latitude: 11.9465,
         longitude: 108.4378,
         kind: "Công viên",
-        time: "14:50 – 16:00",
+        time: "15:40 – 16:45",
         travelMin: 8,
       }),
     ],
@@ -303,12 +358,17 @@ const SAMPLES: SampleTour[] = [
         time: "09:30 – 12:00",
         travelMin: 45,
       }),
+      rest({
+        title: "Nghỉ trưa",
+        time: "12:00 – 13:00",
+        note: "Nghỉ phục hồi sau cung đỉnh",
+      }),
       stop({
         title: "Đồi Đa Phú",
         latitude: 11.955,
         longitude: 108.418,
         kind: "View",
-        time: "12:50 – 14:00",
+        time: "13:30 – 14:45",
         travelMin: 35,
       }),
       stop({
@@ -316,8 +376,8 @@ const SAMPLES: SampleTour[] = [
         latitude: 11.889,
         longitude: 108.432,
         kind: "Hồ",
-        time: "14:40 – 16:30",
-        travelMin: 25,
+        time: "15:20 – 17:00",
+        travelMin: 28,
       }),
     ],
   },
@@ -346,12 +406,17 @@ const SAMPLES: SampleTour[] = [
         time: "10:15 – 11:30",
         travelMin: 8,
       }),
+      rest({
+        title: "Nghỉ ăn trưa",
+        time: "11:30 – 12:30",
+        note: "Ăn quanh chợ / trung tâm",
+      }),
       stop({
         title: "Chợ Đà Lạt",
         latitude: 11.9406,
         longitude: 108.437,
         kind: "Chợ",
-        time: "11:45 – 13:15",
+        time: "12:40 – 14:00",
         travelMin: 6,
       }),
       stop({
@@ -359,7 +424,7 @@ const SAMPLES: SampleTour[] = [
         latitude: 11.9408,
         longitude: 108.4425,
         kind: "Check-in",
-        time: "13:30 – 14:30",
+        time: "14:15 – 15:15",
         travelMin: 7,
       }),
     ],
@@ -389,12 +454,17 @@ const SAMPLES: SampleTour[] = [
         time: "10:15 – 11:00",
         travelMin: 8,
       }),
+      rest({
+        title: "Nghỉ cafe",
+        time: "11:00 – 12:00",
+        note: "Thời gian tự do uống cafe gần trung tâm",
+      }),
       stop({
         title: "Ga Đà Lạt",
         latitude: 11.925,
         longitude: 108.451,
         kind: "Tham quan",
-        time: "11:20 – 12:30",
+        time: "12:20 – 13:30",
         travelMin: 12,
       }),
       stop({
@@ -402,7 +472,7 @@ const SAMPLES: SampleTour[] = [
         latitude: 11.9735,
         longitude: 108.4428,
         kind: "Tham quan",
-        time: "13:10 – 15:00",
+        time: "14:10 – 16:00",
         travelMin: 22,
       }),
     ],
@@ -417,23 +487,32 @@ export function listSampleTours(): SampleTour[] {
   return SAMPLES;
 }
 
-/** Straight-segment route between hardcoded stops (no Directions API). */
+/** Crow-flies per leg with colors — only used if Mapbox Directions fails. */
 export function buildSampleRouteGeoJSON(
   stops: SampleStop[],
 ): RouteFeatureCollection | null {
-  if (stops.length < 2) return null;
-  const coordinates: [number, number][] = stops.map((s) => [
-    s.longitude,
-    s.latitude,
-  ]);
-  return {
-    type: "FeatureCollection",
-    features: [
-      {
-        type: "Feature",
-        properties: { sample: true },
-        geometry: { type: "LineString", coordinates },
+  const mapped = stops.filter(isSampleMapStop);
+  if (mapped.length < 2) return null;
+  const features: RouteFeatureCollection["features"] = [];
+  for (let i = 0; i < mapped.length - 1; i++) {
+    const a = mapped[i]!;
+    const b = mapped[i + 1]!;
+    features.push({
+      type: "Feature",
+      properties: {
+        synthetic: true,
+        legIndex: i,
+        travelKey: `travel-${i}`,
+        color: routeLegColor(i),
       },
-    ],
-  };
+      geometry: {
+        type: "LineString",
+        coordinates: [
+          [a.longitude!, a.latitude!],
+          [b.longitude!, b.latitude!],
+        ],
+      },
+    });
+  }
+  return { type: "FeatureCollection", features };
 }

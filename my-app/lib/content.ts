@@ -174,38 +174,6 @@ export const blogs = [
   },
 ] as const;
 
-export const pricingPlans = [
-  {
-    name: "Bình thường",
-    monthly: "FREE",
-    yearly: "FREE",
-    features: ["1 projects", "Analytics", "Insights Panel", "Share Features"],
-    cta: "Sign up",
-    highlight: false,
-  },
-  {
-    name: "Pro",
-    monthly: "đ59.000",
-    yearly: "đ470.000",
-    features: ["2 projects", "Analytics", "Insights Panel", "Share Features"],
-    cta: "Sign up",
-    highlight: true,
-  },
-  {
-    name: "Doanh nghiệp",
-    monthly: "đ209.000",
-    yearly: "đ1.990K",
-    features: [
-      "Unlimited Projects",
-      "Analytics",
-      "Insights Panel",
-      "Share Features",
-    ],
-    cta: "Sign up",
-    highlight: false,
-  },
-] as const;
-
 export const navLinks = [
   { label: "Về chúng tôi", href: "/about" },
   { label: "Tours", href: "/tours" },
