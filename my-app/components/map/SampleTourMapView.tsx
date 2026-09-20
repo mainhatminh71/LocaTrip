@@ -40,6 +40,36 @@ export function SampleTourMapView() {
 
   const mappedStops = useMemo(() => sampleMapStops(active), [active]);
 
+  const timelineRows = useMemo(() => {
+    return active.stops.map((stop, i) => {
+      const key = `${active.slug}-${i}`;
+      const isRest = Boolean(stop.isRest) || !isSampleMapStop(stop);
+      if (isRest) {
+        return { key, stop, isRest: true as const };
+      }
+      const prior = active.stops.slice(0, i);
+      const visitOrder =
+        prior.filter((s) => !(Boolean(s.isRest) || !isSampleMapStop(s)))
+          .length + 1;
+      const showTravel = stop.travelMin > 0;
+      const travelLegIndex =
+        prior.filter(
+          (s) =>
+            !(Boolean(s.isRest) || !isSampleMapStop(s)) && s.travelMin > 0,
+        ).length + (showTravel ? 0 : -1);
+      return {
+        key,
+        stop,
+        isRest: false as const,
+        showTravel,
+        travelLegIndex,
+        visitOrder,
+        visitKey: `${active.slug}-visit-${visitOrder - 1}`,
+        thisTravelKey: `travel-${travelLegIndex}`,
+      };
+    });
+  }, [active]);
+
   const mapStops: MapStop[] = useMemo(
     () =>
       mappedStops.map((s, i) => ({
@@ -96,9 +126,6 @@ export function SampleTourMapView() {
     setSelectedKey(null);
   }
 
-  let visitOrder = 0;
-  let travelLegIndex = -1;
-
   return (
     <div className={styles.root}>
       <aside className={styles.panel}>
@@ -115,11 +142,9 @@ export function SampleTourMapView() {
         <section className={styles.day}>
           <h2 className={styles.dayTitle}>Ngày 1</h2>
           <ul className={styles.timeline}>
-            {active.stops.map((stop, i) => {
-              const key = `${active.slug}-${i}`;
-              const isRest = Boolean(stop.isRest) || !isSampleMapStop(stop);
-
-              if (isRest) {
+            {timelineRows.map((row) => {
+              if (row.isRest) {
+                const { stop, key } = row;
                 return (
                   <li key={key}>
                     <div className={styles.restCard}>
@@ -139,14 +164,18 @@ export function SampleTourMapView() {
                 );
               }
 
-              const showTravel = stop.travelMin > 0;
-              if (showTravel) travelLegIndex += 1;
-              const thisTravelKey = `travel-${travelLegIndex}`;
+              const {
+                stop,
+                key,
+                showTravel,
+                travelLegIndex,
+                visitOrder,
+                visitKey,
+                thisTravelKey,
+              } = row;
               const legColor = routeLegColor(
                 travelLegIndex >= 0 ? travelLegIndex : 0,
               );
-              visitOrder += 1;
-              const visitKey = `${active.slug}-visit-${visitOrder - 1}`;
               const activeRow = selectedKey === visitKey;
               const travelActive = selectedTravelKey === thisTravelKey;
 

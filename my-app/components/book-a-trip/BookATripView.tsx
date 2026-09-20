@@ -392,6 +392,8 @@ export function BookATripView({
       }
       await runGenerate(loc, genOpts);
     })();
+    // Intentionally omit runGenerate/startGenerateFromGps — resume should run once per pending form.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     authLoading,
     isAuthenticated,
