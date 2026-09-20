@@ -98,11 +98,32 @@ function hostLabel(url: string): string {
   }
 }
 
+function googleMapsDirectionsUrl(opts: {
+  latitude?: number | null;
+  longitude?: number | null;
+  address?: string | null;
+  title?: string | null;
+}): string | null {
+  const lat = Number(opts.latitude);
+  const lng = Number(opts.longitude);
+  if (Number.isFinite(lat) && Number.isFinite(lng)) {
+    return `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
+  }
+  const q = [opts.title, opts.address]
+    .map((s) => (typeof s === "string" ? s.trim() : ""))
+    .filter(Boolean)
+    .join(", ");
+  if (!q) return null;
+  return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(q)}`;
+}
+
 function PlaceInfoBody({
   thumbKey,
   thumbSrc,
   title,
   address,
+  latitude,
+  longitude,
   rating,
   reviewCount,
   category,
@@ -124,6 +145,8 @@ function PlaceInfoBody({
   thumbSrc: string | null;
   title: string;
   address?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
   rating?: number | null;
   reviewCount?: number | null;
   category?: string | null;
@@ -141,6 +164,13 @@ function PlaceInfoBody({
   loading?: boolean;
   showContactEmpty?: boolean;
 }) {
+  const mapsUrl = googleMapsDirectionsUrl({
+    latitude,
+    longitude,
+    address,
+    title,
+  });
+
   return (
     <>
       {loading ? (
@@ -179,6 +209,16 @@ function PlaceInfoBody({
         ) : null}
       </div>
       {address ? <p className={styles.detailAddr}>{address}</p> : null}
+      {mapsUrl ? (
+        <a
+          className={styles.detailMapsLink}
+          href={mapsUrl}
+          target="_blank"
+          rel="noreferrer"
+        >
+          Chỉ đường trên Google Maps
+        </a>
+      ) : null}
 
       {category || price || duration || area ? (
         <div className={styles.detailMeta}>
@@ -775,6 +815,8 @@ export function PlaceStopDetail({
                 thumbSrc={rawThumb}
                 title={title || ""}
                 address={address}
+                latitude={detail?.latitude ?? stop.place.latitude}
+                longitude={detail?.longitude ?? stop.place.longitude}
                 rating={rating}
                 reviewCount={detail?.reviewCount}
                 category={category}
@@ -1039,6 +1081,12 @@ export function PlaceStopDetail({
                   title={candidate.detail?.title || candidate.alt.title || ""}
                   address={
                     candidate.detail?.address || candidate.alt.address || null
+                  }
+                  latitude={
+                    candidate.detail?.latitude ?? candidate.alt.latitude
+                  }
+                  longitude={
+                    candidate.detail?.longitude ?? candidate.alt.longitude
                   }
                   rating={
                     candidate.detail?.reviewRating ??

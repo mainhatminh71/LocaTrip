@@ -3831,6 +3831,22 @@
   line-height: 1.4;
 }
 
+.detailMapsLink {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  margin: 0;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--lt-teal);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.detailMapsLink:hover {
+  color: var(--lt-deep);
+}
+
 .detailMeta {
   display: flex;
   flex-wrap: wrap;
