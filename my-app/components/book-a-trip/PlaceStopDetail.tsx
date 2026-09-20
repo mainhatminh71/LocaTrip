@@ -160,21 +160,34 @@ function PlaceInfoBody({
         alt={title || ""}
       />
 
-      <h3>{title}</h3>
-      {address ? <p className={styles.detailAddr}>{address}</p> : null}
-
-      <div className={styles.detailMeta}>
+      <div className={styles.detailTitleRow}>
+        <h3>{title}</h3>
         {rating != null ? (
-          <span>
-            {rating.toFixed(1)}★
-            {reviewCount != null ? ` (${reviewCount})` : ""}
+          <span className={styles.detailRating}>
+            <span className={styles.detailRatingValue}>
+              {rating.toFixed(1)}
+            </span>
+            <span className={styles.detailRatingStar} aria-hidden="true">
+              ★
+            </span>
+            {reviewCount != null ? (
+              <span className={styles.detailRatingCount}>
+                ({reviewCount})
+              </span>
+            ) : null}
           </span>
         ) : null}
-        {category ? <span>{category}</span> : null}
-        {price ? <span>{price}</span> : null}
-        {duration ? <span>{duration}</span> : null}
-        {area ? <span>{area}</span> : null}
       </div>
+      {address ? <p className={styles.detailAddr}>{address}</p> : null}
+
+      {category || price || duration || area ? (
+        <div className={styles.detailMeta}>
+          {category ? <span>{category}</span> : null}
+          {price ? <span>{price}</span> : null}
+          {duration ? <span>{duration}</span> : null}
+          {area ? <span>{area}</span> : null}
+        </div>
+      ) : null}
 
       {(phone || website || menuLink || email) && !loading ? (
         <ul className={styles.placeDetailLinks}>
@@ -725,6 +738,24 @@ export function PlaceStopDetail({
           </button>
         </div>
 
+        {!readOnly ? (
+          <div className={styles.placeDetailSearchTop}>
+            <label className={styles.placeManualSearch}>
+              <span className={styles.placeManualSearchLabel}>
+                Tìm kiếm thủ công
+              </span>
+              <input
+                type="search"
+                className={styles.placeManualSearchInput}
+                placeholder="Gõ tên quán, điểm đến…"
+                value={query}
+                disabled={!!pickingKey}
+                onChange={(e) => setQuery(e.target.value)}
+              />
+            </label>
+          </div>
+        ) : null}
+
         <div
           className={`${styles.placeDetailBody}${
             candidate ? ` ${styles.placeDetailBodyTriple}` : ""
@@ -924,7 +955,7 @@ export function PlaceStopDetail({
                   !altsError &&
                   alts.length === 0 ? (
                     <p className={styles.placeDetailMuted}>
-                      Chưa có gợi ý hệ thống — thử tìm kiếm thủ công bên dưới.
+                      Chưa có gợi ý hệ thống — thử tìm kiếm thủ công bên trên.
                     </p>
                   ) : null}
                   {altsRequested && alts.length > 0 ? (
@@ -1070,22 +1101,8 @@ export function PlaceStopDetail({
           ) : null}
         </div>
 
-        <div className={styles.placeDetailFooter}>
-          {!readOnly ? (
-            <label className={styles.placeManualSearch}>
-              <span className={styles.placeManualSearchLabel}>
-                Tìm kiếm thủ công
-              </span>
-              <input
-                type="search"
-                className={styles.placeManualSearchInput}
-                placeholder="Gõ tên quán, điểm đến…"
-                value={query}
-                disabled={!!pickingKey}
-                onChange={(e) => setQuery(e.target.value)}
-              />
-            </label>
-          ) : (
+        {readOnly ? (
+          <div className={styles.placeDetailFooter}>
             <button
               type="button"
               className={styles.btnGhost}
@@ -1093,8 +1110,8 @@ export function PlaceStopDetail({
             >
               Đóng
             </button>
-          )}
-        </div>
+          </div>
+        ) : null}
       </div>
     </div>
   );

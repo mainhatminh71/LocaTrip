@@ -3478,6 +3478,18 @@
   line-height: 1.25;
 }
 
+.detailTitleRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px 10px;
+}
+
+.detailTitleRow h3 {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
 .placeDetailRoot {
   display: flex;
   flex-direction: column;
@@ -3503,6 +3515,13 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
+}
+
+.placeDetailSearchTop {
+  flex: 0 0 auto;
+  padding: 0 16px 12px;
+  border-bottom: 1px solid color-mix(in srgb, var(--lt-ink) 8%, transparent);
+  background: #fff;
 }
 
 .placeDetailFooter {
@@ -3819,6 +3838,34 @@
   font-size: 12px;
   font-weight: 650;
   color: var(--lt-ink);
+}
+
+.detailRating {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: baseline;
+  gap: 3px;
+  font-family: var(--lt-font-display);
+  font-size: 1.3rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+  color: var(--lt-deep);
+  white-space: nowrap;
+}
+
+.detailRatingStar {
+  font-size: 1.05em;
+  line-height: 1;
+  color: #e6a100;
+}
+
+.detailRatingCount {
+  font-family: inherit;
+  font-size: 0.72em;
+  font-weight: 650;
+  letter-spacing: 0;
+  color: var(--lt-muted);
 }
 
 .tagChipRow {
