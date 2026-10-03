@@ -88,6 +88,7 @@ jobs:
           NEXT_PUBLIC_MAPBOX_STYLE: mapbox://styles/mapbox/outdoors-v12
           LOCALTRIP_USE_PUBLIC_API: "true"
           LOCALTRIP_PUBLIC_API_URL: https://api.locatrip.app
+          LOCALTRIP_PAYMENT_SERVICE_URL: https://localtrip-paymentservice-production.up.railway.app
 
   deploy:
     name: Deploy to Cloudflare Workers
@@ -136,6 +137,7 @@ jobs:
           NEXT_PUBLIC_MAPBOX_STYLE: mapbox://styles/mapbox/outdoors-v12
           LOCALTRIP_USE_PUBLIC_API: "true"
           LOCALTRIP_PUBLIC_API_URL: https://api.locatrip.app
+          LOCALTRIP_PAYMENT_SERVICE_URL: https://localtrip-paymentservice-production.up.railway.app
 
       - name: Deploy
         run: npm run deploy:cf
@@ -150,6 +152,7 @@ jobs:
           NEXT_PUBLIC_MAPBOX_STYLE: mapbox://styles/mapbox/outdoors-v12
           LOCALTRIP_USE_PUBLIC_API: "true"
           LOCALTRIP_PUBLIC_API_URL: https://api.locatrip.app
+          LOCALTRIP_PAYMENT_SERVICE_URL: https://localtrip-paymentservice-production.up.railway.app
 
   deploy-staging:
     name: Deploy staging to Cloudflare Workers
@@ -212,6 +215,7 @@ jobs:
           NEXT_PUBLIC_MAPBOX_STYLE: mapbox://styles/mapbox/outdoors-v12
           LOCALTRIP_USE_PUBLIC_API: "true"
           LOCALTRIP_PUBLIC_API_URL: https://api.locatrip.app
+          LOCALTRIP_PAYMENT_SERVICE_URL: https://localtrip-paymentservice-production.up.railway.app
 
       - name: Deploy staging
         run: npm run deploy:cf:staging
@@ -226,3 +230,4 @@ jobs:
           NEXT_PUBLIC_MAPBOX_STYLE: mapbox://styles/mapbox/outdoors-v12
           LOCALTRIP_USE_PUBLIC_API: "true"
           LOCALTRIP_PUBLIC_API_URL: https://api.locatrip.app
+          LOCALTRIP_PAYMENT_SERVICE_URL: https://localtrip-paymentservice-production.up.railway.app

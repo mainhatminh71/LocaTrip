@@ -57,8 +57,8 @@ assert.equal(
     },
     "payment",
   ),
-  "https://example.up.railway.app",
-  "custom gateway used for payment too",
+  LOCALTRIP_PAYMENT_SERVICE_DEFAULT,
+  "public gateway does not override payment → Railway payment",
 );
 
 assert.equal(
@@ -78,8 +78,8 @@ assert.equal(
     },
     "payment",
   ),
-  "https://api.locatrip.app",
-  "DO gateway → payment (same single URL)",
+  LOCALTRIP_PAYMENT_SERVICE_DEFAULT,
+  "DO gateway → payment stays Railway",
 );
 
 assert.equal(

@@ -41,9 +41,10 @@ function stripTrailingSlash(url: string): string {
  *
  * Priority:
  * 1. `LOCALTRIP_USE_PUBLIC_API` truthy:
- *    - If `LOCALTRIP_PUBLIC_API_URL` is set and ≠ dead gateway default → single gateway
- *    - Else per-service: payment (payments + wallet) → PAYMENT URL;
- *      trip (default) → TRIP URL
+ *    - payment (payments + wallet) → always PAYMENT Railway URL
+ *      (DO gateway does not route `/payments` / `/wallet` yet)
+ *    - trip: if `LOCALTRIP_PUBLIC_API_URL` set and ≠ dead gateway default → that URL
+ *      else → TRIP Railway URL
  * 2. `LOCALTRIP_API_URL` / `API_BASE_URL` / `NEXT_PUBLIC_API_BASE_URL` (gateway)
  * 3. `http://localhost` (Nginx gateway)
  */
@@ -52,6 +53,13 @@ export function resolveUpstreamBase(
   kind: UpstreamKind = "trip",
 ): string {
   if (truthy(env.LOCALTRIP_USE_PUBLIC_API)) {
+    if (kind === "payment") {
+      return stripTrailingSlash(
+        env.LOCALTRIP_PAYMENT_SERVICE_URL?.trim() ||
+          LOCALTRIP_PAYMENT_SERVICE_DEFAULT,
+      );
+    }
+
     const pub = env.LOCALTRIP_PUBLIC_API_URL?.trim();
     if (
       pub &&
@@ -59,13 +67,6 @@ export function resolveUpstreamBase(
         stripTrailingSlash(LOCALTRIP_PUBLIC_API_DEFAULT)
     ) {
       return stripTrailingSlash(pub);
-    }
-
-    if (kind === "payment") {
-      return stripTrailingSlash(
-        env.LOCALTRIP_PAYMENT_SERVICE_URL?.trim() ||
-          LOCALTRIP_PAYMENT_SERVICE_DEFAULT,
-      );
     }
 
     return stripTrailingSlash(

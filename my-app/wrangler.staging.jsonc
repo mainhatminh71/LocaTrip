@@ -10,9 +10,10 @@
     "binding": "ASSETS"
   },
   "vars": {
-    // Same DO gateway as prod (Caddy → Nginx → trip/auth services)
+    // Trip/auth via DO gateway; payment/wallet still Railway (same as prod)
     "LOCALTRIP_USE_PUBLIC_API": "true",
-    "LOCALTRIP_PUBLIC_API_URL": "https://api.locatrip.app"
+    "LOCALTRIP_PUBLIC_API_URL": "https://api.locatrip.app",
+    "LOCALTRIP_PAYMENT_SERVICE_URL": "https://localtrip-paymentservice-production.up.railway.app"
   },
   "services": [
     {
