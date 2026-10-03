@@ -20,8 +20,9 @@
     "binding": "ASSETS"
   },
   "vars": {
-    // Toggle: public Railway LocalTrip API for locatrip.app Workers
-    "LOCALTRIP_USE_PUBLIC_API": "true"
+    // DigitalOcean API gateway (Caddy → Nginx → trip/auth services)
+    "LOCALTRIP_USE_PUBLIC_API": "true",
+    "LOCALTRIP_PUBLIC_API_URL": "https://api.locatrip.app"
   },
   "services": [
     {

@@ -10,8 +10,9 @@
     "binding": "ASSETS"
   },
   "vars": {
-    // Public Railway LocalTrip API (same as prod; Next proxies per-service)
-    "LOCALTRIP_USE_PUBLIC_API": "true"
+    // Same DO gateway as prod (Caddy → Nginx → trip/auth services)
+    "LOCALTRIP_USE_PUBLIC_API": "true",
+    "LOCALTRIP_PUBLIC_API_URL": "https://api.locatrip.app"
   },
   "services": [
     {

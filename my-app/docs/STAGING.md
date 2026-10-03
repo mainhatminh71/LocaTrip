@@ -37,4 +37,4 @@ OpenNext does not fully support Windows without Developer Mode or WSL.
 
 ## Ongoing
 
-Every push to `staging` runs lint/build and auto-deploys staging. Same Railway public APIs as prod (`LOCALTRIP_USE_PUBLIC_API`).
+Every push to `staging` runs lint/build and auto-deploys staging. Staging and prod Workers proxy to the DigitalOcean gateway (`LOCALTRIP_PUBLIC_API_URL=https://api.locatrip.app`).

@@ -64,6 +64,27 @@ assert.equal(
 assert.equal(
   resolveUpstreamBase({
     LOCALTRIP_USE_PUBLIC_API: "true",
+    LOCALTRIP_PUBLIC_API_URL: "https://api.locatrip.app",
+  }),
+  "https://api.locatrip.app",
+  "DO gateway → trip",
+);
+
+assert.equal(
+  resolveUpstreamBase(
+    {
+      LOCALTRIP_USE_PUBLIC_API: "true",
+      LOCALTRIP_PUBLIC_API_URL: "https://api.locatrip.app/",
+    },
+    "payment",
+  ),
+  "https://api.locatrip.app",
+  "DO gateway → payment (same single URL)",
+);
+
+assert.equal(
+  resolveUpstreamBase({
+    LOCALTRIP_USE_PUBLIC_API: "true",
     LOCALTRIP_PUBLIC_API_URL: LOCALTRIP_PUBLIC_API_DEFAULT,
   }),
   LOCALTRIP_TRIP_SERVICE_DEFAULT,
