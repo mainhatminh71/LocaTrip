@@ -1000,25 +1000,17 @@ export function BookATripView({
         dayBlock.schedule || [],
       );
 
-      const previousVisits = visitItems(scheduleWithHours)
-        .map((v) => {
-          const placeId = v.place?.placeId?.trim() || "";
-          if (!placeId) return null;
-          return {
+      const previousVisits = visitItems(scheduleWithHours).flatMap((v) => {
+        const placeId = v.place?.placeId?.trim() || "";
+        if (!placeId) return [];
+        return [
+          {
             placeId,
             title: visitDisplayTitle(v.place || {}),
             openHours: v.place?.openHours,
-          };
-        })
-        .filter(
-          (
-            v,
-          ): v is {
-            placeId: string;
-            title: string;
-            openHours?: unknown;
-          } => v != null,
-        );
+          },
+        ];
+      });
 
       const preview = await previewReorderDay({
         schedule: scheduleWithHours,
