@@ -234,6 +234,50 @@ export function clearRouteGeometry(option: ItineraryOption): ItineraryOption {
   return next;
 }
 
+/** Replace one day's schedule (e.g. after reorder-day preview confirm). */
+export function applyDaySchedule(
+  option: ItineraryOption,
+  dayNumber: number,
+  schedule: ScheduleItem[],
+): ItineraryOption {
+  let next = cloneOption(option);
+  const dayBlock = next.itinerary.find((d) => d.day === dayNumber);
+  if (!dayBlock) return option;
+  dayBlock.schedule = schedule;
+  next = clearRouteGeometry(next);
+  return next;
+}
+
+/** Visit placeIds in schedule order for one day. */
+export function visitOrderForDay(schedule: ScheduleItem[]): string[] {
+  return visitItems(schedule)
+    .map((v) => v.place?.placeId?.trim())
+    .filter((id): id is string => Boolean(id));
+}
+
+/**
+ * Move visit `fromPlaceId` to sit before/after `toPlaceId` within the same day.
+ * Returns new visitOrder or null if invalid / unchanged.
+ */
+export function reorderVisitIds(
+  visitOrder: string[],
+  fromPlaceId: string,
+  toPlaceId: string,
+  placeAfter: boolean,
+): string[] | null {
+  if (fromPlaceId === toPlaceId) return null;
+  const from = visitOrder.indexOf(fromPlaceId);
+  const to = visitOrder.indexOf(toPlaceId);
+  if (from < 0 || to < 0) return null;
+  const next = [...visitOrder];
+  next.splice(from, 1);
+  const insertAt = next.indexOf(toPlaceId);
+  if (insertAt < 0) return null;
+  next.splice(placeAfter ? insertAt + 1 : insertAt, 0, fromPlaceId);
+  if (next.every((id, i) => id === visitOrder[i])) return null;
+  return next;
+}
+
 export function swapVisitPlace(
   option: ItineraryOption,
   day: number,
@@ -262,6 +306,8 @@ export function swapVisitPlace(
     latitude: lat,
     longitude: lng,
     tags: alt.tags ?? item.place.tags,
+    // Force enrich to pull the new place thumbnail after swap.
+    thumbnail: undefined,
   };
   // Alternatives were relative to the old place — drop them after swap.
   item.topAlternatives = [];
@@ -344,10 +390,17 @@ export async function enrichItineraryCoords(
   itinerary: DayItinerary[],
   fetchPlace: (
     placeId: string,
-  ) => Promise<{ latitude?: number; longitude?: number } | null>,
+  ) => Promise<{
+    latitude?: number;
+    longitude?: number;
+    thumbnail?: string;
+  } | null>,
 ): Promise<DayItinerary[]> {
   const next = structuredClone(itinerary);
-  const cache = new Map<string, { latitude?: number; longitude?: number } | null>();
+  const cache = new Map<
+    string,
+    { latitude?: number; longitude?: number; thumbnail?: string } | null
+  >();
 
   const tasks: Promise<void>[] = [];
   for (const day of next) {
@@ -359,8 +412,11 @@ export async function enrichItineraryCoords(
       if (existingLat != null && existingLng != null) {
         item.place.latitude = existingLat;
         item.place.longitude = existingLng;
-        continue;
       }
+
+      const needsCoords = existingLat == null || existingLng == null;
+      const needsThumb = !item.place.thumbnail?.trim();
+      if (!needsCoords && !needsThumb) continue;
 
       const placeId = item.place.placeId?.trim();
       if (!placeId) continue;
@@ -378,9 +434,13 @@ export async function enrichItineraryCoords(
           }
           const lat = toFiniteNumber(hit?.latitude);
           const lng = toFiniteNumber(hit?.longitude);
-          if (lat != null && lng != null) {
+          if (needsCoords && lat != null && lng != null) {
             item.place.latitude = lat;
             item.place.longitude = lng;
+          }
+          const thumb = hit?.thumbnail?.trim();
+          if (needsThumb && thumb) {
+            item.place.thumbnail = thumb;
           }
         })(),
       );

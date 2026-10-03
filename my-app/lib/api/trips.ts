@@ -663,6 +663,54 @@ export async function suggestReplaceForTrip(
   return { alternatives, charged, fromCache };
 }
 
+export type DayReorderStats = {
+  totalTravelMin: number;
+  totalDistanceKm: number;
+  dayStart: string | null;
+  dayEnd: string | null;
+  visitCount: number;
+  overtime: boolean;
+};
+
+export type ReorderDayPreviewBody = {
+  schedule: ScheduleItem[];
+  visitOrder: string[];
+  startCoords: { latitude: number; longitude: number };
+  startTimePerDay?: string;
+  endTimePerDay?: string;
+  showRoad?: boolean;
+};
+
+export type ReorderDayPreviewResult = {
+  before: DayReorderStats;
+  after: DayReorderStats;
+  schedule: ScheduleItem[];
+  visitOrder: string[];
+  warnings: { type: string; message: string; placeId?: string }[];
+};
+
+/** Preview same-day visit reorder → `POST /trips/reorder-day/preview` (no persist). */
+export async function previewReorderDay(
+  body: ReorderDayPreviewBody,
+): Promise<ReorderDayPreviewResult> {
+  const res = await apiFetch("/api/trips/reorder-day/preview", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+    cache: "no-store",
+  });
+  const data = (await res.json()) as ReorderDayPreviewResult & {
+    error?: string;
+  };
+  if (!res.ok) {
+    throw new ApiError(data.error || (await readError(res)), res.status);
+  }
+  if (!Array.isArray(data.schedule) || !data.before || !data.after) {
+    throw new ApiError("Server không trả về kết quả sắp xếp ngày", 502);
+  }
+  return data;
+}
+
 /** Persist stop replacement → `PUT /trips/:tripId/replace-place`. */
 export async function replacePlaceInTrip(
   tripId: string,
