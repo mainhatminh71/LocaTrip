@@ -89,3 +89,11 @@ export function visitDisplayTitle(place: TripPlace | PlaceLike): string {
   return "Nghỉ ngơi";
 }
 
+/** Soft break / filler stop — no real POI, no thumbnail. */
+export function isRestStop(place: TripPlace | PlaceLike): boolean {
+  const title = "title" in place ? place.title?.trim().toLowerCase() : "";
+  if (title === "nghỉ ngơi" || title === "nghi ngoi") return true;
+  if (title && GENERIC_STOP_TITLES.has(title)) return true;
+  return visitDisplayTitle(place) === "Nghỉ ngơi";
+}
+

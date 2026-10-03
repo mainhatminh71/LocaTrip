@@ -29,7 +29,7 @@ export function HeroSection({
   showTrustRow = true,
 }: HeroProps) {
   const heroRef = useRef<HTMLElement | null>(null);
-  const inView = useInView(heroRef, { amount: 0.2, once: false });
+  const inView = useInView(heroRef, { amount: 0.2, once: true });
 
   const thumbs = [
     {
@@ -122,8 +122,8 @@ export function HeroSection({
       ))}
 
       <motion.div
-        initial={inView ? { opacity: 0, y: 18 } : false}
-        animate={{ opacity: 1, y: 0 }}
+        initial={{ opacity: 0, y: 18 }}
+        animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 18 }}
         transition={{ duration: 0.7 }}
         className="relative z-[2] flex w-full max-w-[980px] flex-col justify-end gap-6 p-[clamp(16px,3vw,28px)] pt-[clamp(88px,14vh,120px)]"
       >

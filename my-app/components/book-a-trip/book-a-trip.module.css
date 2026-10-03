@@ -3626,11 +3626,12 @@
 }
 
 .placeThumbImg {
+  position: absolute;
+  inset: 0;
   display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: opacity 0.28s ease;
 }
 
 .placeThumbSkeleton {
@@ -4108,6 +4109,14 @@
   line-height: 1.35 !important;
 }
 
+.visitWarnClosed {
+  margin: 2px 0 0 !important;
+  font-size: 12px !important;
+  font-weight: 700;
+  color: #c2410c !important;
+  line-height: 1.35 !important;
+}
+
 .stopRow,
 .stopRowActive {
   appearance: none;
@@ -4508,6 +4517,150 @@
 }
 
 /* —— Same-day reorder —— */
+.reorderPickerSheet {
+  width: min(420px, 100%);
+  gap: 16px;
+}
+
+.reorderPickerHead {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.reorderPickerEyebrow {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--lt-muted);
+}
+
+.reorderPickerSheet h3 {
+  margin: 0;
+  font-family: var(--lt-font-display);
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--lt-deep);
+}
+
+.reorderPickerSub {
+  margin: 0;
+  font-size: 13px;
+  color: var(--lt-muted);
+  line-height: 1.4;
+}
+
+.reorderPickerSub strong {
+  color: var(--lt-ink);
+  font-weight: 700;
+}
+
+.reorderPickerSection {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.reorderPickerSection h4 {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--lt-muted);
+}
+
+.reorderPosGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.reorderPosBtn,
+.reorderPosBtnActive {
+  min-width: 44px;
+  height: 36px;
+  padding: 0 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(1, 40, 48, 0.12);
+  background: #fff;
+  color: var(--lt-deep);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.reorderPosBtn:hover:not(:disabled) {
+  border-color: rgba(1, 40, 48, 0.35);
+  background: rgba(1, 40, 48, 0.04);
+}
+
+.reorderPosBtnActive,
+.reorderPosBtn:disabled {
+  opacity: 0.45;
+  cursor: default;
+  background: rgba(1, 40, 48, 0.06);
+}
+
+.reorderSwapList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 240px;
+  overflow-y: auto;
+}
+
+.reorderSwapBtn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-align: left;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(1, 40, 48, 0.1);
+  background: #fff;
+  cursor: pointer;
+  color: var(--lt-ink);
+}
+
+.reorderSwapBtn:hover:not(:disabled) {
+  border-color: rgba(1, 40, 48, 0.28);
+  background: rgba(1, 40, 48, 0.03);
+}
+
+.reorderSwapBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.reorderSwapNum {
+  flex: 0 0 auto;
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--lt-deep);
+}
+
+.reorderSwapTitle {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: 14px;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.reorderPickerActions {
+  display: flex;
+  justify-content: flex-end;
+}
+
 .reorderConfirmSheet h3 {
   margin: 0;
   font-family: var(--lt-font-display);
@@ -4519,6 +4672,77 @@
 .reorderNote {
   margin: 0;
   font-size: 13px;
+  color: var(--lt-muted);
+}
+
+.reorderChanges {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 12px;
+  border-radius: 12px;
+  background: rgba(1, 40, 48, 0.04);
+  border: 1px solid rgba(1, 40, 48, 0.08);
+}
+
+.reorderChangesTitle {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--lt-muted);
+}
+
+.reorderSwapLine {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--lt-ink);
+}
+
+.reorderChangeList,
+.reorderSlotList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.reorderChangeList li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--lt-ink);
+}
+
+.reorderPosDelta {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--lt-deep);
+  font-variant-numeric: tabular-nums;
+}
+
+.reorderSlotList li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--lt-ink);
+  line-height: 1.4;
+}
+
+.reorderSlotFrom {
+  color: var(--lt-muted);
+  text-decoration: line-through;
+  text-decoration-thickness: 1px;
+}
+
+.reorderSlotArrow {
   color: var(--lt-muted);
 }
 
@@ -4539,6 +4763,25 @@
   color: var(--lt-ink);
 }
 
+.reorderVisitMoved {
+  font-weight: 600;
+}
+
+.reorderVisitText {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+}
+
+.reorderVisitWas {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--lt-muted);
+  font-variant-numeric: tabular-nums;
+}
+
 .reorderVisitIdx {
   flex: 0 0 22px;
   height: 22px;
@@ -4550,10 +4793,33 @@
   font-weight: 700;
 }
 
+.reorderVisitMoved .reorderVisitIdx {
+  background: rgba(1, 40, 48, 0.14);
+  color: var(--lt-deep);
+}
+
 .reorderVisitMore {
   color: var(--lt-muted);
   font-size: 13px;
   padding-left: 32px;
+}
+
+.reorderVisitMoreBtn {
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--lt-deep);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+.reorderVisitMoreBtn:hover {
+  color: var(--lt-teal, #0a6b7c);
 }
 
 .reorderStatsTable {
@@ -4591,6 +4857,56 @@
   gap: 4px;
 }
 
+.reorderWarningClosed {
+  color: #b45309;
+  font-weight: 600;
+}
+
+.reorderHoursOk {
+  font-size: 11px;
+  font-weight: 600;
+  color: #166534;
+  font-variant-numeric: tabular-nums;
+}
+
+.reorderHoursBad {
+  font-size: 11px;
+  font-weight: 700;
+  color: #c2410c;
+}
+
+.reorderOpenHours {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  border-radius: 12px;
+  background: rgba(194, 65, 12, 0.06);
+  border: 1px solid rgba(194, 65, 12, 0.18);
+}
+
+.reorderOpenHoursList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--lt-ink);
+}
+
+.reorderOpenHoursList li {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+  align-items: baseline;
+}
+
+.reorderOpenHoursList li span {
+  color: #9a3412;
+}
+
 .reorderOk {
   margin: 0;
   font-size: 13px;
@@ -4607,10 +4923,19 @@
 
 .visitItemDraggable {
   position: relative;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+}
+
+.visitItemDraggable:active {
+  cursor: grabbing;
 }
 
 .visitItemDragging {
   opacity: 0.55;
+  cursor: grabbing;
 }
 
 .visitItemDragOver {
@@ -4624,33 +4949,45 @@
   width: 28px;
   height: 28px;
   margin: 0;
-  border: none;
+}
+
+.reorderBtn {
+  flex: 0 0 auto;
+  align-self: center;
+  width: 28px;
+  height: 28px;
+  margin: 0;
+  padding: 0;
+  border: 1px solid rgba(1, 40, 48, 0.12);
   border-radius: 8px;
-  background: transparent;
-  color: var(--lt-muted);
-  cursor: grab;
-  font-size: 14px;
-  line-height: 1;
+  background: #fff;
+  color: var(--lt-deep);
   display: grid;
   place-items: center;
-  user-select: none;
-  -webkit-user-select: none;
-  touch-action: none;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
 }
 
-.dragHandle:active {
-  cursor: grabbing;
-}
-
-.dragHandle:hover {
+.reorderBtn:hover:not(:disabled) {
   background: rgba(1, 40, 48, 0.06);
-  color: var(--lt-deep);
+  border-color: rgba(1, 40, 48, 0.28);
 }
 
-.dragHandle[aria-disabled="true"] {
-  opacity: 0.35;
+.reorderBtn:disabled {
+  opacity: 0.45;
   cursor: not-allowed;
-  pointer-events: none;
+}
+
+.reorderBtnIcon {
+  display: grid;
+  place-items: center;
+  line-height: 0;
+}
+
+.visitItemDraggable[aria-disabled="true"],
+.visitItemDraggable[data-candrag="false"] {
+  cursor: default;
+  touch-action: auto;
 }
 
 .reorderLoadingNote {

@@ -36,6 +36,8 @@ export type TripPlace = {
   longitude?: number;
   tags?: string[];
   thumbnail?: string;
+  /** Opening hours map/array when enriched from place detail. */
+  openHours?: unknown;
 };
 
 export type AlternativePlaceSuggestion = {

@@ -2,7 +2,14 @@
 
 import Image from "next/image";
 import { LT_IMAGE_QUALITY } from "@/lib/image-quality";
-import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+} from "react";
+import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   createSavedTrip,
@@ -24,6 +31,7 @@ import {
   type SavedTrip,
 } from "@/lib/api/trips";
 import { isPaidSuggestSlot } from "@/lib/paid-suggest-slots";
+import { enrichScheduleOpenHours } from "@/lib/enrich-open-hours";
 import { ApiError } from "@/lib/api/http";
 import { COSTS, withXuCost } from "@/lib/api/wallet";
 import {
@@ -71,10 +79,12 @@ import {
   hasCompleteTravelGeometry,
   isSyntheticRoute,
   listTravelKeys,
+  moveVisitToIndex,
   reorderVisitIds,
   routeWaypoints,
   stopsForMap,
   summarizeOptionForCard,
+  swapVisitIds,
   swapVisitPlace,
   visitItems,
   visitOrderForDay,
@@ -82,7 +92,11 @@ import {
 } from "@/lib/itinerary-map";
 import { fetchDrivingRouteGeoJSON } from "@/lib/mapbox-directions";
 import { routeLegColor } from "@/lib/route-leg-colors";
-import { visitDisplayTitle, visitKindLabel } from "@/lib/place-type";
+import {
+  isRestStop,
+  visitDisplayTitle,
+  visitKindLabel,
+} from "@/lib/place-type";
 import { useAuthActions } from "@/components/auth/useAuthActions";
 import { TripWeatherAdvisoryWidget } from "@/components/weather/TripWeatherAdvisoryWidget";
 import { useAuthModal } from "@/components/auth/AuthModalProvider";
@@ -95,6 +109,10 @@ import { LtBrandLoader, LtButtonLoading } from "./LtBrandLoader";
 import { PlaceStopDetail } from "./PlaceStopDetail";
 import { ReplacePlaceModal } from "./ReplacePlaceModal";
 import { ReorderDayConfirmModal } from "./ReorderDayConfirmModal";
+import {
+  ReorderVisitPickerModal,
+  type ReorderPickerVisit,
+} from "./ReorderVisitPickerModal";
 import { PlaceThumb } from "./PlaceThumb";
 import styles from "./book-a-trip.module.css";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -152,6 +170,16 @@ export function BookATripView({
   const [reorderPreview, setReorderPreview] = useState<{
     dayNumber: number;
     preview: ReorderDayPreviewResult;
+    previousVisits: {
+      placeId: string;
+      title: string;
+      openHours?: unknown;
+    }[];
+    tripDate?: string;
+  } | null>(null);
+  const [reorderPicker, setReorderPicker] = useState<{
+    dayNumber: number;
+    placeId: string;
   } | null>(null);
   const [reorderLoading, setReorderLoading] = useState(false);
   const [reorderApplying, setReorderApplying] = useState(false);
@@ -967,8 +995,33 @@ export function BookATripView({
         }
       }
 
+      const tripDate = draft.date?.trim().slice(0, 10) || undefined;
+      const scheduleWithHours = await enrichScheduleOpenHours(
+        dayBlock.schedule || [],
+      );
+
+      const previousVisits = visitItems(scheduleWithHours)
+        .map((v) => {
+          const placeId = v.place?.placeId?.trim() || "";
+          if (!placeId) return null;
+          return {
+            placeId,
+            title: visitDisplayTitle(v.place || {}),
+            openHours: v.place?.openHours,
+          };
+        })
+        .filter(
+          (
+            v,
+          ): v is {
+            placeId: string;
+            title: string;
+            openHours?: unknown;
+          } => v != null,
+        );
+
       const preview = await previewReorderDay({
-        schedule: dayBlock.schedule || [],
+        schedule: scheduleWithHours,
         visitOrder: nextVisitOrder,
         startCoords: {
           latitude: start.latitude,
@@ -977,8 +1030,10 @@ export function BookATripView({
         startTimePerDay,
         endTimePerDay,
         showRoad: draft.showRoad !== false,
+        tripDate,
+        dayNumber,
       });
-      setReorderPreview({ dayNumber, preview });
+      setReorderPreview({ dayNumber, preview, previousVisits, tripDate });
     } catch (err) {
       let msg =
         err instanceof ApiError
@@ -999,6 +1054,63 @@ export function BookATripView({
       setReorderLoading(false);
       clearDragState();
     }
+  }
+
+  function dayReorderVisits(dayNumber: number): ReorderPickerVisit[] {
+    const dayBlock = selectedOption?.itinerary.find((d) => d.day === dayNumber);
+    if (!dayBlock) return [];
+    return visitItems(dayBlock.schedule || [])
+      .map((v, index) => {
+        const placeId = v.place?.placeId?.trim() || "";
+        if (!placeId) return null;
+        return {
+          placeId,
+          title: visitDisplayTitle(v.place || {}),
+          index,
+        };
+      })
+      .filter((v): v is ReorderPickerVisit => v != null);
+  }
+
+  function openReorderPicker(dayNumber: number, placeId: string) {
+    if (!placeId || reorderLoading) return;
+    if (!isAuthenticated) {
+      openAuth();
+      return;
+    }
+    const visits = dayReorderVisits(dayNumber);
+    if (visits.length < 2) {
+      toastError("Cần ít nhất 2 địa điểm trong ngày để đổi thứ tự.");
+      return;
+    }
+    if (!visits.some((v) => v.placeId === placeId)) return;
+    setReorderPicker({ dayNumber, placeId });
+  }
+
+  async function applyPickerMoveToIndex(toIndex: number) {
+    if (!reorderPicker) return;
+    const { dayNumber, placeId } = reorderPicker;
+    const order = dayReorderVisits(dayNumber).map((v) => v.placeId);
+    const next = moveVisitToIndex(order, placeId, toIndex);
+    if (!next) {
+      setReorderPicker(null);
+      return;
+    }
+    await requestReorderDayPreview(dayNumber, next);
+    setReorderPicker(null);
+  }
+
+  async function applyPickerSwapWith(otherPlaceId: string) {
+    if (!reorderPicker) return;
+    const { dayNumber, placeId } = reorderPicker;
+    const order = dayReorderVisits(dayNumber).map((v) => v.placeId);
+    const next = swapVisitIds(order, placeId, otherPlaceId);
+    if (!next) {
+      setReorderPicker(null);
+      return;
+    }
+    await requestReorderDayPreview(dayNumber, next);
+    setReorderPicker(null);
   }
 
   async function confirmReorderDay() {
@@ -1949,6 +2061,36 @@ export function BookATripView({
                               className={`${styles.visitItem} ${styles.visitItemDraggable}${
                                 dragging ? ` ${styles.visitItemDragging}` : ""
                               }${dragOver ? ` ${styles.visitItemDragOver}` : ""}`}
+                              data-candrag={canDrag ? "true" : "false"}
+                              draggable={canDrag}
+                              aria-grabbed={dragging || undefined}
+                              onDragStart={(e) => {
+                                if (!canDrag) {
+                                  e.preventDefault();
+                                  return;
+                                }
+                                const target = e.target as HTMLElement | null;
+                                if (target?.closest?.("[data-no-drag]")) {
+                                  e.preventDefault();
+                                  return;
+                                }
+                                dragDropConsumedRef.current = false;
+                                const payload = {
+                                  day: day.day,
+                                  placeId,
+                                };
+                                dragVisitRef.current = payload;
+                                setDragVisit(payload);
+                                e.dataTransfer.effectAllowed = "move";
+                                e.dataTransfer.setData("text/plain", placeId);
+                              }}
+                              onDragEnd={() => {
+                                if (!dragDropConsumedRef.current) {
+                                  clearDragState();
+                                } else {
+                                  dragDropConsumedRef.current = false;
+                                }
+                              }}
                               onDragOver={(e) => {
                                 const drag = dragVisitRef.current;
                                 if (!canDrag || !drag) return;
@@ -1991,56 +2133,50 @@ export function BookATripView({
                               }}
                             >
                               <div className={styles.visitDragRow}>
-                                <span
+                                {canDrag ? (
+                                  <button
+                                    type="button"
+                                    data-no-drag
+                                    className={styles.reorderBtn}
+                                    aria-label={`Đổi thứ tự: ${title}`}
+                                    title="Đổi thứ tự địa điểm"
+                                    disabled={reorderLoading}
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      openReorderPicker(day.day, placeId);
+                                    }}
+                                    onPointerDown={(e) => e.stopPropagation()}
+                                  >
+                                    <span className={styles.reorderBtnIcon} aria-hidden="true">
+                                      <svg width="15" height="15" viewBox="0 0 16 16" fill="none">
+                                        <path
+                                          d="M5 2.5v11M5 2.5L3 4.75M5 2.5L7 4.75M11 13.5V2.5M11 13.5L9 11.25M11 13.5L13 11.25"
+                                          stroke="currentColor"
+                                          strokeWidth="1.5"
+                                          strokeLinecap="round"
+                                          strokeLinejoin="round"
+                                        />
+                                      </svg>
+                                    </span>
+                                  </button>
+                                ) : (
+                                  <span className={styles.dragHandle} aria-hidden="true" />
+                                )}
+                                <div
                                   role="button"
-                                  tabIndex={canDrag ? 0 : -1}
-                                  className={styles.dragHandle}
-                                  draggable={canDrag}
-                                  aria-disabled={!canDrag}
-                                  aria-label={`Kéo để đổi thứ tự: ${title}`}
-                                  title="Kéo để đổi thứ tự trong ngày"
-                                  onDragStart={(e) => {
-                                    if (!canDrag) {
-                                      e.preventDefault();
-                                      return;
-                                    }
-                                    dragDropConsumedRef.current = false;
-                                    const payload = {
-                                      day: day.day,
-                                      placeId,
-                                    };
-                                    dragVisitRef.current = payload;
-                                    setDragVisit(payload);
-                                    e.dataTransfer.effectAllowed = "move";
-                                    e.dataTransfer.setData(
-                                      "text/plain",
-                                      placeId,
-                                    );
-                                  }}
-                                  onDragEnd={() => {
-                                    if (!dragDropConsumedRef.current) {
-                                      clearDragState();
-                                    } else {
-                                      dragDropConsumedRef.current = false;
-                                    }
-                                  }}
-                                  onClick={(e) => e.stopPropagation()}
-                                  onKeyDown={(e) => {
-                                    if (e.key === "Enter" || e.key === " ") {
-                                      e.preventDefault();
-                                    }
-                                  }}
-                                >
-                                  ⠿
-                                </span>
-                                <button
-                                  type="button"
+                                  tabIndex={0}
                                   className={
                                     active
                                       ? styles.stopRowActive
                                       : styles.stopRow
                                   }
                                   onClick={() => selectStop(key)}
+                                  onKeyDown={(e) => {
+                                    if (e.key === "Enter" || e.key === " ") {
+                                      e.preventDefault();
+                                      selectStop(key);
+                                    }
+                                  }}
                                 >
                                   <span className={styles.time}>
                                     {item.time}
@@ -2090,18 +2226,27 @@ export function BookATripView({
                                       </div>
                                     ) : null}
                                     {item.warning?.message ? (
-                                      <p className={styles.visitWarn}>
+                                      <p
+                                        className={
+                                          item.warning.type === "CLOSED" ||
+                                          item.warning.type === "CLOSES_EARLY"
+                                            ? styles.visitWarnClosed
+                                            : styles.visitWarn
+                                        }
+                                      >
                                         {item.warning.message}
                                       </p>
                                     ) : null}
                                   </div>
-                                  <PlaceThumb
-                                    src={item.place?.thumbnail}
-                                    alt={title}
-                                    variant="tile"
-                                    className={styles.stopThumb}
-                                  />
-                                </button>
+                                  {!isRestStop(item.place || {}) ? (
+                                    <PlaceThumb
+                                      src={item.place?.thumbnail}
+                                      alt={title}
+                                      variant="tile"
+                                      className={styles.stopThumb}
+                                    />
+                                  ) : null}
+                                </div>
                               </div>
                             </li>
                           );
@@ -2400,30 +2545,45 @@ export function BookATripView({
                 ) : null}
               </AnimatePresence>
 
-              <AnimatePresence>
-                {reorderPreview ? (
-                  <ReorderDayConfirmModal
-                    key="reorder-modal"
-                    dayNumber={reorderPreview.dayNumber}
-                    visitTitles={reorderPreview.preview.schedule
-                      .filter((i) => i.type === "visit")
-                      .map((i) =>
-                        i.type === "visit"
-                          ? visitDisplayTitle(i.place || {})
-                          : "",
-                      )
-                      .filter(Boolean)}
-                    preview={reorderPreview.preview}
-                    applying={reorderApplying}
-                    onClose={() => setReorderPreview(null)}
-                    onConfirm={() => void confirmReorderDay()}
-                  />
-                ) : null}
-              </AnimatePresence>
             </motion.div>
           ) : null}
         </AnimatePresence>
       </section>
+
+      {typeof document !== "undefined" &&
+      reorderPicker &&
+      (() => {
+        const visits = dayReorderVisits(reorderPicker.dayNumber);
+        const active = visits.find((v) => v.placeId === reorderPicker.placeId);
+        if (!active) return null;
+        return createPortal(
+          <ReorderVisitPickerModal
+            dayNumber={reorderPicker.dayNumber}
+            active={active}
+            visits={visits}
+            busy={reorderLoading}
+            onClose={() => setReorderPicker(null)}
+            onMoveToIndex={(i) => void applyPickerMoveToIndex(i)}
+            onSwapWith={(id) => void applyPickerSwapWith(id)}
+          />,
+          document.body,
+        );
+      })()}
+
+      {typeof document !== "undefined" && reorderPreview
+        ? createPortal(
+            <ReorderDayConfirmModal
+              dayNumber={reorderPreview.dayNumber}
+              previousVisits={reorderPreview.previousVisits}
+              tripDate={reorderPreview.tripDate}
+              preview={reorderPreview.preview}
+              applying={reorderApplying}
+              onClose={() => setReorderPreview(null)}
+              onConfirm={() => void confirmReorderDay()}
+            />,
+            document.body,
+          )
+        : null}
     </div>
   );
 }

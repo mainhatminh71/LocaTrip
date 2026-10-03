@@ -1,5 +1,10 @@
 import assert from "node:assert/strict";
-import { reorderVisitIds, visitOrderForDay } from "@/lib/itinerary-map";
+import {
+  moveVisitToIndex,
+  reorderVisitIds,
+  swapVisitIds,
+  visitOrderForDay,
+} from "@/lib/itinerary-map";
 import type { ScheduleItem } from "@/lib/trip";
 
 const schedule: ScheduleItem[] = [
@@ -73,6 +78,36 @@ assert.deepEqual(
   reorderVisitIds(["a", "b", "c"], "a", "b", true),
   ["b", "a", "c"],
   "move a after b",
+);
+
+assert.deepEqual(
+  moveVisitToIndex(["a", "b", "c", "d"], "a", 3),
+  ["b", "c", "d", "a"],
+  "move first to last index",
+);
+
+assert.deepEqual(
+  moveVisitToIndex(["a", "b", "c", "d"], "d", 0),
+  ["d", "a", "b", "c"],
+  "move last to first",
+);
+
+assert.equal(
+  moveVisitToIndex(["a", "b", "c"], "b", 1),
+  null,
+  "same index → null",
+);
+
+assert.deepEqual(
+  swapVisitIds(["a", "b", "c", "d"], "a", "d"),
+  ["d", "b", "c", "a"],
+  "swap 1 with 4",
+);
+
+assert.equal(
+  swapVisitIds(["a", "b", "c"], "a", "a"),
+  null,
+  "swap same id → null",
 );
 
 console.log("itinerary-reorder.test.ts: ok");

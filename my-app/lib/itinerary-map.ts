@@ -278,6 +278,40 @@ export function reorderVisitIds(
   return next;
 }
 
+/** Move visit to a 0-based index within the same day. */
+export function moveVisitToIndex(
+  visitOrder: string[],
+  placeId: string,
+  toIndex: number,
+): string[] | null {
+  const from = visitOrder.indexOf(placeId);
+  if (from < 0) return null;
+  if (!Number.isInteger(toIndex) || toIndex < 0 || toIndex >= visitOrder.length) {
+    return null;
+  }
+  if (from === toIndex) return null;
+  const next = [...visitOrder];
+  next.splice(from, 1);
+  next.splice(toIndex, 0, placeId);
+  return next;
+}
+
+/** Swap two visits in the day order. */
+export function swapVisitIds(
+  visitOrder: string[],
+  placeIdA: string,
+  placeIdB: string,
+): string[] | null {
+  if (placeIdA === placeIdB) return null;
+  const a = visitOrder.indexOf(placeIdA);
+  const b = visitOrder.indexOf(placeIdB);
+  if (a < 0 || b < 0) return null;
+  const next = [...visitOrder];
+  next[a] = placeIdB;
+  next[b] = placeIdA;
+  return next;
+}
+
 export function swapVisitPlace(
   option: ItineraryOption,
   day: number,

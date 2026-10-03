@@ -679,6 +679,10 @@ export type ReorderDayPreviewBody = {
   startTimePerDay?: string;
   endTimePerDay?: string;
   showRoad?: boolean;
+  /** Trip start date YYYY-MM-DD — used with dayNumber for open-hours weekday. */
+  tripDate?: string;
+  /** 1-based itinerary day. */
+  dayNumber?: number;
 };
 
 export type ReorderDayPreviewResult = {
@@ -689,21 +693,37 @@ export type ReorderDayPreviewResult = {
   warnings: { type: string; message: string; placeId?: string }[];
 };
 
+/** Strip heavy fields from a single-day schedule before reorder preview. */
+function slimScheduleForReorder(schedule: ScheduleItem[]): ScheduleItem[] {
+  return schedule.map((item) => {
+    if (item.type === "travel") {
+      const { routeGeometry: _rg, ...rest } = item;
+      return rest;
+    }
+    const { topAlternatives: _alts, ...rest } = item;
+    return rest;
+  });
+}
+
 /** Preview same-day visit reorder → `POST /trips/reorder-day/preview` (no persist). */
 export async function previewReorderDay(
   body: ReorderDayPreviewBody,
 ): Promise<ReorderDayPreviewResult> {
+  const payload: ReorderDayPreviewBody = {
+    ...body,
+    schedule: slimScheduleForReorder(body.schedule || []),
+  };
   const res = await apiFetch("/api/trips/reorder-day/preview", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
+    body: JSON.stringify(payload),
     cache: "no-store",
   });
   const data = (await res.json()) as ReorderDayPreviewResult & {
     error?: string;
   };
   if (!res.ok) {
-    throw new ApiError(data.error || (await readError(res)), res.status);
+    throw apiErrorFromBody(data, res.status, `Lỗi ${res.status}`);
   }
   if (!Array.isArray(data.schedule) || !data.before || !data.after) {
     throw new ApiError("Server không trả về kết quả sắp xếp ngày", 502);

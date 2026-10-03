@@ -142,7 +142,7 @@ function PlaceInfoBody({
   showContactEmpty,
 }: {
   thumbKey: string;
-  thumbSrc: string | null;
+  thumbSrc: string | null | Array<string | null | undefined>;
   title: string;
   address?: string | null;
   latitude?: number | null;
@@ -729,8 +729,8 @@ export function PlaceStopDetail({
   const category = detail?.category || stop.place.category;
   const rating = detail?.reviewRating ?? stop.place.reviewRating;
   const tags = tagChips(detail?.tags ?? stop.place.tags, 10);
-  // Prefer itinerary snapshot immediately so thumb shows while detail loads.
-  const rawThumb = detail?.thumbnail || stop.place.thumbnail || null;
+  // Try itinerary snapshot first, then detail (some detail URLs 403 / hang).
+  const rawThumb = [stop.place.thumbnail, detail?.thumbnail];
   const hours = summarizeOpenHours(detail?.openHours);
   const price = detail ? priceLabel(detail) : null;
   const busy = detail ? busySummary(detail) : null;
@@ -811,7 +811,7 @@ export function PlaceStopDetail({
                 <p className={styles.placeDetailMuted}>{error}</p>
               ) : null}
               <PlaceInfoBody
-                thumbKey={`${stop.place.placeId || stop.key}:${rawThumb || "none"}`}
+                thumbKey={`${stop.place.placeId || stop.key}:${rawThumb.filter(Boolean).join("|") || "none"}`}
                 thumbSrc={rawThumb}
                 title={title || ""}
                 address={address}
