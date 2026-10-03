@@ -3913,6 +3913,19 @@
   align-items: start;
 }
 
+.stopRow,
+.stopRowActive {
+  grid-template-columns: 76px 22px minmax(0, 1fr) 56px;
+}
+
+.stopThumb {
+  width: 56px !important;
+  height: 56px !important;
+  border-radius: 12px !important;
+  margin-top: 2px;
+  pointer-events: none;
+}
+
 .travelItem,
 .visitItem {
   list-style: none;
@@ -4492,4 +4505,171 @@
 .pickConfirmActions .btnPrimary,
 .pickConfirmActions .btnGhost {
   min-width: 104px;
+}
+
+/* —— Same-day reorder —— */
+.reorderConfirmSheet h3 {
+  margin: 0;
+  font-family: var(--lt-font-display);
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--lt-deep);
+}
+
+.reorderNote {
+  margin: 0;
+  font-size: 13px;
+  color: var(--lt-muted);
+}
+
+.reorderVisitList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.reorderVisitList li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  color: var(--lt-ink);
+}
+
+.reorderVisitIdx {
+  flex: 0 0 22px;
+  height: 22px;
+  border-radius: 999px;
+  background: rgba(1, 40, 48, 0.08);
+  display: grid;
+  place-items: center;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.reorderVisitMore {
+  color: var(--lt-muted);
+  font-size: 13px;
+  padding-left: 32px;
+}
+
+.reorderStatsTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.reorderStatsTable th,
+.reorderStatsTable td {
+  padding: 8px 6px;
+  text-align: left;
+  border-bottom: 1px solid rgba(1, 40, 48, 0.08);
+}
+
+.reorderStatsTable thead th {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--lt-muted);
+}
+
+.reorderStatChanged {
+  font-weight: 700;
+  color: var(--lt-deep);
+}
+
+.reorderWarnings {
+  margin: 0;
+  padding-left: 1.1rem;
+  font-size: 13px;
+  color: #9a3412;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.reorderOk {
+  margin: 0;
+  font-size: 13px;
+  color: #166534;
+}
+
+.reorderActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 4px;
+}
+
+.visitItemDraggable {
+  position: relative;
+}
+
+.visitItemDragging {
+  opacity: 0.55;
+}
+
+.visitItemDragOver {
+  outline: 2px dashed rgba(1, 40, 48, 0.35);
+  outline-offset: 2px;
+  border-radius: 12px;
+}
+
+.dragHandle {
+  flex: 0 0 auto;
+  width: 28px;
+  height: 28px;
+  margin: 0;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--lt-muted);
+  cursor: grab;
+  font-size: 14px;
+  line-height: 1;
+  display: grid;
+  place-items: center;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+}
+
+.dragHandle:active {
+  cursor: grabbing;
+}
+
+.dragHandle:hover {
+  background: rgba(1, 40, 48, 0.06);
+  color: var(--lt-deep);
+}
+
+.dragHandle[aria-disabled="true"] {
+  opacity: 0.35;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.reorderLoadingNote {
+  font-size: 0.78em;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--lt-muted);
+}
+
+.visitDragRow {
+  display: flex;
+  align-items: stretch;
+  gap: 4px;
+  width: 100%;
+}
+
+.visitDragRow > .stopRow,
+.visitDragRow > .stopRowActive {
+  flex: 1 1 auto;
+  min-width: 0;
 }

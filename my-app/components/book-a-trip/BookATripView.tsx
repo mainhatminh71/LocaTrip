@@ -10,12 +10,15 @@ import {
   generateAutoTrip,
   getPlaceById,
   getSavedTrip,
+  localizeTripApiError,
+  previewReorderDay,
   replacePlaceInTrip,
   resolveTripProgressStatus,
   TRIP_PROGRESS_OPTIONS,
   updateSavedTrip,
   updateTripPrefs,
   type CreateSavedTripBody,
+  type ReorderDayPreviewResult,
   type TripPrefsBody,
   type TripProgressStatus,
   type SavedTrip,
@@ -57,6 +60,7 @@ import {
   type ItineraryOption,
 } from "@/lib/trip";
 import {
+  applyDaySchedule,
   buildRouteGeoJSON,
   clearRouteGeometry,
   cloneOption,
@@ -67,10 +71,13 @@ import {
   hasCompleteTravelGeometry,
   isSyntheticRoute,
   listTravelKeys,
+  reorderVisitIds,
   routeWaypoints,
   stopsForMap,
   summarizeOptionForCard,
   swapVisitPlace,
+  visitItems,
+  visitOrderForDay,
   type RouteFeatureCollection,
 } from "@/lib/itinerary-map";
 import { fetchDrivingRouteGeoJSON } from "@/lib/mapbox-directions";
@@ -87,6 +94,8 @@ import { ItineraryMap } from "./ItineraryMap";
 import { LtBrandLoader, LtButtonLoading } from "./LtBrandLoader";
 import { PlaceStopDetail } from "./PlaceStopDetail";
 import { ReplacePlaceModal } from "./ReplacePlaceModal";
+import { ReorderDayConfirmModal } from "./ReorderDayConfirmModal";
+import { PlaceThumb } from "./PlaceThumb";
 import styles from "./book-a-trip.module.css";
 import { useRouter, useSearchParams } from "next/navigation";
 
@@ -140,6 +149,19 @@ export function BookATripView({
     null,
   );
   const [replaceTargetKey, setReplaceTargetKey] = useState<string | null>(null);
+  const [reorderPreview, setReorderPreview] = useState<{
+    dayNumber: number;
+    preview: ReorderDayPreviewResult;
+  } | null>(null);
+  const [reorderLoading, setReorderLoading] = useState(false);
+  const [reorderApplying, setReorderApplying] = useState(false);
+  const [dragVisit, setDragVisit] = useState<{
+    day: number;
+    placeId: string;
+  } | null>(null);
+  const [dragOverPlaceId, setDragOverPlaceId] = useState<string | null>(null);
+  const dragVisitRef = useRef<{ day: number; placeId: string } | null>(null);
+  const dragDropConsumedRef = useRef(false);
   const [mobileMapOpen, setMobileMapOpen] = useState(false);
   const [routeStale, setRouteStale] = useState(false);
   /** Road-following line for the map (OSRM from generate or Mapbox Directions). */
@@ -261,6 +283,7 @@ export function BookATripView({
                 ? {
                     latitude: place.latitude,
                     longitude: place.longitude,
+                    thumbnail: place.thumbnail,
                   }
                 : null;
             },
@@ -671,8 +694,12 @@ export function BookATripView({
       if (data.itineraries.length === 1) {
         const only = data.itineraries[0]!;
         const tripId = savedMap[only.optionId];
-        setSelectedOption(cloneOption(only));
+        const cloned = cloneOption(only);
+        setSelectedOption(cloned);
         setPhase("itinerary");
+        void enrichOptionCoords(cloned).then((enriched) => {
+          setSelectedOption(enriched);
+        });
         if (tripId) {
           setEditingTrip(tripId);
           setEditingTripStatus("Pending");
@@ -809,6 +836,9 @@ export function BookATripView({
     setSavedTripId(null);
     setPhase("itinerary");
     saveAutoTripSelection(opt.optionId);
+    void enrichOptionCoords(cloned).then((enriched) => {
+      setSelectedOption(enriched);
+    });
     const linkedId = optionTripIds[opt.optionId];
     if (linkedId) {
       setEditingTrip(linkedId);
@@ -850,13 +880,165 @@ export function BookATripView({
         try {
           const p = await getPlaceById(placeId);
           if (!p) return null;
-          return { latitude: p.latitude, longitude: p.longitude };
+          return {
+            latitude: p.latitude,
+            longitude: p.longitude,
+            thumbnail: p.thumbnail,
+          };
         } catch {
           return null;
         }
       },
     );
     return { ...option, itinerary };
+  }
+
+  function clearDragState() {
+    dragVisitRef.current = null;
+    dragDropConsumedRef.current = false;
+    setDragVisit(null);
+    setDragOverPlaceId(null);
+  }
+
+  function dayVisitsMissingCoords(
+    schedule: Parameters<typeof visitItems>[0] | undefined,
+  ) {
+    return visitItems(schedule || []).some((v) => {
+      const lat = Number(v.place?.latitude);
+      const lng = Number(v.place?.longitude);
+      return !Number.isFinite(lat) || !Number.isFinite(lng);
+    });
+  }
+
+  async function requestReorderDayPreview(
+    dayNumber: number,
+    nextVisitOrder: string[],
+  ) {
+    if (!selectedOption) return;
+    if (!isAuthenticated) {
+      openAuth();
+      return;
+    }
+
+    let option = selectedOption;
+    let dayBlock = option.itinerary.find((d) => d.day === dayNumber);
+    if (!dayBlock) return;
+
+    const currentOrder = visitOrderForDay(dayBlock.schedule || []);
+    if (currentOrder.length < 2) {
+      toastError("Cần ít nhất 2 địa điểm trong ngày để đổi thứ tự.");
+      clearDragState();
+      return;
+    }
+    if (
+      nextVisitOrder.length !== currentOrder.length ||
+      [...nextVisitOrder].sort().join("|") !==
+        [...currentOrder].sort().join("|")
+    ) {
+      toastError("Thứ tự địa điểm không hợp lệ.");
+      clearDragState();
+      return;
+    }
+
+    const start =
+      lastLocationOverride ??
+      ({
+        latitude: activeStart.latitude,
+        longitude: activeStart.longitude,
+      } as const);
+    const { start: startTimePerDay, end: endTimePerDay } = parseDraftHours(
+      draft.hours,
+    );
+    setReorderLoading(true);
+    try {
+      if (dayVisitsMissingCoords(dayBlock.schedule)) {
+        option = await enrichOptionCoords(option);
+        setSelectedOption(option);
+        dayBlock = option.itinerary.find((d) => d.day === dayNumber);
+        if (!dayBlock) {
+          toastError("Không tìm thấy lịch ngày để sắp xếp lại.");
+          return;
+        }
+        if (dayVisitsMissingCoords(dayBlock.schedule)) {
+          toastError(
+            "Thiếu tọa độ địa điểm — không sắp xếp lại được. Thử mở chi tiết điểm hoặc tạo lại lịch.",
+          );
+          return;
+        }
+      }
+
+      const preview = await previewReorderDay({
+        schedule: dayBlock.schedule || [],
+        visitOrder: nextVisitOrder,
+        startCoords: {
+          latitude: start.latitude,
+          longitude: start.longitude,
+        },
+        startTimePerDay,
+        endTimePerDay,
+        showRoad: draft.showRoad !== false,
+      });
+      setReorderPreview({ dayNumber, preview });
+    } catch (err) {
+      let msg =
+        err instanceof ApiError
+          ? localizeTripApiError(err.message)
+          : err instanceof Error
+            ? err.message
+            : "Không sắp xếp lại được lịch ngày.";
+      if (
+        err instanceof ApiError &&
+        err.status === 400 &&
+        /coord|latitude|longitude|placeId|visitOrder|order/i.test(err.message)
+      ) {
+        msg =
+          "Không sắp xếp lại được: thiếu tọa độ hoặc thứ tự địa điểm không hợp lệ.";
+      }
+      toastError(msg);
+    } finally {
+      setReorderLoading(false);
+      clearDragState();
+    }
+  }
+
+  async function confirmReorderDay() {
+    if (!selectedOption || !reorderPreview) return;
+    setReorderApplying(true);
+    try {
+      let next = applyDaySchedule(
+        selectedOption,
+        reorderPreview.dayNumber,
+        reorderPreview.preview.schedule,
+      );
+      next = await enrichOptionCoords(next);
+      setSelectedOption(next);
+      setRouteStale(true);
+      setSelectedStopKey(null);
+      setSelectedTravelKey(null);
+      setReorderPreview(null);
+      toastSuccess(`Đã sắp lại Ngày ${reorderPreview.dayNumber}`);
+      if (result) {
+        const itineraries = result.itineraries.map((o) =>
+          o.optionId === next.optionId ? next : o,
+        );
+        const nextResult = { ...result, itineraries };
+        setResult(nextResult);
+        const prev = loadAutoTrip();
+        if (prev) {
+          saveAutoTrip({
+            ...prev,
+            result: nextResult,
+            selectedOptionId: next.optionId,
+          });
+        }
+      }
+    } catch (err) {
+      const msg =
+        err instanceof Error ? err.message : "Không áp dụng được thứ tự mới.";
+      toastError(msg);
+    } finally {
+      setReorderApplying(false);
+    }
   }
 
   async function applyReplace(alt: AlternativePlaceSuggestion) {
@@ -1680,7 +1862,15 @@ export function BookATripView({
                 <div className={styles.days}>
                   {(selectedOption.itinerary || []).map((day) => (
                     <section key={day.day} className={styles.day}>
-                      <h3>Ngày {day.day}</h3>
+                      <h3>
+                        Ngày {day.day}
+                        {reorderLoading ? (
+                          <span className={styles.reorderLoadingNote}>
+                            {" "}
+                            · Đang tính lại thứ tự…
+                          </span>
+                        ) : null}
+                      </h3>
                       <ul>
                         {(day.schedule || []).map((item, i) => {
                           const key = `${day.day}-${i}`;
@@ -1741,66 +1931,178 @@ export function BookATripView({
                           const active = selectedStopKey === key;
                           const kind = visitKindLabel(item.place || {});
                           const title = visitDisplayTitle(item.place || {});
+                          const placeId = item.place?.placeId?.trim() || "";
+                          const canDrag =
+                            Boolean(placeId) && !reorderLoading;
+                          const activeDrag = dragVisitRef.current ?? dragVisit;
+                          const dragging =
+                            activeDrag?.day === day.day &&
+                            activeDrag.placeId === placeId;
+                          const dragOver =
+                            dragOverPlaceId === placeId &&
+                            activeDrag != null &&
+                            activeDrag.day === day.day &&
+                            activeDrag.placeId !== placeId;
                           return (
-                            <li key={key} className={styles.visitItem}>
-                              <button
-                                type="button"
-                                className={
-                                  active
-                                    ? styles.stopRowActive
-                                    : styles.stopRow
+                            <li
+                              key={key}
+                              className={`${styles.visitItem} ${styles.visitItemDraggable}${
+                                dragging ? ` ${styles.visitItemDragging}` : ""
+                              }${dragOver ? ` ${styles.visitItemDragOver}` : ""}`}
+                              onDragOver={(e) => {
+                                const drag = dragVisitRef.current;
+                                if (!canDrag || !drag) return;
+                                if (drag.day !== day.day) return;
+                                e.preventDefault();
+                                e.dataTransfer.dropEffect = "move";
+                                setDragOverPlaceId(placeId);
+                              }}
+                              onDragLeave={() => {
+                                if (dragOverPlaceId === placeId) {
+                                  setDragOverPlaceId(null);
                                 }
-                                onClick={() => selectStop(key)}
-                              >
-                                <span className={styles.time}>{item.time}</span>
+                              }}
+                              onDrop={(e) => {
+                                e.preventDefault();
+                                const drag = dragVisitRef.current;
+                                if (!canDrag || !drag) return;
+                                if (drag.day !== day.day) return;
+                                dragDropConsumedRef.current = true;
+                                const order = visitOrderForDay(
+                                  day.schedule || [],
+                                );
+                                const fromIdx = order.indexOf(drag.placeId);
+                                const toIdx = order.indexOf(placeId);
+                                const placeAfter = fromIdx < toIdx;
+                                const nextOrder = reorderVisitIds(
+                                  order,
+                                  drag.placeId,
+                                  placeId,
+                                  placeAfter,
+                                );
+                                dragVisitRef.current = null;
+                                setDragVisit(null);
+                                setDragOverPlaceId(null);
+                                if (!nextOrder) return;
+                                void requestReorderDayPreview(
+                                  day.day,
+                                  nextOrder,
+                                );
+                              }}
+                            >
+                              <div className={styles.visitDragRow}>
                                 <span
-                                  className={styles.stopOrder}
-                                  aria-label={
-                                    stopOrder != null
-                                      ? `Điểm ${stopOrder}`
-                                      : "Nghỉ ngơi"
-                                  }
+                                  role="button"
+                                  tabIndex={canDrag ? 0 : -1}
+                                  className={styles.dragHandle}
+                                  draggable={canDrag}
+                                  aria-disabled={!canDrag}
+                                  aria-label={`Kéo để đổi thứ tự: ${title}`}
+                                  title="Kéo để đổi thứ tự trong ngày"
+                                  onDragStart={(e) => {
+                                    if (!canDrag) {
+                                      e.preventDefault();
+                                      return;
+                                    }
+                                    dragDropConsumedRef.current = false;
+                                    const payload = {
+                                      day: day.day,
+                                      placeId,
+                                    };
+                                    dragVisitRef.current = payload;
+                                    setDragVisit(payload);
+                                    e.dataTransfer.effectAllowed = "move";
+                                    e.dataTransfer.setData(
+                                      "text/plain",
+                                      placeId,
+                                    );
+                                  }}
+                                  onDragEnd={() => {
+                                    if (!dragDropConsumedRef.current) {
+                                      clearDragState();
+                                    } else {
+                                      dragDropConsumedRef.current = false;
+                                    }
+                                  }}
+                                  onClick={(e) => e.stopPropagation()}
+                                  onKeyDown={(e) => {
+                                    if (e.key === "Enter" || e.key === " ") {
+                                      e.preventDefault();
+                                    }
+                                  }}
                                 >
-                                  {stopOrder ?? "·"}
+                                  ⠿
                                 </span>
-                                <div className={styles.scheduleBody}>
-                                  <div className={styles.visitLabelRow}>
-                                    <span className={styles.visitLabel}>
-                                      {kind}
-                                    </span>
-                                  </div>
-                                  <strong>{title}</strong>
-                                  {item.place?.address ? (
-                                    <p className={styles.visitAddr}>
-                                      {item.place.address}
-                                    </p>
-                                  ) : null}
-                                  {item.place?.reviewRating != null ||
-                                  (item.place?.category &&
-                                    item.place.category !== kind) ||
-                                  item.place?.areaType ? (
-                                    <div className={styles.visitMeta}>
-                                      {item.place?.reviewRating != null ? (
-                                        <span>
-                                          {item.place.reviewRating.toFixed(1)}★
-                                        </span>
-                                      ) : null}
-                                      {item.place?.category &&
-                                      item.place.category !== kind ? (
-                                        <span>{item.place.category}</span>
-                                      ) : null}
-                                      {item.place?.areaType ? (
-                                        <span>{item.place.areaType}</span>
-                                      ) : null}
+                                <button
+                                  type="button"
+                                  className={
+                                    active
+                                      ? styles.stopRowActive
+                                      : styles.stopRow
+                                  }
+                                  onClick={() => selectStop(key)}
+                                >
+                                  <span className={styles.time}>
+                                    {item.time}
+                                  </span>
+                                  <span
+                                    className={styles.stopOrder}
+                                    aria-label={
+                                      stopOrder != null
+                                        ? `Điểm ${stopOrder}`
+                                        : "Nghỉ ngơi"
+                                    }
+                                  >
+                                    {stopOrder ?? "·"}
+                                  </span>
+                                  <div className={styles.scheduleBody}>
+                                    <div className={styles.visitLabelRow}>
+                                      <span className={styles.visitLabel}>
+                                        {kind}
+                                      </span>
                                     </div>
-                                  ) : null}
-                                  {item.warning?.message ? (
-                                    <p className={styles.visitWarn}>
-                                      {item.warning.message}
-                                    </p>
-                                  ) : null}
-                                </div>
-                              </button>
+                                    <strong>{title}</strong>
+                                    {item.place?.address ? (
+                                      <p className={styles.visitAddr}>
+                                        {item.place.address}
+                                      </p>
+                                    ) : null}
+                                    {item.place?.reviewRating != null ||
+                                    (item.place?.category &&
+                                      item.place.category !== kind) ||
+                                    item.place?.areaType ? (
+                                      <div className={styles.visitMeta}>
+                                        {item.place?.reviewRating != null ? (
+                                          <span>
+                                            {item.place.reviewRating.toFixed(
+                                              1,
+                                            )}
+                                            ★
+                                          </span>
+                                        ) : null}
+                                        {item.place?.category &&
+                                        item.place.category !== kind ? (
+                                          <span>{item.place.category}</span>
+                                        ) : null}
+                                        {item.place?.areaType ? (
+                                          <span>{item.place.areaType}</span>
+                                        ) : null}
+                                      </div>
+                                    ) : null}
+                                    {item.warning?.message ? (
+                                      <p className={styles.visitWarn}>
+                                        {item.warning.message}
+                                      </p>
+                                    ) : null}
+                                  </div>
+                                  <PlaceThumb
+                                    src={item.place?.thumbnail}
+                                    alt={title}
+                                    variant="tile"
+                                    className={styles.stopThumb}
+                                  />
+                                </button>
+                              </div>
                             </li>
                           );
                         })}
@@ -2094,6 +2396,27 @@ export function BookATripView({
                         ? (newPlaceId) => applyServerReplace(newPlaceId)
                         : undefined
                     }
+                  />
+                ) : null}
+              </AnimatePresence>
+
+              <AnimatePresence>
+                {reorderPreview ? (
+                  <ReorderDayConfirmModal
+                    key="reorder-modal"
+                    dayNumber={reorderPreview.dayNumber}
+                    visitTitles={reorderPreview.preview.schedule
+                      .filter((i) => i.type === "visit")
+                      .map((i) =>
+                        i.type === "visit"
+                          ? visitDisplayTitle(i.place || {})
+                          : "",
+                      )
+                      .filter(Boolean)}
+                    preview={reorderPreview.preview}
+                    applying={reorderApplying}
+                    onClose={() => setReorderPreview(null)}
+                    onConfirm={() => void confirmReorderDay()}
                   />
                 ) : null}
               </AnimatePresence>
