@@ -6,7 +6,13 @@ const PROXY_HOSTS = new Set([
   "streetviewpixels-pa.googleapis.com",
 ]);
 
-/** Route Google place thumbnails through same-origin media-proxy when needed. */
+/**
+ * Display URL for place media.
+ *
+ * Google lh3.* blocks Cloudflare Worker / server fetches (403 → media-proxy 502).
+ * Prefer the raw HTTPS URL in the browser with `referrerPolicy="no-referrer"`
+ * (see PlaceThumb). Do not route Google hosts through `/api/media-proxy`.
+ */
 export function proxiedMediaUrl(url?: string | null): string | undefined {
   if (!url || typeof url !== "string") return undefined;
   const trimmed = url.trim();
@@ -14,7 +20,7 @@ export function proxiedMediaUrl(url?: string | null): string | undefined {
   try {
     const parsed = new URL(trimmed);
     if (parsed.protocol === "https:" && PROXY_HOSTS.has(parsed.hostname)) {
-      return `/api/media-proxy?url=${encodeURIComponent(trimmed)}`;
+      return trimmed;
     }
   } catch {
     return trimmed;

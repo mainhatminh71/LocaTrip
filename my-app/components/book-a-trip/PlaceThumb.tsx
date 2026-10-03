@@ -1,63 +1,23 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { proxiedMediaUrl } from "@/lib/media-url";
-import {
-  getCachedThumbBlob,
-  setCachedThumbBlob,
-} from "@/lib/place-detail-cache";
 import styles from "./book-a-trip.module.css";
 
 type PlaceThumbProps = {
-  /** Raw place thumbnail URL (will be proxied when needed). */
+  /** Raw place thumbnail URL (Google lh3.* etc.). */
   src?: string | null;
   alt?: string;
-  /** `detail` = large modal hero; `tile` = replace/search thumbs */
+  /** `detail` = large modal hero; `tile` = list / replace thumbs */
   variant?: "detail" | "tile";
   className?: string;
 };
 
-async function resolveDisplayUrl(raw: string): Promise<string> {
-  const cached = getCachedThumbBlob(raw);
-  if (cached) return cached;
-
-  const candidates = [
-    proxiedMediaUrl(raw),
-    raw !== proxiedMediaUrl(raw) ? raw : null,
-  ].filter(Boolean) as string[];
-
-  let lastErr: unknown = null;
-  for (const candidate of candidates) {
-    try {
-      const res = await fetch(candidate, { cache: "force-cache" });
-      if (!res.ok) {
-        lastErr = new Error(`HTTP ${res.status}`);
-        continue;
-      }
-      const type = res.headers.get("content-type") || "";
-      if (type && !type.toLowerCase().startsWith("image/")) {
-        lastErr = new Error(`not image: ${type}`);
-        continue;
-      }
-      const blob = await res.blob();
-      if (!blob.size) {
-        lastErr = new Error("empty");
-        continue;
-      }
-      const objectUrl = URL.createObjectURL(blob);
-      setCachedThumbBlob(raw, objectUrl);
-      return objectUrl;
-    } catch (err) {
-      lastErr = err;
-    }
-  }
-  throw lastErr instanceof Error ? lastErr : new Error("thumb failed");
-}
-
 /**
- * Place image with polished skeleton when missing or broken.
- * Fetches via media-proxy into a blob URL and caches by raw src so
- * reopening the modal does not re-hit Google / flash “Chưa có ảnh”.
+ * Place image with skeleton when missing or broken.
+ *
+ * Google `lh3.googleusercontent.com` blocks server/Worker fetches (403), so
+ * `/api/media-proxy` returns 502. Load the image in the browser with
+ * `referrerPolicy="no-referrer"` instead — that is the reliable path.
  */
 export function PlaceThumb({
   src,
@@ -66,47 +26,12 @@ export function PlaceThumb({
   className,
 }: PlaceThumbProps) {
   const raw = src?.trim() || "";
-  const [displayUrl, setDisplayUrl] = useState<string | null>(() =>
-    raw ? getCachedThumbBlob(raw) : null,
-  );
+  const [loaded, setLoaded] = useState(false);
   const [failed, setFailed] = useState(false);
 
   useEffect(() => {
-    if (!raw) {
-      setDisplayUrl(null);
-      setFailed(false);
-      return;
-    }
-
-    const cached = getCachedThumbBlob(raw);
-    if (cached) {
-      setDisplayUrl(cached);
-      setFailed(false);
-      return;
-    }
-
-    let cancelled = false;
-    setDisplayUrl(null);
+    setLoaded(false);
     setFailed(false);
-
-    void (async () => {
-      try {
-        const url = await resolveDisplayUrl(raw);
-        if (!cancelled) {
-          setDisplayUrl(url);
-          setFailed(false);
-        }
-      } catch {
-        if (!cancelled) {
-          setDisplayUrl(null);
-          setFailed(true);
-        }
-      }
-    })();
-
-    return () => {
-      cancelled = true;
-    };
   }, [raw]);
 
   const shellClass =
@@ -144,14 +69,14 @@ export function PlaceThumb({
         </svg>
         {variant === "detail" ? (
           <span className={styles.placeThumbSkeletonLabel}>
-            {failed ? "Chưa có ảnh" : "Đang tải ảnh…"}
+            {failed || !raw ? "Chưa có ảnh" : "Đang tải ảnh…"}
           </span>
         ) : null}
       </div>
     </div>
   );
 
-  if (!raw || failed || !displayUrl) {
+  if (!raw || failed) {
     return (
       <div className={merged} style={{ minHeight: minH }}>
         {skeleton}
@@ -161,18 +86,23 @@ export function PlaceThumb({
 
   return (
     <div className={merged} style={{ minHeight: minH }}>
+      {!loaded ? skeleton : null}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src={displayUrl}
+        src={raw}
         alt={alt}
         className={styles.placeThumbImg}
-        loading="eager"
+        loading="lazy"
         decoding="async"
-        style={{ opacity: 1 }}
+        referrerPolicy="no-referrer"
+        style={{ opacity: loaded ? 1 : 0, position: loaded ? "relative" : "absolute" }}
+        onLoad={() => {
+          setLoaded(true);
+          setFailed(false);
+        }}
         onError={() => {
-          /* Blob URLs should not fail; mark failed so UI recovers cleanly. */
           setFailed(true);
-          setDisplayUrl(null);
+          setLoaded(false);
         }}
       />
     </div>

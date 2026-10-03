@@ -11,7 +11,11 @@ const ALLOWED = new Set([
 ]);
 
 /**
- * Proxy Google place thumbnails (browser Referer often blocks lh3.*).
+ * Legacy proxy for Google place thumbnails.
+ *
+ * NOTE: Google often returns 403 to Cloudflare Workers / datacenter IPs, so
+ * this route may 502. Prefer browser `<img referrerPolicy="no-referrer">`
+ * (PlaceThumb) instead of calling this from the client.
  * GET /api/media-proxy?url=https%3A%2F%2Flh3.googleusercontent.com%2F...
  */
 export async function GET(request: Request) {
