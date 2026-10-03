@@ -121,12 +121,13 @@ export async function apiFetch(
 
   let user = await readUser();
 
-  // Proactively renew before a long generate if the token is already expired.
+  // Proactively renew if the token is already expired. Do NOT wipe the
+  // stored session on silent-renew failure — that logs the user out of the
+  // whole app (RequireAuth → login modal) while the UI still looked signed-in.
   if (user?.expired && userManager) {
     try {
       user = await userManager.signinSilent();
     } catch {
-      await userManager.removeUser().catch(() => undefined);
       if (redirectOn401) goLogin();
       throw new ApiError("Phiên đăng nhập hết hạn", 401);
     }
@@ -138,7 +139,7 @@ export async function apiFetch(
 
   let res = await fetch(input, { ...requestInit, headers });
 
-  if (res.status === 401 && userManager) {
+  if (res.status === 401 && userManager && user?.access_token) {
     try {
       user = await userManager.signinSilent();
       if (user?.access_token) {
@@ -146,7 +147,8 @@ export async function apiFetch(
         res = await fetch(input, { ...requestInit, headers });
       }
     } catch {
-      await userManager.removeUser().catch(() => undefined);
+      // Keep local session; caller shows error. Silent renew often fails
+      // (3rd-party cookie / iframe) even when the user is still signed in.
       if (redirectOn401) goLogin();
       throw new ApiError("Phiên đăng nhập hết hạn", 401);
     }

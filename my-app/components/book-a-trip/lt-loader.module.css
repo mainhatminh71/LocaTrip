@@ -116,7 +116,7 @@
 
 .lg {
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
 }
 
 .lg .mark {
@@ -138,6 +138,28 @@
 
 .lg.onDark .label {
   color: rgba(255, 255, 255, 0.92);
+}
+
+/* Logo motion clip (lg) — asset is designed on black */
+.animMark {
+  position: relative;
+  flex: 0 0 auto;
+  width: min(220px, 56vw);
+  height: min(220px, 56vw);
+  border-radius: 28px;
+  overflow: hidden;
+  background: #0a0a0a;
+  box-shadow:
+    0 12px 40px rgba(1, 40, 48, 0.18),
+    0 0 0 1px rgba(1, 40, 48, 0.08);
+}
+
+.animVideo {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
 }
 
 @keyframes ltSpin {

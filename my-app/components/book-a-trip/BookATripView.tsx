@@ -56,7 +56,11 @@ import {
   loadPendingAutoTripForm,
   savePendingAutoTripForm,
 } from "@/lib/auto-trip-pending";
-import { draftFromSavedTrip } from "@/lib/saved-trip-draft";
+import {
+  draftFromSavedTrip,
+  draftFromSuggestedPrefs,
+  VIBE_PREFS_STORAGE_KEY,
+} from "@/lib/saved-trip-draft";
 import { buildAutoTripRequest, buildPreferences, getBrowserLocation } from "@/lib/build-auto-trip-request";
 import {
   START_PRESETS_BY_CITY,
@@ -236,6 +240,7 @@ export function BookATripView({
   const searchParams = useSearchParams();
   const fromTripId = searchParams.get("from")?.trim() || "";
   const editTripId = searchParams.get("edit")?.trim() || "";
+  const vibePrefill = searchParams.get("vibe") === "1";
   const resumeGenerateParam = searchParams.get("resume") === "generate";
   const prefillAppliedRef = useRef<string | null>(null);
   const pendingResumeTriedRef = useRef(false);
@@ -375,6 +380,55 @@ export function BookATripView({
     router,
   ]);
 
+  /** Prefill form from account vibe card (`?vibe=1` + sessionStorage). */
+  useEffect(() => {
+    if (!vibePrefill || authLoading) return;
+    if (editTripId || fromTripId) return;
+    if (prefillAppliedRef.current === "vibe:1") return;
+
+    let raw: string | null = null;
+    try {
+      raw = sessionStorage.getItem(VIBE_PREFS_STORAGE_KEY);
+    } catch {
+      raw = null;
+    }
+    if (!raw) {
+      prefillAppliedRef.current = "vibe:1";
+      return;
+    }
+
+    try {
+      const prefs = JSON.parse(raw) as {
+        preferences?: string[];
+        tripType?: string;
+        targetCustomer?: string;
+        pace?: AutoTripDraft["pace"];
+        budgetLevel?: AutoTripDraft["budgetLevel"];
+      };
+      const nextDraft = draftFromSuggestedPrefs(prefs);
+      setDraft(nextDraft);
+      setPhase("form");
+      setPrefillNotice(
+        "Đã nạp tiêu chí theo phong cách đi chơi của bạn. Chỉnh rồi tạo lịch trình.",
+      );
+      try {
+        sessionStorage.removeItem(VIBE_PREFS_STORAGE_KEY);
+      } catch {
+        // ignore
+      }
+      router.replace("/book-a-trip/?vibe=1", { scroll: false });
+    } catch {
+      // invalid JSON — ignore
+    }
+    prefillAppliedRef.current = "vibe:1";
+  }, [
+    vibePrefill,
+    authLoading,
+    editTripId,
+    fromTripId,
+    router,
+  ]);
+
   /**
    * Restore tag/pref draft after login or nạp xu, then auto-generate when
    * `?resume=generate` or pending.resumeGenerate is set.
@@ -382,6 +436,8 @@ export function BookATripView({
   useEffect(() => {
     if (authLoading) return;
     if (editTripId || fromTripId) return;
+    // Don't overwrite vibe prefill with a stale pending draft.
+    if (prefillAppliedRef.current === "vibe:1") return;
 
     const pending = loadPendingAutoTripForm();
     if (!pending?.draft) return;
@@ -1704,6 +1760,29 @@ export function BookATripView({
                 label="Đang mở lịch trình…"
               />
             </motion.div>
+          ) : phase === "form" && (loading || locating) ? (
+            <motion.div
+              key="generating"
+              className={styles.autoForm}
+              style={{
+                display: "grid",
+                placeItems: "center",
+                minHeight: "48vh",
+                padding: "2rem",
+              }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+            >
+              <LtBrandLoader
+                size="lg"
+                tone="onLight"
+                label={
+                  locating ? "Đang lấy vị trí…" : "Đang dựng lịch…"
+                }
+              />
+            </motion.div>
           ) : phase === "form" ? (
             <motion.form
               key="form"
@@ -1751,16 +1830,8 @@ export function BookATripView({
                   className={styles.btnPrimary}
                   disabled={loading || locating || savingGenerated}
                 >
-                  {loading || locating || savingGenerated ? (
-                    <LtButtonLoading
-                      label={
-                        locating
-                          ? "Đang lấy vị trí…"
-                          : savingGenerated
-                            ? "Đang lưu…"
-                            : "Đang dựng lịch…"
-                      }
-                    />
+                  {savingGenerated ? (
+                    <LtButtonLoading label="Đang lưu…" />
                   ) : (
                     withXuCost(BOOK_TRIP_COPY.submit, COSTS.tripGenerate)
                   )}

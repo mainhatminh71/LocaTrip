@@ -464,6 +464,46 @@ export type SavedTripPrefs = TripPrefsBody & {
   updatedAt?: string;
 };
 
+export type UserVibeResult = {
+  status: "ready" | "insufficient";
+  vibe?: { id: string; label: string; blurb: string };
+  secondaryVibe?: { id: string; label: string };
+  confidence: number;
+  topTags: { tag: string; count: number }[];
+  topPlaces: {
+    placeId: string;
+    title: string;
+    thumbnail?: string;
+    count: number;
+  }[];
+  suggestedPrefs: {
+    preferences: string[];
+    tripType?: string;
+    targetCustomer?: string;
+    pace?: Pace;
+    budgetLevel?: BudgetLevel;
+  };
+  sample: { tripCount: number; placeVisitCount: number };
+  message?: string;
+};
+
+/** Personal travel vibe → `GET /trips/vibe`. */
+export async function getMyVibe(): Promise<UserVibeResult> {
+  const res = await apiFetch("/api/trips/vibe", {
+    method: "GET",
+    headers: { Accept: "application/json" },
+    cache: "no-store",
+  });
+  const data = (await res.json()) as UserVibeResult & { error?: string };
+  if (!res.ok) {
+    throw new ApiError(data.error || (await readError(res)), res.status);
+  }
+  if (data.status !== "ready" && data.status !== "insufficient") {
+    throw new ApiError("Server không trả về vibe hợp lệ", 502);
+  }
+  return data;
+}
+
 /** Create options set → `POST /trips/prefs`. */
 export async function createTripPrefs(
   body: TripPrefsBody,

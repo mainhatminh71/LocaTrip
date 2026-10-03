@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 import { useAuth } from "react-oidc-context";
 import { roleFromUser, type AppRole } from "@/lib/auth/roles";
 import { useAuthModal } from "@/components/auth/AuthModalProvider";
@@ -15,12 +15,19 @@ export function RequireAuth({
 }) {
   const auth = useAuth();
   const { openAuth } = useAuthModal();
+  const promptedRef = useRef(false);
 
   useEffect(() => {
     if (auth.isLoading) return;
-    if (!auth.isAuthenticated) {
-      openAuth({ next: nextPath });
+    if (auth.isAuthenticated) {
+      promptedRef.current = false;
+      return;
     }
+    // One prompt per unauthenticated stretch — avoid re-opening the modal
+    // every render if the user dismisses it while still signed out.
+    if (promptedRef.current) return;
+    promptedRef.current = true;
+    openAuth({ next: nextPath });
   }, [auth.isLoading, auth.isAuthenticated, nextPath, openAuth]);
 
   if (auth.isLoading) {

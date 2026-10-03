@@ -210,3 +210,38 @@ export function draftFromSavedTrip(trip: SavedTrip): {
 
   return { draft, locationOverride };
 }
+
+export const VIBE_PREFS_STORAGE_KEY = "locatrip.suggestedVibePrefs";
+
+/** Map vibe API suggestedPrefs → book-a-trip draft chips. */
+export function draftFromSuggestedPrefs(prefs: {
+  preferences?: string[];
+  tripType?: string;
+  targetCustomer?: string;
+  pace?: Pace;
+  budgetLevel?: BudgetLevel;
+}): AutoTripDraft {
+  const buckets = bucketPreferences(prefs.preferences || []);
+  const budgetLevel =
+    prefs.budgetLevel && BUDGETS.has(prefs.budgetLevel)
+      ? prefs.budgetLevel
+      : DEFAULT_AUTO_TRIP_DRAFT.budgetLevel;
+  const pace =
+    prefs.pace && PACES.has(prefs.pace)
+      ? prefs.pace
+      : DEFAULT_AUTO_TRIP_DRAFT.pace;
+
+  return {
+    ...DEFAULT_AUTO_TRIP_DRAFT,
+    date: todayYmd(),
+    tripStatus: "Pending",
+    budgetLevel,
+    pace,
+    tripType: prefs.tripType || null,
+    targetCustomer: prefs.targetCustomer || null,
+    atmosphere: buckets.atmosphere.slice(0, 6),
+    food: buckets.food.slice(0, 6),
+    activities: buckets.activities.slice(0, 6),
+    constraints: buckets.constraints.slice(0, 6),
+  };
+}
