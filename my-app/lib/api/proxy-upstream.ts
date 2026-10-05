@@ -21,9 +21,8 @@ export const LOCALTRIP_PUBLIC_API_DEFAULT =
 export const LOCALTRIP_TRIP_SERVICE_DEFAULT =
   "https://localtrip-tripservice-production.up.railway.app";
 
-/** Railway payment-service (payments + wallet). */
-export const LOCALTRIP_PAYMENT_SERVICE_DEFAULT =
-  "https://localtrip-paymentservice-production.up.railway.app";
+/** Default payment upstream (DO gateway — payments + wallet + SePay webhooks). */
+export const LOCALTRIP_PAYMENT_SERVICE_DEFAULT = "https://api.locatrip.app";
 
 export type UpstreamKind = "trip" | "payment";
 
@@ -36,13 +35,24 @@ function stripTrailingSlash(url: string): string {
   return url.replace(/\/$/, "");
 }
 
+function resolvePublicGateway(env: NodeJS.ProcessEnv): string | null {
+  const pub = env.LOCALTRIP_PUBLIC_API_URL?.trim();
+  if (
+    pub &&
+    stripTrailingSlash(pub) !== stripTrailingSlash(LOCALTRIP_PUBLIC_API_DEFAULT)
+  ) {
+    return stripTrailingSlash(pub);
+  }
+  return null;
+}
+
 /**
  * Resolve LocalTrip upstream base from env.
  *
  * Priority:
  * 1. `LOCALTRIP_USE_PUBLIC_API` truthy:
- *    - payment (payments + wallet) → always PAYMENT Railway URL
- *      (DO gateway does not route `/payments` / `/wallet` yet)
+ *    - payment: `LOCALTRIP_PAYMENT_SERVICE_URL` → else same DO/public gateway as trip
+ *      → else payment default (`api.locatrip.app`)
  *    - trip: if `LOCALTRIP_PUBLIC_API_URL` set and ≠ dead gateway default → that URL
  *      else → TRIP Railway URL
  * 2. `LOCALTRIP_API_URL` / `API_BASE_URL` / `NEXT_PUBLIC_API_BASE_URL` (gateway)
@@ -54,20 +64,16 @@ export function resolveUpstreamBase(
 ): string {
   if (truthy(env.LOCALTRIP_USE_PUBLIC_API)) {
     if (kind === "payment") {
-      return stripTrailingSlash(
-        env.LOCALTRIP_PAYMENT_SERVICE_URL?.trim() ||
-          LOCALTRIP_PAYMENT_SERVICE_DEFAULT,
+      const explicit = env.LOCALTRIP_PAYMENT_SERVICE_URL?.trim();
+      if (explicit) return stripTrailingSlash(explicit);
+      return (
+        resolvePublicGateway(env) ||
+        stripTrailingSlash(LOCALTRIP_PAYMENT_SERVICE_DEFAULT)
       );
     }
 
-    const pub = env.LOCALTRIP_PUBLIC_API_URL?.trim();
-    if (
-      pub &&
-      stripTrailingSlash(pub) !==
-        stripTrailingSlash(LOCALTRIP_PUBLIC_API_DEFAULT)
-    ) {
-      return stripTrailingSlash(pub);
-    }
+    const pub = resolvePublicGateway(env);
+    if (pub) return pub;
 
     return stripTrailingSlash(
       env.LOCALTRIP_TRIP_SERVICE_URL?.trim() || LOCALTRIP_TRIP_SERVICE_DEFAULT,

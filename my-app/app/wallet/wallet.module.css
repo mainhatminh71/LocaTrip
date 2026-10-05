@@ -77,6 +77,17 @@
   font-weight: 800;
   letter-spacing: -0.03em;
   line-height: 1.1;
+  display: flex;
+  align-items: baseline;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.balanceSub {
+  margin: 0.15rem 0 0;
+  font-size: 0.9rem;
+  font-weight: 650;
+  opacity: 0.92;
 }
 
 .balanceRate {
@@ -118,12 +129,14 @@
 .packageBtn,
 .packageBtnOn {
   appearance: none;
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 0.2rem;
-  padding: 0.85rem 0.95rem;
-  border-radius: 14px;
+  gap: 0.25rem;
+  min-height: 5.5rem;
+  padding: 1.05rem 1rem 0.95rem;
+  border-radius: 16px;
   border: 1.5px solid rgba(1, 40, 48, 0.12);
   background: #fff;
   cursor: pointer;
@@ -142,14 +155,28 @@
   box-shadow: 0 0 0 2px rgba(10, 107, 124, 0.15);
 }
 
-.packageAmount {
-  font-size: 0.95rem;
+.packageBadge {
+  position: absolute;
+  top: 0.55rem;
+  right: 0.55rem;
+  padding: 0.15rem 0.45rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--lt-teal, #0a6b7c) 14%, #fff);
+  color: var(--lt-teal, #0a6b7c);
+  font-size: 0.68rem;
   font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.packageAmount {
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
   color: var(--lt-deep, #012830);
 }
 
 .packageXu {
-  font-size: 0.82rem;
+  font-size: 0.86rem;
   font-weight: 650;
   color: var(--lt-teal, #0a6b7c);
 }
@@ -204,6 +231,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 0.35rem;
   font: inherit;
   font-size: 0.9rem;
   font-weight: 700;
@@ -373,6 +401,27 @@
   border-radius: 14px;
   background: #f8faf9;
   border: 1px solid rgba(1, 40, 48, 0.06);
+}
+
+.txIconPos,
+.txIconNeg {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 1.7rem;
+  height: 1.7rem;
+  margin-top: 0.1rem;
+  border-radius: 999px;
+}
+
+.txIconPos {
+  background: #ecfdf5;
+  color: #047857;
+}
+
+.txIconNeg {
+  background: #fff7ed;
+  color: #c2410c;
 }
 
 .payCard {

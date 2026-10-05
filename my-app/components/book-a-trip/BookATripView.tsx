@@ -106,6 +106,13 @@ import { TripWeatherAdvisoryWidget } from "@/components/weather/TripWeatherAdvis
 import { useAuthModal } from "@/components/auth/AuthModalProvider";
 import { AccountMenu } from "@/components/auth/AccountFab";
 import { WalletBalanceBadge } from "@/components/wallet/WalletBalanceBadge";
+import {
+  readBalanceVisible,
+  readMapRoutesVisible,
+  writeBalanceVisible,
+  writeMapRoutesVisible,
+} from "@/lib/ui/view-prefs";
+import { Eye, EyeOff, Route } from "lucide-react";
 import { useToast } from "@/components/ui/ToastProvider";
 import { AutoTripPrefsFields } from "./AutoTripPrefsFields";
 import { ItineraryMap } from "./ItineraryMap";
@@ -196,6 +203,8 @@ export function BookATripView({
   const dragDropConsumedRef = useRef(false);
   const [mobileMapOpen, setMobileMapOpen] = useState(false);
   const [routeStale, setRouteStale] = useState(false);
+  const [showBalance, setShowBalance] = useState(true);
+  const [showRoutes, setShowRoutes] = useState(true);
   /** Road-following line for the map (OSRM from generate or Mapbox Directions). */
   const [routeGeoJSON, setRouteGeoJSON] =
     useState<RouteFeatureCollection | null>(null);
@@ -226,6 +235,27 @@ export function BookATripView({
     const stored = readStoredEditingTripId();
     if (stored) setEditingTripId(stored);
   }, []);
+
+  useEffect(() => {
+    setShowBalance(readBalanceVisible());
+    setShowRoutes(readMapRoutesVisible());
+  }, []);
+
+  function toggleBalanceVisible() {
+    setShowBalance((prev) => {
+      const next = !prev;
+      writeBalanceVisible(next);
+      return next;
+    });
+  }
+
+  function toggleRoutesVisible() {
+    setShowRoutes((prev) => {
+      const next = !prev;
+      writeMapRoutesVisible(next);
+      return next;
+    });
+  }
 
   function setEditingTrip(id: string | null) {
     setEditingTripId(id);
@@ -1725,7 +1755,23 @@ export function BookATripView({
             <span>Gợi ý chuyến Đà Lạt</span>
           </div>
           <div className={styles.focusMeta}>
-            <WalletBalanceBadge tone="dark" size="md" showLabel />
+            {showBalance ? (
+              <WalletBalanceBadge tone="dark" size="md" showLabel />
+            ) : null}
+            <button
+              type="button"
+              className={styles.focusToggle}
+              onClick={toggleBalanceVisible}
+              aria-pressed={showBalance}
+              aria-label={showBalance ? "Ẩn số dư xu" : "Hiện số dư xu"}
+              title={showBalance ? "Ẩn số dư" : "Hiện số dư"}
+            >
+              {showBalance ? (
+                <EyeOff size={16} strokeWidth={2.2} />
+              ) : (
+                <Eye size={16} strokeWidth={2.2} />
+              )}
+            </button>
             <AccountMenu variant="bar" />
           </div>
         </div>
@@ -2475,20 +2521,36 @@ export function BookATripView({
               <aside className={styles.mapPane} aria-label="Bản đồ lộ trình">
                 <div className={styles.mapPaneInner}>
                   {!isNarrow ? (
-                    <ItineraryMap
-                      stops={mapStops}
-                      selectedKey={selectedStopKey}
-                      selectedTravelKey={selectedTravelKey}
-                      routeGeoJSON={routeGeoJSON}
-                      onSelectStop={selectStop}
-                      onClearTravel={clearTravelSelection}
-                      busy={loading || locating}
-                      busyLabel={
-                        locating
-                          ? "Đang lấy vị trí…"
-                          : "Đang dựng lộ trình…"
-                      }
-                    />
+                    <>
+                      <button
+                        type="button"
+                        className={styles.mapRouteToggle}
+                        onClick={toggleRoutesVisible}
+                        aria-pressed={showRoutes}
+                        aria-label={
+                          showRoutes ? "Ẩn đường đi trên bản đồ" : "Hiện đường đi trên bản đồ"
+                        }
+                        title={showRoutes ? "Ẩn đường đi" : "Hiện đường đi"}
+                      >
+                        <Route size={16} strokeWidth={2.2} />
+                        <span>{showRoutes ? "Ẩn đường" : "Hiện đường"}</span>
+                      </button>
+                      <ItineraryMap
+                        stops={mapStops}
+                        selectedKey={selectedStopKey}
+                        selectedTravelKey={selectedTravelKey}
+                        routeGeoJSON={routeGeoJSON}
+                        showRoute={showRoutes}
+                        onSelectStop={selectStop}
+                        onClearTravel={clearTravelSelection}
+                        busy={loading || locating}
+                        busyLabel={
+                          locating
+                            ? "Đang lấy vị trí…"
+                            : "Đang dựng lộ trình…"
+                        }
+                      />
+                    </>
                   ) : null}
                   {!selectedStop ? (
                     <p className={styles.mapHint}>
@@ -2551,13 +2613,29 @@ export function BookATripView({
                     <div className={styles.mobileMapSheet}>
                       <div className={styles.mobileMapBar}>
                         <span>Bản đồ lộ trình</span>
-                        <button
-                          type="button"
-                          className={styles.focusBack}
-                          onClick={() => setMobileMapOpen(false)}
-                        >
-                          Đóng
-                        </button>
+                        <div className={styles.mobileMapBarActions}>
+                          <button
+                            type="button"
+                            className={styles.mapRouteToggle}
+                            onClick={toggleRoutesVisible}
+                            aria-pressed={showRoutes}
+                            aria-label={
+                              showRoutes
+                                ? "Ẩn đường đi trên bản đồ"
+                                : "Hiện đường đi trên bản đồ"
+                            }
+                          >
+                            <Route size={15} strokeWidth={2.2} />
+                            <span>{showRoutes ? "Ẩn đường" : "Hiện đường"}</span>
+                          </button>
+                          <button
+                            type="button"
+                            className={styles.focusBack}
+                            onClick={() => setMobileMapOpen(false)}
+                          >
+                            Đóng
+                          </button>
+                        </div>
                       </div>
                       <div className={styles.mobileMapBody}>
                         <ItineraryMap
@@ -2565,6 +2643,7 @@ export function BookATripView({
                           selectedKey={selectedStopKey}
                           selectedTravelKey={selectedTravelKey}
                           routeGeoJSON={routeGeoJSON}
+                          showRoute={showRoutes}
                           onSelectStop={(key) => {
                             selectStop(key);
                             setMobileMapOpen(false);

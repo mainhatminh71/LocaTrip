@@ -105,7 +105,8 @@ export async function getWeatherForecast(
   const lat = Number(params.latitude);
   const lng = Number(params.longitude);
   if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
-    throw new ApiError("Thiếu tọa độ để lấy dự báo thời tiết", 400);
+    // Keep ASCII — Next code-frame highlighter panics on mid-rune UTF-8 slices.
+    throw new ApiError("Missing coordinates for weather forecast", 400);
   }
 
   const qs = new URLSearchParams({
@@ -133,10 +134,11 @@ export async function getWeatherForecast(
     days?: unknown[];
   };
   if (!res.ok) {
+    // ASCII fallback only — Next `next-code-frame` can panic highlighting VN text.
     throw apiErrorFromBody(
       data,
       res.status,
-      data.error || `Không tải được dự báo thời tiết (${res.status})`,
+      data.error || `Weather forecast failed (${res.status})`,
     );
   }
 
@@ -150,7 +152,7 @@ export async function getWeatherForecast(
     .filter((d): d is WeatherDay => Boolean(d));
 
   if (!days.length) {
-    throw new ApiError("Không có ngày dự báo trong phản hồi", 404);
+    throw new ApiError("No forecast days in response", 404);
   }
 
   return {

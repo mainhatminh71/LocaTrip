@@ -3,6 +3,15 @@
 import Link from "next/link";
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
+import { motion } from "framer-motion";
+import {
+  Check,
+  Clock,
+  Copy,
+  Loader2,
+  QrCode,
+  Wallet,
+} from "lucide-react";
 import { MarketingChrome } from "@/components/layout/MarketingChrome";
 import { RequireAuth } from "@/components/auth/RequireAuth";
 import { LtBrandLoader } from "@/components/book-a-trip/LtBrandLoader";
@@ -25,6 +34,8 @@ import {
 } from "@/lib/auto-trip-pending";
 import { useToast } from "@/components/ui/ToastProvider";
 import { requestWalletRefresh } from "@/lib/wallet/xu";
+import { xuFromVnd } from "@/lib/api/wallet";
+import { copyText } from "@/lib/ui/clipboard";
 import styles from "../payments.module.css";
 
 /** Poll while awaiting — BE SePay webhook flips status to paid; FE discovers via GET. */
@@ -79,6 +90,45 @@ function formatWhen(iso?: string) {
   } catch {
     return iso;
   }
+}
+
+function CopyField({
+  label,
+  value,
+  mono,
+}: {
+  label: string;
+  value: string;
+  mono?: boolean;
+}) {
+  const [copied, setCopied] = useState(false);
+  useEffect(() => {
+    if (!copied) return;
+    const t = setTimeout(() => setCopied(false), 1600);
+    return () => clearTimeout(t);
+  }, [copied]);
+
+  return (
+    <div className={styles.copyRow}>
+      <div className={styles.copyText}>
+        <span className={styles.copyLabel}>{label}</span>
+        <span className={mono ? styles.code : styles.copyValue}>{value}</span>
+      </div>
+      <button
+        type="button"
+        className={styles.copyBtn}
+        aria-label={copied ? "Đã sao chép" : `Sao chép ${label}`}
+        onClick={() => {
+          void copyText(value).then((ok) => {
+            if (ok) setCopied(true);
+          });
+        }}
+      >
+        {copied ? <Check size={16} strokeWidth={2.4} /> : <Copy size={16} />}
+        <span>{copied ? "Đã chép" : "Chép"}</span>
+      </button>
+    </div>
+  );
 }
 
 function PaymentDetailInner() {
@@ -258,15 +308,33 @@ function PaymentDetailInner() {
     Boolean(payment.checkoutUrl) &&
     isPaymentQrImage(payment.checkoutUrl) &&
     !imgBroken;
+  const creditedXu = xuFromVnd(payment.amount);
+  const accountLine = [payment.accountNo, payment.accountName]
+    .filter(Boolean)
+    .join(" · ");
 
   if (isPaid) {
     return (
       <main className={styles.page}>
         <div className={styles.wrap}>
           <div className={`${styles.panel} ${styles.successPanel}`}>
-            <div className={styles.successIcon} aria-hidden="true">
-              ✓
-            </div>
+            <motion.div
+              className={styles.successIconRing}
+              initial={{ scale: 0.6, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ type: "spring", stiffness: 320, damping: 18 }}
+              aria-hidden="true"
+            >
+              <Check size={28} strokeWidth={2.6} />
+            </motion.div>
+            <motion.p
+              className={styles.successXu}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.15 }}
+            >
+              +{creditedXu.toLocaleString("vi-VN")} xu
+            </motion.p>
             <p className={styles.eyebrow}>Thanh toán</p>
             <h1 className={styles.title}>Thanh toán thành công</h1>
             <p className={styles.sub}>
@@ -285,20 +353,10 @@ function PaymentDetailInner() {
                 <dt>Mã CK</dt>
                 <dd className={styles.code}>{payment.code}</dd>
               </div>
-              <div>
-                <dt>Mã đơn</dt>
-                <dd>{payment.orderCode}</dd>
-              </div>
               {formatWhen(payment.paidAt) ? (
                 <div>
                   <dt>Thanh toán lúc</dt>
                   <dd>{formatWhen(payment.paidAt)}</dd>
-                </div>
-              ) : null}
-              {payment.note ? (
-                <div>
-                  <dt>Ghi chú</dt>
-                  <dd>{payment.note}</dd>
                 </div>
               ) : null}
             </dl>
@@ -317,8 +375,9 @@ function PaymentDetailInner() {
                   Về lịch sử giao dịch
                 </Link>
               )}
-              <Link href="/my-trips" className={styles.btnGhost}>
-                Chuyến đi của tôi
+              <Link href="/wallet" className={styles.btnGhost}>
+                <Wallet size={16} />
+                Ví xu
               </Link>
             </div>
           </div>
@@ -329,59 +388,108 @@ function PaymentDetailInner() {
 
   return (
     <main className={styles.page}>
-      <div className={styles.wrap}>
-        <header className={styles.detailHead}>
-          <div>
-            <p className={styles.eyebrow}>Thanh toán</p>
-            <h1 className={styles.title}>{formatVnd(payment.amount)}</h1>
-            <p className={styles.sub}>
-              {waiting && countdown.label && !countdown.expired
-                ? `Còn ${countdown.label} trước khi hết hạn`
-                : paymentStatusLabel(payment.status)}
-            </p>
-          </div>
-          <span className={badgeClass(payment.status)}>
-            {paymentStatusLabel(payment.status)}
-          </span>
-        </header>
-
-        <div className={styles.panel}>
-          {waiting ? (
-            <div className={styles.qrWrap}>
-              {showImg ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={payment.checkoutUrl}
-                  alt={`Mã QR thanh toán ${payment.code}`}
-                  className={styles.qrImg}
-                  onError={() => setImgBroken(true)}
-                />
-              ) : payment.checkoutUrl ? (
-                <a
-                  href={payment.checkoutUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className={styles.btnPrimary}
-                >
-                  Mở trang / ảnh QR thanh toán
-                </a>
-              ) : (
-                <p className={styles.error}>
-                  Đơn đã tạo nhưng thiếu link QR. Dùng thông tin chuyển khoản bên
-                  dưới.
-                </p>
-              )}
-              {countdown.label ? (
-                <p className={styles.countdown}>
-                  {countdown.expired
-                    ? "Đã hết hạn — đang cập nhật trạng thái…"
-                    : `Hết hạn sau ${countdown.label}`}
-                </p>
-              ) : null}
-              <p className={styles.pollHint}>
-                Đang chờ xác nhận chuyển khoản (SePay)… màn hình sẽ tự cập nhật
-                khi thanh toán thành công.
+      <div className={styles.wrapNarrow}>
+        <div className={styles.trustPanel}>
+          <motion.div
+            className={styles.statusStrip}
+            animate={
+              waiting
+                ? { boxShadow: ["0 0 0 0 rgba(194,65,12,0)", "0 0 0 8px rgba(194,65,12,0.08)", "0 0 0 0 rgba(194,65,12,0)"] }
+                : undefined
+            }
+            transition={
+              waiting
+                ? { duration: 1.8, repeat: Infinity, ease: "easeInOut" }
+                : undefined
+            }
+          >
+            {waiting ? (
+              <Loader2 className={styles.statusSpin} size={18} />
+            ) : (
+              <Clock size={18} />
+            )}
+            <div className={styles.statusStripText}>
+              <span className={badgeClass(payment.status)}>
+                {paymentStatusLabel(payment.status)}
+              </span>
+              <p>
+                {waiting
+                  ? "Đang chờ xác nhận chuyển khoản — trang tự cập nhật"
+                  : paymentStatusLabel(payment.status)}
               </p>
+            </div>
+          </motion.div>
+
+          <header className={styles.amountBlock}>
+            <p className={styles.eyebrow}>Số tiền chuyển</p>
+            <h1 className={styles.amountHero}>{formatVnd(payment.amount)}</h1>
+            {waiting && countdown.label ? (
+              <p
+                className={
+                  countdown.expired ? styles.countdownExpired : styles.countdownHero
+                }
+              >
+                {countdown.expired
+                  ? "Đã hết hạn — đang cập nhật trạng thái…"
+                  : `Còn ${countdown.label} trước khi hết hạn`}
+              </p>
+            ) : null}
+            {fromWallet ? (
+              <p className={styles.xuHint}>
+                Nhận khoảng {creditedXu.toLocaleString("vi-VN")} xu
+              </p>
+            ) : null}
+          </header>
+
+          {waiting ? (
+            <div className={styles.qrStage}>
+              <div className={styles.qrFrame}>
+                {showImg ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={payment.checkoutUrl}
+                    alt={`Mã QR thanh toán ${payment.code}`}
+                    className={styles.qrImg}
+                    onError={() => setImgBroken(true)}
+                  />
+                ) : payment.checkoutUrl ? (
+                  <a
+                    href={payment.checkoutUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className={styles.btnPrimary}
+                  >
+                    <QrCode size={16} />
+                    Mở trang / ảnh QR
+                  </a>
+                ) : (
+                  <p className={styles.error}>
+                    Đơn đã tạo nhưng thiếu link QR. Dùng thông tin chuyển khoản bên
+                    dưới.
+                  </p>
+                )}
+              </div>
+
+              <div className={styles.transferMeta}>
+                {payment.bankName ? (
+                  <CopyField label="Ngân hàng" value={payment.bankName} />
+                ) : null}
+                {accountLine ? (
+                  <CopyField
+                    label="STK nhận"
+                    value={payment.accountNo || accountLine}
+                    mono
+                  />
+                ) : null}
+                <CopyField label="Nội dung CK" value={payment.code} mono />
+              </div>
+
+              <ol className={styles.steps}>
+                <li>Mở app ngân hàng và quét mã QR</li>
+                <li>Kiểm tra đúng số tiền và nội dung CK</li>
+                <li>Xác nhận — xu sẽ cộng khi SePay báo thành công</li>
+              </ol>
+
               <p className={styles.paySupportBanner} role="note">
                 Nếu chuyển khoản lỗi, liên hệ Zalo hỗ trợ:{" "}
                 <a
@@ -396,41 +504,37 @@ function PaymentDetailInner() {
             </div>
           ) : null}
 
-          <dl className={styles.dl}>
-            <div>
-              <dt>Mã CK</dt>
-              <dd className={styles.code}>{payment.code}</dd>
-            </div>
-            <div>
-              <dt>Mã đơn</dt>
-              <dd>{payment.orderCode}</dd>
-            </div>
-            <div>
-              <dt>Trạng thái</dt>
-              <dd>{paymentStatusLabel(payment.status)}</dd>
-            </div>
-            {payment.note ? (
+          <details className={styles.techDetails}>
+            <summary>Chi tiết kỹ thuật</summary>
+            <dl className={styles.dl}>
               <div>
-                <dt>Ghi chú</dt>
-                <dd>{payment.note}</dd>
+                <dt>Mã đơn</dt>
+                <dd>{payment.orderCode}</dd>
               </div>
-            ) : null}
-            {payment.bankName ? (
               <div>
-                <dt>Ngân hàng</dt>
-                <dd>{payment.bankName}</dd>
+                <dt>Payment ID</dt>
+                <dd className={styles.code}>{payment.paymentId}</dd>
               </div>
-            ) : null}
-            {payment.accountNo ? (
-              <div>
-                <dt>TK nhận</dt>
-                <dd>
-                  {payment.accountNo}
-                  {payment.accountName ? ` · ${payment.accountName}` : ""}
-                </dd>
-              </div>
-            ) : null}
-          </dl>
+              {formatWhen(payment.createdAt) ? (
+                <div>
+                  <dt>Tạo lúc</dt>
+                  <dd>{formatWhen(payment.createdAt)}</dd>
+                </div>
+              ) : null}
+              {payment.note ? (
+                <div>
+                  <dt>Ghi chú</dt>
+                  <dd>{payment.note}</dd>
+                </div>
+              ) : null}
+              {payment.accountName && payment.accountNo ? (
+                <div>
+                  <dt>Chủ TK</dt>
+                  <dd>{payment.accountName}</dd>
+                </div>
+              ) : null}
+            </dl>
+          </details>
 
           <div className={styles.actions}>
             {waiting ? (

@@ -2,9 +2,13 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { motion } from "framer-motion";
+import * as Tabs from "@radix-ui/react-tabs";
+import { Map, Plus } from "lucide-react";
 import { MarketingChrome } from "@/components/layout/MarketingChrome";
 import { RequireAuth } from "@/components/auth/RequireAuth";
 import { LtBrandLoader } from "@/components/book-a-trip/LtBrandLoader";
+import { PlaceThumb } from "@/components/book-a-trip/PlaceThumb";
 import {
   deleteSavedTrip,
   listSavedTrips,
@@ -17,7 +21,7 @@ import { ApiError } from "@/lib/api/http";
 import { labelForValue } from "@/lib/auto-trip-form";
 import { visitItems } from "@/lib/itinerary-map";
 import { pickSavedTripPrefs } from "@/lib/saved-trip-draft";
-import { BUDGET_OPTIONS, PACE_OPTIONS } from "@/lib/trip";
+import { tripStatusTone } from "@/lib/ui/status-tone";
 import { useToast } from "@/components/ui/ToastProvider";
 import styles from "./my-trips.module.css";
 
@@ -44,145 +48,152 @@ function formatTripDay(ymd?: string) {
   }
 }
 
-function paceLabel(pace?: string) {
-  return PACE_OPTIONS.find((o) => o.value === pace)?.label || pace || null;
-}
-
-function budgetLabel(budget?: string) {
-  return BUDGET_OPTIONS.find((o) => o.value === budget)?.hint || budget || null;
-}
-
 function displayTitle(title: string) {
   return title.replace(/^Lộ trình\s+\d+:\s*/i, "").trim() || title;
+}
+
+function statusPillClass(status?: TripProgressStatus | null): string {
+  const tone = tripStatusTone(status);
+  if (tone === "pending") return styles.statusPending;
+  if (tone === "ongoing") return styles.statusOngoing;
+  if (tone === "done") return styles.statusDone;
+  return styles.statusMuted;
 }
 
 function TripListCard({
   trip,
   deleting,
   onDelete,
+  index,
 }: {
   trip: SavedTrip;
   deleting: boolean;
   onDelete: () => void;
+  index: number;
 }) {
   const prefs = useMemo(() => pickSavedTripPrefs(trip), [trip]);
-  const days =
-    trip.durationDays ||
-    trip.itinerary?.length ||
-    0;
+  const days = trip.durationDays || trip.itinerary?.length || 0;
   const visits = useMemo(
     () =>
       (trip.itinerary || []).flatMap((day) => visitItems(day.schedule || [])),
     [trip.itinerary],
   );
-  const preview = visits
-    .map((v) => v.place?.title?.trim())
-    .filter(Boolean)
-    .slice(0, 3) as string[];
-  const more = Math.max(0, visits.length - preview.length);
+  const coverThumbs = useMemo(() => {
+    const urls: string[] = [];
+    const seen = new Set<string>();
+    for (const v of visits) {
+      const t = v.place?.thumbnail?.trim();
+      if (!t || seen.has(t)) continue;
+      seen.add(t);
+      urls.push(t);
+      if (urls.length >= 3) break;
+    }
+    return urls;
+  }, [visits]);
 
   const tripDate = resolveTripDate(trip);
   const tripDay = formatTripDay(tripDate);
-
   const progressLabel =
     TRIP_PROGRESS_OPTIONS.find((o) => o.value === trip.tripStatus)?.label ||
     null;
 
-  const chips = [
-    progressLabel,
+  const metaBits = [
+    tripDay ? `Ngày đi ${tripDay}` : "Chưa có ngày đi",
+    visits.length > 0 ? `${visits.length} điểm` : null,
     days > 0 ? `${days} ngày` : null,
-    prefs.tripType ? labelForValue(prefs.tripType) : null,
-    prefs.targetCustomer ? labelForValue(prefs.targetCustomer) : null,
-    paceLabel(prefs.pace),
-    budgetLabel(prefs.budgetLevel),
-    prefs.isRoundTrip === true
-      ? "Khứ hồi"
-      : prefs.isRoundTrip === false
-        ? "Một chiều"
-        : null,
-  ].filter(Boolean) as string[];
+  ].filter(Boolean);
 
   const softPrefs = (prefs.preferences || [])
-    .slice(0, 4)
+    .slice(0, 3)
     .map((p) => labelForValue(p));
 
   return (
-    <li className={styles.card}>
-      <div className={styles.cardTop}>
-        {tripDay && tripDate ? (
-          <time className={styles.cardTripDay} dateTime={tripDate}>
-            Ngày đi · {tripDay}
-          </time>
+    <motion.li
+      className={styles.card}
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.28, delay: Math.min(index, 4) * 0.05 }}
+    >
+      <div
+        className={
+          coverThumbs.length > 0 ? styles.coverStrip : styles.coverFallback
+        }
+        style={
+          coverThumbs.length > 0
+            ? {
+                gridTemplateColumns: `repeat(${coverThumbs.length}, minmax(0, 1fr))`,
+              }
+            : undefined
+        }
+        aria-hidden={coverThumbs.length === 0}
+      >
+        {coverThumbs.length > 0 ? (
+          coverThumbs.map((src, i) => (
+            <div key={`${src}-${i}`} className={styles.coverCell}>
+              <PlaceThumb
+                src={src}
+                alt=""
+                variant="tile"
+                className={styles.coverThumb}
+              />
+            </div>
+          ))
         ) : (
-          <span className={styles.cardTripDayMuted}>Chưa có ngày đi</span>
+          <div className={styles.coverFallbackInner}>
+            <Map size={22} strokeWidth={1.8} />
+          </div>
         )}
-        <time
-          className={styles.cardDate}
-          dateTime={trip.updatedAt || trip.createdAt}
-          title="Lần cập nhật gần nhất"
-        >
-          {formatDate(trip.updatedAt || trip.createdAt)}
-        </time>
       </div>
 
-      <Link href={`/my-trips/${trip.id}/`} className={styles.cardTitle}>
-        {displayTitle(trip.title)}
-      </Link>
+      <div className={styles.cardBody}>
+        <div className={styles.cardTop}>
+          {progressLabel ? (
+            <span className={statusPillClass(trip.tripStatus)}>
+              {progressLabel}
+            </span>
+          ) : (
+            <span className={styles.statusMuted}>Lịch trình</span>
+          )}
+          <time
+            className={styles.cardDate}
+            dateTime={trip.updatedAt || trip.createdAt}
+            title="Lần cập nhật gần nhất"
+          >
+            {formatDate(trip.updatedAt || trip.createdAt)}
+          </time>
+        </div>
 
-      {chips.length > 0 ? (
-        <ul className={styles.metaChips}>
-          {chips.map((c) => (
-            <li key={c}>{c}</li>
-          ))}
-        </ul>
-      ) : (
-        <p className={styles.meta}>
-          {days > 0 ? `${days} ngày` : "Lịch trình"}
-          {trip.pace ? ` · ${paceLabel(trip.pace) || trip.pace}` : ""}
-        </p>
-      )}
-
-      {preview.length > 0 ? (
-        <ol className={styles.stopPreview}>
-          {preview.map((title, idx) => (
-            <li key={`${title}-${idx}`}>{title}</li>
-          ))}
-          {more > 0 ? (
-            <li className={styles.stopMore}>+{more} điểm nữa</li>
-          ) : null}
-        </ol>
-      ) : trip.summary ? (
-        <p className={styles.summary}>{trip.summary}</p>
-      ) : null}
-
-      {softPrefs.length > 0 ? (
-        <p className={styles.softLine}>
-          Sở thích: {softPrefs.join(" · ")}
-          {(prefs.preferences?.length || 0) > softPrefs.length ? "…" : ""}
-        </p>
-      ) : null}
-
-      {trip.totalEstimatedCost != null && trip.totalEstimatedCost !== "" ? (
-        <p className={styles.cost}>{String(trip.totalEstimatedCost)}</p>
-      ) : null}
-
-      <div className={styles.cardActions}>
-        <Link
-          href={`/book-a-trip/?edit=${encodeURIComponent(trip.id)}`}
-          className={styles.btnPrimary}
-        >
-          Xem và chỉnh sửa
+        <Link href={`/my-trips/${trip.id}/`} className={styles.cardTitle}>
+          {displayTitle(trip.title)}
         </Link>
-        <button
-          type="button"
-          className={styles.btnDanger}
-          disabled={deleting}
-          onClick={onDelete}
-        >
-          {deleting ? "Đang xóa…" : "Xóa"}
-        </button>
+
+        <p className={styles.metaLine}>{metaBits.join(" · ")}</p>
+
+        {softPrefs.length > 0 ? (
+          <p className={styles.softLine}>
+            {softPrefs.join(" · ")}
+            {(prefs.preferences?.length || 0) > softPrefs.length ? "…" : ""}
+          </p>
+        ) : null}
+
+        <div className={styles.cardActions}>
+          <Link
+            href={`/book-a-trip/?edit=${encodeURIComponent(trip.id)}`}
+            className={styles.btnPrimary}
+          >
+            Xem và chỉnh sửa
+          </Link>
+          <button
+            type="button"
+            className={styles.btnDanger}
+            disabled={deleting}
+            onClick={onDelete}
+          >
+            {deleting ? "Đang xóa…" : "Xóa"}
+          </button>
+        </div>
       </div>
-    </li>
+    </motion.li>
   );
 }
 
@@ -288,6 +299,7 @@ function MyTripsInner() {
             </p>
           </div>
           <Link href="/book-a-trip/" className={styles.btnPrimary}>
+            <Plus size={16} strokeWidth={2.4} />
             Tạo chuyến đi
           </Link>
         </header>
@@ -302,11 +314,15 @@ function MyTripsInner() {
 
         {!loading && !error && trips.length === 0 ? (
           <div className={styles.empty}>
+            <span className={styles.emptyIcon} aria-hidden="true">
+              <Map size={28} strokeWidth={1.7} />
+            </span>
             <p className={styles.emptyTitle}>Chưa có chuyến đi nào</p>
             <p>
-              Tạo lịch trên Book a trip rồi tạo nháp — danh sách sẽ hiện tại đây.
+              Tạo lịch trên Book a trip rồi lưu nháp — danh sách sẽ hiện tại đây.
             </p>
             <Link href="/book-a-trip/" className={styles.btnPrimary}>
+              <Plus size={16} strokeWidth={2.4} />
               Tạo chuyến đi đầu tiên
             </Link>
           </div>
@@ -314,41 +330,39 @@ function MyTripsInner() {
 
         {!loading && trips.length > 0 ? (
           <>
-            <div
-              className={styles.statusTabs}
-              role="tablist"
-              aria-label="Lọc theo trạng thái"
+            <Tabs.Root
+              value={statusFilter}
+              onValueChange={(v) => setStatusFilter(v as StatusFilter)}
             >
-              <button
-                type="button"
-                role="tab"
-                aria-selected={statusFilter === "all"}
-                className={
-                  statusFilter === "all"
-                    ? styles.statusTabOn
-                    : styles.statusTab
-                }
-                onClick={() => setStatusFilter("all")}
+              <Tabs.List
+                className={styles.statusTabs}
+                aria-label="Lọc theo trạng thái"
               >
-                Tất cả
-              </button>
-              {TRIP_PROGRESS_OPTIONS.map((opt) => (
-                <button
-                  key={opt.value}
-                  type="button"
-                  role="tab"
-                  aria-selected={statusFilter === opt.value}
+                <Tabs.Trigger
+                  value="all"
                   className={
-                    statusFilter === opt.value
+                    statusFilter === "all"
                       ? styles.statusTabOn
                       : styles.statusTab
                   }
-                  onClick={() => setStatusFilter(opt.value)}
                 >
-                  {opt.label}
-                </button>
-              ))}
-            </div>
+                  Tất cả
+                </Tabs.Trigger>
+                {TRIP_PROGRESS_OPTIONS.map((opt) => (
+                  <Tabs.Trigger
+                    key={opt.value}
+                    value={opt.value}
+                    className={
+                      statusFilter === opt.value
+                        ? styles.statusTabOn
+                        : styles.statusTab
+                    }
+                  >
+                    {opt.label}
+                  </Tabs.Trigger>
+                ))}
+              </Tabs.List>
+            </Tabs.Root>
 
             {filteredTrips.length === 0 ? (
               <div className={styles.empty}>
@@ -358,10 +372,11 @@ function MyTripsInner() {
             ) : null}
 
             <ul className={styles.list}>
-              {pageTrips.map((trip) => (
+              {pageTrips.map((trip, index) => (
                 <TripListCard
                   key={trip.id}
                   trip={trip}
+                  index={index}
                   deleting={deletingId === trip.id}
                   onDelete={() => setPendingDelete(trip)}
                 />

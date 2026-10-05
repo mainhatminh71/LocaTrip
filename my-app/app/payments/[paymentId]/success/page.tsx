@@ -1,8 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useParams } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useParams, useSearchParams } from "next/navigation";
+import { Suspense, useCallback, useEffect, useState } from "react";
+import { motion } from "framer-motion";
+import { Check, Map, Wallet } from "lucide-react";
 import { MarketingChrome } from "@/components/layout/MarketingChrome";
 import { RequireAuth } from "@/components/auth/RequireAuth";
 import { LtBrandLoader } from "@/components/book-a-trip/LtBrandLoader";
@@ -12,6 +14,11 @@ import {
   paymentStatusLabel,
   type Payment,
 } from "@/lib/api/payments";
+import { xuFromVnd } from "@/lib/api/wallet";
+import {
+  BOOK_A_TRIP_RESUME_PATH,
+  hasPendingGenerateResume,
+} from "@/lib/auto-trip-pending";
 import { ApiError } from "@/lib/api/http";
 import styles from "../../payments.module.css";
 
@@ -29,7 +36,15 @@ function formatWhen(iso?: string) {
 
 function PaymentSuccessInner() {
   const params = useParams();
+  const searchParams = useSearchParams();
   const paymentId = String(params.paymentId || "");
+  const returnToRaw = searchParams.get("returnTo")?.trim() || "";
+  const returnTo =
+    returnToRaw.startsWith("/") && !returnToRaw.startsWith("//")
+      ? returnToRaw
+      : hasPendingGenerateResume()
+        ? BOOK_A_TRIP_RESUME_PATH
+        : null;
   const [payment, setPayment] = useState<Payment | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -82,17 +97,33 @@ function PaymentSuccessInner() {
 
   const isPaid = payment.status === "paid";
   const paidAt = formatWhen(payment.paidAt);
+  const creditedXu = xuFromVnd(payment.amount);
 
   return (
     <main className={styles.page}>
-      <div className={styles.wrap}>
+      <div className={styles.wrapNarrow}>
         <div className={`${styles.panel} ${styles.successPanel}`}>
-          <div
-            className={isPaid ? styles.successIcon : styles.successIconMuted}
+          <motion.div
+            className={
+              isPaid ? styles.successIconRing : styles.successIconRingMuted
+            }
+            initial={{ scale: 0.55, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ type: "spring", stiffness: 340, damping: 16 }}
             aria-hidden="true"
           >
-            {isPaid ? "✓" : "!"}
-          </div>
+            {isPaid ? <Check size={28} strokeWidth={2.6} /> : "!"}
+          </motion.div>
+          {isPaid ? (
+            <motion.p
+              className={styles.successXu}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.12 }}
+            >
+              +{creditedXu.toLocaleString("vi-VN")} xu
+            </motion.p>
+          ) : null}
           <p className={styles.eyebrow}>Thanh toán</p>
           <h1 className={styles.title}>
             {isPaid ? "Thanh toán thành công" : "Trạng thái thanh toán"}
@@ -112,31 +143,31 @@ function PaymentSuccessInner() {
               <dt>Mã CK</dt>
               <dd className={styles.code}>{payment.code}</dd>
             </div>
-            <div>
-              <dt>Mã đơn</dt>
-              <dd>{payment.orderCode}</dd>
-            </div>
-            <div>
-              <dt>Trạng thái</dt>
-              <dd>{paymentStatusLabel(payment.status)}</dd>
-            </div>
             {paidAt ? (
               <div>
                 <dt>Thanh toán lúc</dt>
                 <dd>{paidAt}</dd>
               </div>
             ) : null}
-            {payment.note ? (
-              <div>
-                <dt>Ghi chú</dt>
-                <dd>{payment.note}</dd>
-              </div>
-            ) : null}
           </dl>
 
           <div className={styles.actions}>
-            <Link href="/payments/" className={styles.btnPrimary}>
-              Về lịch sử giao dịch
+            {returnTo ? (
+              <Link href={returnTo} className={styles.btnPrimary}>
+                Tiếp tục tạo lịch trình
+              </Link>
+            ) : (
+              <Link href="/book-a-trip/" className={styles.btnPrimary}>
+                Tạo chuyến đi
+              </Link>
+            )}
+            <Link href="/wallet/" className={styles.btnGhost}>
+              <Wallet size={16} />
+              Về ví xu
+            </Link>
+            <Link href="/my-trips/" className={styles.btnGhost}>
+              <Map size={16} />
+              Chuyến đi của tôi
             </Link>
             {!isPaid ? (
               <Link
@@ -146,9 +177,6 @@ function PaymentSuccessInner() {
                 Xem chi tiết đơn
               </Link>
             ) : null}
-            <Link href="/my-trips/" className={styles.btnGhost}>
-              Chuyến đi của tôi
-            </Link>
           </div>
         </div>
       </div>
@@ -162,7 +190,17 @@ export default function PaymentSuccessPage() {
   return (
     <MarketingChrome hideConversion>
       <RequireAuth nextPath={`/payments/${paymentId}/success/`}>
-        <PaymentSuccessInner />
+        <Suspense
+          fallback={
+            <main className={styles.page}>
+              <div className={styles.center}>
+                <LtBrandLoader size="lg" tone="onLight" label="Đang tải…" />
+              </div>
+            </main>
+          }
+        >
+          <PaymentSuccessInner />
+        </Suspense>
       </RequireAuth>
     </MarketingChrome>
   );

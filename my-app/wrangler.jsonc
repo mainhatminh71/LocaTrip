@@ -19,11 +19,19 @@
     "directory": ".open-next/assets",
     "binding": "ASSETS"
   },
+  "r2_buckets": [
+    {
+      "binding": "MEDIA",
+      "bucket_name": "locatrip"
+    }
+  ],
   "vars": {
-    // Trip/auth via DO gateway; payment/wallet still Railway
+    // Trip/auth/payment via DO gateway
     "LOCALTRIP_USE_PUBLIC_API": "true",
     "LOCALTRIP_PUBLIC_API_URL": "https://api.locatrip.app",
-    "LOCALTRIP_PAYMENT_SERVICE_URL": "https://localtrip-paymentservice-production.up.railway.app"
+    "LOCALTRIP_PAYMENT_SERVICE_URL": "https://api.locatrip.app",
+    "R2_PUBLIC_URL": "https://pub-b88157c7e2b9415da4d0bb9a4fac1496.r2.dev",
+    "R2_BUCKET": "locatrip"
   },
   "services": [
     {

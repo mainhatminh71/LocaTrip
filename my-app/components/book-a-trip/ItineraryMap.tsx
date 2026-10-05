@@ -31,6 +31,8 @@ type ItineraryMapProps = {
   /** Sidebar travel row key (`day-scheduleIndex`) — highlights that leg. */
   selectedTravelKey?: string | null;
   routeGeoJSON: RouteFeatureCollection | null;
+  /** When false, hide road polylines / arrows (pins stay). Default true. */
+  showRoute?: boolean;
   onSelectStop: (key: string) => void;
   /** Clear travel highlight (click map empty / outside). */
   onClearTravel?: () => void;
@@ -123,6 +125,7 @@ export function ItineraryMap({
   selectedKey,
   selectedTravelKey = null,
   routeGeoJSON,
+  showRoute = true,
   onSelectStop,
   onClearTravel,
   busy = false,
@@ -251,7 +254,9 @@ export function ItineraryMap({
     if (map.getLayer(ROUTE_LAYER)) map.removeLayer(ROUTE_LAYER);
     if (map.getSource(ROUTE_SOURCE)) map.removeSource(ROUTE_SOURCE);
 
-    if (!routeGeoJSON || routeGeoJSON.features.length === 0) return;
+    if (!showRoute || !routeGeoJSON || routeGeoJSON.features.length === 0) {
+      return;
+    }
 
     ensureRouteArrowImage(map);
 
@@ -293,12 +298,12 @@ export function ItineraryMap({
         "icon-opacity": 1,
       },
     });
-  }, [routeGeoJSON, mapReady]);
+  }, [routeGeoJSON, mapReady, showRoute]);
 
   // Highlight selected travel leg + fit that segment
   useEffect(() => {
     const map = mapRef.current;
-    if (!map || !mapReady || !map.getLayer(ROUTE_LAYER)) return;
+    if (!map || !mapReady || !showRoute || !map.getLayer(ROUTE_LAYER)) return;
 
     const hasSelection = Boolean(selectedTravelKey);
     if (!hasSelection) {
@@ -351,7 +356,7 @@ export function ItineraryMap({
     if (!bounds.isEmpty()) {
       map.fitBounds(bounds, { padding: 80, maxZoom: 15, duration: 550 });
     }
-  }, [selectedTravelKey, routeGeoJSON, mapReady]);
+  }, [selectedTravelKey, routeGeoJSON, mapReady, showRoute]);
 
   if (!mapboxToken) {
     return (

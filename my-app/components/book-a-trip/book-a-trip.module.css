@@ -664,6 +664,30 @@
   min-width: 0;
 }
 
+.focusToggle {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.2rem;
+  height: 2.2rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.focusToggle:hover {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.45);
+}
+
+.focusToggle[aria-pressed="false"] {
+  background: rgba(255, 255, 255, 0.16);
+}
+
 .focusStep {
   font-size: 13px;
   font-weight: 600;
@@ -2946,6 +2970,39 @@
   height: 100%;
 }
 
+.mapRouteToggle {
+  appearance: none;
+  position: absolute;
+  z-index: 2;
+  top: 12px;
+  left: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 2.2rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  border: 1px solid rgba(1, 40, 48, 0.14);
+  background: rgba(255, 255, 255, 0.94);
+  color: var(--lt-deep, #012830);
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(1, 40, 48, 0.12);
+}
+
+.mapRouteToggle:hover {
+  border-color: rgba(10, 107, 124, 0.4);
+  color: var(--lt-teal, #0a6b7c);
+}
+
+.mapRouteToggle[aria-pressed="false"] {
+  background: #012830;
+  color: #fff;
+  border-color: transparent;
+}
+
 .mapShell {
   position: relative;
   width: 100%;
@@ -4430,11 +4487,35 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 0.75rem;
   padding: 12px 16px;
   background: var(--lt-deep);
   color: #fff;
   font-weight: 700;
   font-size: 14px;
+}
+
+.mobileMapBarActions {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex-shrink: 0;
+}
+
+.mobileMapBar .mapRouteToggle {
+  position: static;
+  top: auto;
+  left: auto;
+  box-shadow: none;
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.28);
+  color: #fff;
+}
+
+.mobileMapBar .mapRouteToggle[aria-pressed="false"] {
+  background: #fff;
+  color: var(--lt-deep, #012830);
+  border-color: transparent;
 }
 
 .mobileMapBody {

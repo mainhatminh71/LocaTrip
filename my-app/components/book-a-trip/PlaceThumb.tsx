@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { proxiedMediaUrl } from "@/lib/media-url";
 import styles from "./book-a-trip.module.css";
 
 type PlaceThumbProps = {
-  /** Raw place thumbnail URL (Google lh3.* etc.), or ordered candidates. */
+  /** Raw place thumbnail URL (Google lh3.* / R2 / etc.), or ordered candidates. */
   src?: string | null | Array<string | null | undefined>;
   alt?: string;
   /** `detail` = large modal hero; `tile` = list / replace thumbs */
@@ -28,9 +29,11 @@ function candidateUrls(
   const seen = new Set<string>();
   for (const item of list) {
     const n = normalizeThumbUrl(item || "");
-    if (!n || seen.has(n)) continue;
-    seen.add(n);
-    out.push(n);
+    if (!n) continue;
+    const display = proxiedMediaUrl(n) || n;
+    if (!display || seen.has(display)) continue;
+    seen.add(display);
+    out.push(display);
   }
   return out;
 }
@@ -39,9 +42,9 @@ function candidateUrls(
  * Place image with skeleton when missing or broken.
  *
  * Google `lh3.googleusercontent.com` blocks server/Worker fetches (403), so
- * `/api/media-proxy` returns 502. Preload in the browser with
- * `referrerPolicy="no-referrer"` (and URL fallbacks) so we never stick on
- * “Đang tải ảnh…”.
+ * we load those in the browser with `referrerPolicy="no-referrer"`.
+ * Cloudflare R2 public `*.r2.dev` URLs are rewritten to `/api/r2-media`
+ * (same-origin stream) because they often fail TLS from some networks.
  */
 export function PlaceThumb({
   src,
@@ -72,7 +75,10 @@ export function PlaceThumb({
 
     let cancelled = false;
     const probe = new window.Image();
-    probe.referrerPolicy = "no-referrer";
+    // Same-origin R2 proxy does not need referrer stripping; keep for Google.
+    if (!raw.startsWith("/api/r2-media")) {
+      probe.referrerPolicy = "no-referrer";
+    }
 
     const fail = () => {
       if (cancelled) return;
@@ -168,7 +174,9 @@ export function PlaceThumb({
           alt={alt}
           className={styles.placeThumbImg}
           decoding="async"
-          referrerPolicy="no-referrer"
+          referrerPolicy={
+            raw.startsWith("/api/r2-media") ? undefined : "no-referrer"
+          }
           draggable={false}
         />
       ) : null}

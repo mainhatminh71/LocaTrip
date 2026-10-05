@@ -3,6 +3,9 @@
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FormEvent, Suspense, useCallback, useEffect, useMemo, useState } from "react";
+import NumberFlow from "@number-flow/react";
+import * as Tabs from "@radix-ui/react-tabs";
+import { Minus, Plus, RefreshCw } from "lucide-react";
 import { MarketingChrome } from "@/components/layout/MarketingChrome";
 import { RequireAuth } from "@/components/auth/RequireAuth";
 import { LtBrandLoader } from "@/components/book-a-trip/LtBrandLoader";
@@ -36,6 +39,7 @@ import styles from "./wallet.module.css";
 type HistoryTab = "ledger" | "payments";
 
 const HISTORY_PAGE_SIZE = 5;
+const POPULAR_AMOUNTS = new Set([10000, 20000]);
 
 function formatWhen(iso: string) {
   try {
@@ -90,6 +94,10 @@ function WalletInner() {
   }, [customAmount, selectedAmount]);
 
   const previewXu = xuFromVnd(Math.max(0, effectiveAmount));
+  const tripBudget =
+    balance != null && COSTS.tripGenerate > 0
+      ? Math.floor(balance / COSTS.tripGenerate)
+      : 0;
 
   const historyItems = tab === "ledger" ? txs : payments;
   const totalPages = Math.max(
@@ -202,9 +210,24 @@ function WalletInner() {
         <section className={styles.balanceCard} aria-live="polite">
           <p className={styles.balanceLabel}>Số dư</p>
           <p className={styles.balanceValue}>
-            {walletLoading && balance == null
+            {walletLoading && balance == null ? (
+              "…"
+            ) : (
+              <>
+                <NumberFlow
+                  value={balance ?? 0}
+                  locales="vi-VN"
+                  suffix=" xu"
+                />
+              </>
+            )}
+          </p>
+          <p className={styles.balanceSub}>
+            {balance == null
               ? "…"
-              : `${(balance ?? 0).toLocaleString("vi-VN")} xu`}
+              : tripBudget > 0
+                ? `Đủ ~${tripBudget.toLocaleString("vi-VN")} lần tạo chuyến`
+                : "Chưa đủ xu để tạo chuyến — nạp thêm bên dưới"}
           </p>
           <p className={styles.balanceRate}>
             {rate?.example || "10000 VND = 50 xu"}
@@ -221,26 +244,32 @@ function WalletInner() {
         <section className={styles.panel}>
           <h2 className={styles.panelTitle}>Nạp xu</h2>
           <div className={styles.packages} role="group" aria-label="Gói nạp">
-            {TOPUP_PACKAGES.map((pkg) => (
-              <button
-                key={pkg.amount}
-                type="button"
-                className={
-                  !customAmount.trim() && selectedAmount === pkg.amount
-                    ? styles.packageBtnOn
-                    : styles.packageBtn
-                }
-                onClick={() => {
-                  setSelectedAmount(pkg.amount);
-                  setCustomAmount("");
-                }}
-              >
-                <span className={styles.packageAmount}>{pkg.label}</span>
-                <span className={styles.packageXu}>
-                  → {xuFromVnd(pkg.amount)} xu
-                </span>
-              </button>
-            ))}
+            {TOPUP_PACKAGES.map((pkg) => {
+              const selected =
+                !customAmount.trim() && selectedAmount === pkg.amount;
+              const popular = POPULAR_AMOUNTS.has(pkg.amount);
+              return (
+                <button
+                  key={pkg.amount}
+                  type="button"
+                  className={
+                    selected ? styles.packageBtnOn : styles.packageBtn
+                  }
+                  onClick={() => {
+                    setSelectedAmount(pkg.amount);
+                    setCustomAmount("");
+                  }}
+                >
+                  {popular ? (
+                    <span className={styles.packageBadge}>Hay chọn</span>
+                  ) : null}
+                  <span className={styles.packageAmount}>{pkg.label}</span>
+                  <span className={styles.packageXu}>
+                    {xuFromVnd(pkg.amount)} xu
+                  </span>
+                </button>
+              );
+            })}
           </div>
 
           <form className={styles.form} onSubmit={onTopup}>
@@ -256,7 +285,8 @@ function WalletInner() {
               />
             </label>
             <p className={styles.previewXu}>
-              Nhận khoảng {previewXu.toLocaleString("vi-VN")} xu
+              Bạn sẽ nhận{" "}
+              <strong>{previewXu.toLocaleString("vi-VN")} xu</strong>
               {effectiveAmount >= 1000
                 ? ` từ ${formatVnd(effectiveAmount)}`
                 : ""}
@@ -280,209 +310,235 @@ function WalletInner() {
                   void loadHistory();
                 }}
               >
-                Làm mới số dư
+                <RefreshCw size={15} />
+                Làm mới
               </button>
             </div>
           </form>
         </section>
 
         <section className={styles.panel}>
-          <div className={styles.tabs} role="tablist">
-            <button
-              type="button"
-              role="tab"
-              aria-selected={tab === "ledger"}
-              className={tab === "ledger" ? styles.tabOn : styles.tab}
-              onClick={() => {
-                setTab("ledger");
-                setPage(1);
-              }}
-            >
-              Lịch sử xu
-            </button>
-            <button
-              type="button"
-              role="tab"
-              aria-selected={tab === "payments"}
-              className={tab === "payments" ? styles.tabOn : styles.tab}
-              onClick={() => {
-                setTab("payments");
-                setPage(1);
-              }}
-            >
-              Lịch sử nạp
-            </button>
-          </div>
+          <Tabs.Root
+            value={tab}
+            onValueChange={(v) => {
+              setTab(v as HistoryTab);
+              setPage(1);
+            }}
+          >
+            <Tabs.List className={styles.tabs} aria-label="Lịch sử ví">
+              <Tabs.Trigger
+                value="ledger"
+                className={tab === "ledger" ? styles.tabOn : styles.tab}
+              >
+                Lịch sử xu
+              </Tabs.Trigger>
+              <Tabs.Trigger
+                value="payments"
+                className={tab === "payments" ? styles.tabOn : styles.tab}
+              >
+                Lịch sử nạp
+              </Tabs.Trigger>
+            </Tabs.List>
 
-          {histLoading ? (
-            <div className={styles.center}>
-              <LtBrandLoader size="md" tone="onLight" label="Đang tải…" />
-            </div>
-          ) : histError ? (
-            <p className={styles.error}>{histError}</p>
-          ) : tab === "ledger" ? (
-            txs.length === 0 ? (
-              <div className={styles.empty}>Chưa có giao dịch xu.</div>
+            {histLoading ? (
+              <div className={styles.center}>
+                <LtBrandLoader size="md" tone="onLight" label="Đang tải…" />
+              </div>
+            ) : histError ? (
+              <p className={styles.error}>{histError}</p>
             ) : (
               <>
-                <div className={styles.listScroll}>
-                  <ul className={styles.list}>
-                    {pageTxs.map((tx) => (
-                      <li key={tx.id} className={styles.txRow}>
-                        <div className={styles.txMain}>
-                          <p className={styles.txReason}>
-                            {walletReasonLabel(tx.reason)}
-                          </p>
-                          <p className={styles.txMeta}>
-                            {formatWhen(tx.createdAt)}
-                            {tx.paymentId
-                              ? ` · ${tx.paymentId.slice(0, 8)}…`
-                              : ""}
-                          </p>
-                        </div>
-                        <span
-                          className={
-                            tx.delta >= 0
-                              ? styles.txDeltaPos
-                              : styles.txDeltaNeg
-                          }
-                        >
-                          {tx.delta >= 0 ? "+" : ""}
-                          {tx.delta} xu
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-                <nav className={styles.pagination} aria-label="Phân trang lịch sử xu">
-                  <p className={styles.pageInfo}>
-                    {rangeStart}–{rangeEnd} / {txs.length}
-                  </p>
-                  <div className={styles.pageControls}>
-                    <button
-                      type="button"
-                      className={styles.pageBtn}
-                      disabled={safePage <= 1}
-                      onClick={() => setPage((p) => Math.max(1, p - 1))}
-                    >
-                      Trước
-                    </button>
-                    <ul className={styles.pageNumbers}>
-                      {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                        (n) => (
-                          <li key={n}>
-                            <button
-                              type="button"
-                              className={
-                                n === safePage
-                                  ? `${styles.pageNum} ${styles.pageNumActive}`
-                                  : styles.pageNum
-                              }
-                              aria-current={
-                                n === safePage ? "page" : undefined
-                              }
-                              onClick={() => setPage(n)}
-                            >
-                              {n}
-                            </button>
-                          </li>
-                        ),
-                      )}
-                    </ul>
-                    <button
-                      type="button"
-                      className={styles.pageBtn}
-                      disabled={safePage >= totalPages}
-                      onClick={() =>
-                        setPage((p) => Math.min(totalPages, p + 1))
-                      }
-                    >
-                      Sau
-                    </button>
-                  </div>
-                </nav>
-              </>
-            )
-          ) : payments.length === 0 ? (
-            <div className={styles.empty}>Chưa có lần nạp nào.</div>
-          ) : (
-            <>
-              <div className={styles.listScroll}>
-                <ul className={styles.list}>
-                  {pagePayments.map((p) => (
-                    <li key={p.paymentId}>
-                      <Link
-                        href={paymentDetailPath(p.paymentId, {
-                          fromWallet: true,
-                        })}
-                        className={styles.payCard}
+                <Tabs.Content value="ledger">
+                  {txs.length === 0 ? (
+                    <div className={styles.empty}>Chưa có giao dịch xu.</div>
+                  ) : (
+                    <>
+                      <div className={styles.listScroll}>
+                        <ul className={styles.list}>
+                          {pageTxs.map((tx) => (
+                            <li key={tx.id} className={styles.txRow}>
+                              <span
+                                className={
+                                  tx.delta >= 0
+                                    ? styles.txIconPos
+                                    : styles.txIconNeg
+                                }
+                                aria-hidden="true"
+                              >
+                                {tx.delta >= 0 ? (
+                                  <Plus size={14} strokeWidth={2.6} />
+                                ) : (
+                                  <Minus size={14} strokeWidth={2.6} />
+                                )}
+                              </span>
+                              <div className={styles.txMain}>
+                                <p className={styles.txReason}>
+                                  {walletReasonLabel(tx.reason)}
+                                </p>
+                                <p className={styles.txMeta}>
+                                  {formatWhen(tx.createdAt)}
+                                  {tx.paymentId
+                                    ? ` · ${tx.paymentId.slice(0, 8)}…`
+                                    : ""}
+                                </p>
+                              </div>
+                              <span
+                                className={
+                                  tx.delta >= 0
+                                    ? styles.txDeltaPos
+                                    : styles.txDeltaNeg
+                                }
+                              >
+                                {tx.delta >= 0 ? "+" : ""}
+                                {tx.delta} xu
+                              </span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                      <nav
+                        className={styles.pagination}
+                        aria-label="Phân trang lịch sử xu"
                       >
-                        <div className={styles.txMain}>
-                          <p className={styles.txReason}>
-                            {formatVnd(p.amount)}
-                          </p>
-                          <p className={styles.txMeta}>
-                            {formatWhen(p.createdAt)} · {p.code}
-                          </p>
-                        </div>
-                        <span className={badgeClass(p.status)}>
-                          {paymentStatusLabel(p.status)}
-                        </span>
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <nav
-                className={styles.pagination}
-                aria-label="Phân trang lịch sử nạp"
-              >
-                <p className={styles.pageInfo}>
-                  {rangeStart}–{rangeEnd} / {payments.length}
-                </p>
-                <div className={styles.pageControls}>
-                  <button
-                    type="button"
-                    className={styles.pageBtn}
-                    disabled={safePage <= 1}
-                    onClick={() => setPage((p) => Math.max(1, p - 1))}
-                  >
-                    Trước
-                  </button>
-                  <ul className={styles.pageNumbers}>
-                    {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                      (n) => (
-                        <li key={n}>
+                        <p className={styles.pageInfo}>
+                          {rangeStart}–{rangeEnd} / {txs.length}
+                        </p>
+                        <div className={styles.pageControls}>
                           <button
                             type="button"
-                            className={
-                              n === safePage
-                                ? `${styles.pageNum} ${styles.pageNumActive}`
-                                : styles.pageNum
-                            }
-                            aria-current={n === safePage ? "page" : undefined}
-                            onClick={() => setPage(n)}
+                            className={styles.pageBtn}
+                            disabled={safePage <= 1}
+                            onClick={() => setPage((p) => Math.max(1, p - 1))}
                           >
-                            {n}
+                            Trước
                           </button>
-                        </li>
-                      ),
-                    )}
-                  </ul>
-                  <button
-                    type="button"
-                    className={styles.pageBtn}
-                    disabled={safePage >= totalPages}
-                    onClick={() =>
-                      setPage((p) => Math.min(totalPages, p + 1))
-                    }
-                  >
-                    Sau
-                  </button>
-                </div>
-              </nav>
-            </>
-          )}
+                          <ul className={styles.pageNumbers}>
+                            {Array.from(
+                              { length: totalPages },
+                              (_, i) => i + 1,
+                            ).map((n) => (
+                              <li key={n}>
+                                <button
+                                  type="button"
+                                  className={
+                                    n === safePage
+                                      ? `${styles.pageNum} ${styles.pageNumActive}`
+                                      : styles.pageNum
+                                  }
+                                  aria-current={
+                                    n === safePage ? "page" : undefined
+                                  }
+                                  onClick={() => setPage(n)}
+                                >
+                                  {n}
+                                </button>
+                              </li>
+                            ))}
+                          </ul>
+                          <button
+                            type="button"
+                            className={styles.pageBtn}
+                            disabled={safePage >= totalPages}
+                            onClick={() =>
+                              setPage((p) => Math.min(totalPages, p + 1))
+                            }
+                          >
+                            Sau
+                          </button>
+                        </div>
+                      </nav>
+                    </>
+                  )}
+                </Tabs.Content>
+
+                <Tabs.Content value="payments">
+                  {payments.length === 0 ? (
+                    <div className={styles.empty}>Chưa có lần nạp nào.</div>
+                  ) : (
+                    <>
+                      <div className={styles.listScroll}>
+                        <ul className={styles.list}>
+                          {pagePayments.map((p) => (
+                            <li key={p.paymentId}>
+                              <Link
+                                href={paymentDetailPath(p.paymentId, {
+                                  fromWallet: true,
+                                })}
+                                className={styles.payCard}
+                              >
+                                <div className={styles.txMain}>
+                                  <p className={styles.txReason}>
+                                    {formatVnd(p.amount)}
+                                  </p>
+                                  <p className={styles.txMeta}>
+                                    {formatWhen(p.createdAt)} · {p.code}
+                                  </p>
+                                </div>
+                                <span className={badgeClass(p.status)}>
+                                  {paymentStatusLabel(p.status)}
+                                </span>
+                              </Link>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                      <nav
+                        className={styles.pagination}
+                        aria-label="Phân trang lịch sử nạp"
+                      >
+                        <p className={styles.pageInfo}>
+                          {rangeStart}–{rangeEnd} / {payments.length}
+                        </p>
+                        <div className={styles.pageControls}>
+                          <button
+                            type="button"
+                            className={styles.pageBtn}
+                            disabled={safePage <= 1}
+                            onClick={() => setPage((p) => Math.max(1, p - 1))}
+                          >
+                            Trước
+                          </button>
+                          <ul className={styles.pageNumbers}>
+                            {Array.from(
+                              { length: totalPages },
+                              (_, i) => i + 1,
+                            ).map((n) => (
+                              <li key={n}>
+                                <button
+                                  type="button"
+                                  className={
+                                    n === safePage
+                                      ? `${styles.pageNum} ${styles.pageNumActive}`
+                                      : styles.pageNum
+                                  }
+                                  aria-current={
+                                    n === safePage ? "page" : undefined
+                                  }
+                                  onClick={() => setPage(n)}
+                                >
+                                  {n}
+                                </button>
+                              </li>
+                            ))}
+                          </ul>
+                          <button
+                            type="button"
+                            className={styles.pageBtn}
+                            disabled={safePage >= totalPages}
+                            onClick={() =>
+                              setPage((p) => Math.min(totalPages, p + 1))
+                            }
+                          >
+                            Sau
+                          </button>
+                        </div>
+                      </nav>
+                    </>
+                  )}
+                </Tabs.Content>
+              </>
+            )}
+          </Tabs.Root>
         </section>
       </div>
     </main>

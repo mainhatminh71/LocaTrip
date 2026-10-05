@@ -181,6 +181,7 @@ export function TripWeatherAdvisoryWidget({
               data = { ...data, days: data.days.slice(0, daysKey) };
             }
           } else {
+            // 404 / other — banner-only; outer catch hides the widget.
             throw first;
           }
         }

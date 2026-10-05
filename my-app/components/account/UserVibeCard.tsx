@@ -8,7 +8,7 @@ import { getMyVibe, type UserVibeResult } from "@/lib/api/trips";
 import { labelForValue } from "@/lib/auto-trip-form";
 import { VIBE_PREFS_STORAGE_KEY } from "@/lib/saved-trip-draft";
 import { ApiError } from "@/lib/api/http";
-import styles from "@/app/account/account-stub.module.css";
+import styles from "@/app/account/account.module.css";
 
 export function UserVibeCard() {
   const router = useRouter();
