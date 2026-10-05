@@ -107,12 +107,10 @@ import { useAuthModal } from "@/components/auth/AuthModalProvider";
 import { AccountMenu } from "@/components/auth/AccountFab";
 import { WalletBalanceBadge } from "@/components/wallet/WalletBalanceBadge";
 import {
-  readBalanceVisible,
   readMapRoutesVisible,
-  writeBalanceVisible,
   writeMapRoutesVisible,
 } from "@/lib/ui/view-prefs";
-import { Eye, EyeOff, Route } from "lucide-react";
+import { Route } from "lucide-react";
 import { useToast } from "@/components/ui/ToastProvider";
 import { AutoTripPrefsFields } from "./AutoTripPrefsFields";
 import { ItineraryMap } from "./ItineraryMap";
@@ -203,7 +201,6 @@ export function BookATripView({
   const dragDropConsumedRef = useRef(false);
   const [mobileMapOpen, setMobileMapOpen] = useState(false);
   const [routeStale, setRouteStale] = useState(false);
-  const [showBalance, setShowBalance] = useState(true);
   const [showRoutes, setShowRoutes] = useState(true);
   /** Road-following line for the map (OSRM from generate or Mapbox Directions). */
   const [routeGeoJSON, setRouteGeoJSON] =
@@ -237,17 +234,8 @@ export function BookATripView({
   }, []);
 
   useEffect(() => {
-    setShowBalance(readBalanceVisible());
     setShowRoutes(readMapRoutesVisible());
   }, []);
-
-  function toggleBalanceVisible() {
-    setShowBalance((prev) => {
-      const next = !prev;
-      writeBalanceVisible(next);
-      return next;
-    });
-  }
 
   function toggleRoutesVisible() {
     setShowRoutes((prev) => {
@@ -1755,23 +1743,7 @@ export function BookATripView({
             <span>Gợi ý chuyến Đà Lạt</span>
           </div>
           <div className={styles.focusMeta}>
-            {showBalance ? (
-              <WalletBalanceBadge tone="dark" size="md" showLabel />
-            ) : null}
-            <button
-              type="button"
-              className={styles.focusToggle}
-              onClick={toggleBalanceVisible}
-              aria-pressed={showBalance}
-              aria-label={showBalance ? "Ẩn số dư xu" : "Hiện số dư xu"}
-              title={showBalance ? "Ẩn số dư" : "Hiện số dư"}
-            >
-              {showBalance ? (
-                <EyeOff size={16} strokeWidth={2.2} />
-              ) : (
-                <Eye size={16} strokeWidth={2.2} />
-              )}
-            </button>
+            <WalletBalanceBadge tone="dark" size="md" showLabel />
             <AccountMenu variant="bar" />
           </div>
         </div>

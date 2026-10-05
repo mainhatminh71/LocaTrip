@@ -1,3 +1,55 @@
+.wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-width: 0;
+}
+
+.wrapDark {
+  color: #fff;
+}
+
+.toggle {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.1rem;
+  height: 2.1rem;
+  border-radius: 999px;
+  border: 1px solid rgba(10, 107, 124, 0.28);
+  background: #fff;
+  color: var(--lt-deep, #012830);
+  cursor: pointer;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(1, 40, 48, 0.08);
+}
+
+.toggle:hover {
+  border-color: rgba(10, 107, 124, 0.5);
+  background: #f0faf7;
+}
+
+.toggleDark {
+  border-color: rgba(255, 255, 255, 0.28);
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  box-shadow: none;
+}
+
+.toggleDark:hover {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.45);
+}
+
+.toggle[aria-pressed="false"] {
+  background: color-mix(in srgb, var(--lt-teal, #0a6b7c) 14%, #fff);
+}
+
+.toggleDark[aria-pressed="false"] {
+  background: rgba(255, 255, 255, 0.18);
+}
+
 .badge {
   display: inline-flex;
   align-items: center;
