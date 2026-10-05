@@ -1,5 +1,6 @@
 const BALANCE_VISIBLE_KEY = "locatrip.ui.balanceVisible";
 const ROUTES_VISIBLE_KEY = "locatrip.ui.mapRoutesVisible";
+export const BALANCE_VISIBLE_EVENT = "locatrip:balance-visible";
 
 function readBool(key: string, fallback: boolean): boolean {
   if (typeof window === "undefined") return fallback;
@@ -28,6 +29,11 @@ export function readBalanceVisible(): boolean {
 
 export function writeBalanceVisible(visible: boolean) {
   writeBool(BALANCE_VISIBLE_KEY, visible);
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(
+      new CustomEvent(BALANCE_VISIBLE_EVENT, { detail: visible }),
+    );
+  }
 }
 
 export function readMapRoutesVisible(): boolean {
