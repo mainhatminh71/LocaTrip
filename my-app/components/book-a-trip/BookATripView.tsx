@@ -2254,11 +2254,15 @@ export function BookATripView({
                           const placeId = item.place?.placeId?.trim() || "";
                           const canDrag =
                             Boolean(placeId) && !reorderLoading;
+                          /** HTML5 DnD fights touch scrolling on phones — picker only. */
+                          const desktopDrag = canDrag && !isNarrow;
                           const activeDrag = dragVisitRef.current ?? dragVisit;
                           const dragging =
+                            desktopDrag &&
                             activeDrag?.day === day.day &&
                             activeDrag.placeId === placeId;
                           const dragOver =
+                            desktopDrag &&
                             dragOverPlaceId === placeId &&
                             activeDrag != null &&
                             activeDrag.day === day.day &&
@@ -2266,14 +2270,18 @@ export function BookATripView({
                           return (
                             <li
                               key={key}
-                              className={`${styles.visitItem} ${styles.visitItemDraggable}${
-                                dragging ? ` ${styles.visitItemDragging}` : ""
-                              }${dragOver ? ` ${styles.visitItemDragOver}` : ""}`}
-                              data-candrag={canDrag ? "true" : "false"}
-                              draggable={canDrag}
+                              className={`${styles.visitItem}${
+                                desktopDrag
+                                  ? ` ${styles.visitItemDraggable}`
+                                  : ""
+                              }${dragging ? ` ${styles.visitItemDragging}` : ""}${
+                                dragOver ? ` ${styles.visitItemDragOver}` : ""
+                              }`}
+                              data-candrag={desktopDrag ? "true" : "false"}
+                              draggable={desktopDrag}
                               aria-grabbed={dragging || undefined}
                               onDragStart={(e) => {
-                                if (!canDrag) {
+                                if (!desktopDrag) {
                                   e.preventDefault();
                                   return;
                                 }
@@ -2301,7 +2309,7 @@ export function BookATripView({
                               }}
                               onDragOver={(e) => {
                                 const drag = dragVisitRef.current;
-                                if (!canDrag || !drag) return;
+                                if (!desktopDrag || !drag) return;
                                 if (drag.day !== day.day) return;
                                 e.preventDefault();
                                 e.dataTransfer.dropEffect = "move";
@@ -2315,7 +2323,7 @@ export function BookATripView({
                               onDrop={(e) => {
                                 e.preventDefault();
                                 const drag = dragVisitRef.current;
-                                if (!canDrag || !drag) return;
+                                if (!desktopDrag || !drag) return;
                                 if (drag.day !== day.day) return;
                                 dragDropConsumedRef.current = true;
                                 const order = visitOrderForDay(

@@ -2889,7 +2889,7 @@
     gap: 0.35rem;
   }
 
-  /* Docked bottom CTA — always clear of thumbs / safe-area */
+  /* Docked bottom CTA — solid fill (blur janks while scrolling on phones) */
   .autoSticky {
     position: fixed;
     left: 0;
@@ -2899,9 +2899,7 @@
     margin: 0;
     padding: 10px 14px calc(10px + env(safe-area-inset-bottom));
     gap: 8px;
-    background: rgba(255, 255, 255, 0.94);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
+    background: #fff;
     border-top: 1px solid rgba(1, 40, 48, 0.08);
     box-shadow: 0 -12px 32px rgba(1, 40, 48, 0.12);
   }
@@ -2929,11 +2927,18 @@
   }
 
   .pageFocus .autoSticky {
-    background: rgba(238, 243, 241, 0.96);
+    background: #eef3f1;
   }
 
   .itineraryPane {
     padding-bottom: 120px;
+    overflow: visible;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .itineraryPane .day li {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 88px;
   }
 
   .itineraryPane .autoSticky {
@@ -4720,7 +4725,13 @@
 
   .itineraryPane {
     max-height: none;
+    overflow: visible;
     padding-bottom: 8px;
+  }
+
+  .visitItemDraggable {
+    touch-action: pan-y;
+    cursor: default;
   }
 
   .mobileMapOverlay {
@@ -5331,11 +5342,18 @@
   cursor: grab;
   user-select: none;
   -webkit-user-select: none;
-  touch-action: none;
+  /* Keep vertical scroll on touch; HTML5 drag is desktop-only. */
+  touch-action: pan-y;
 }
 
 .visitItemDraggable:active {
   cursor: grabbing;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .visitItemDraggable {
+    touch-action: none;
+  }
 }
 
 .visitItemDragging {

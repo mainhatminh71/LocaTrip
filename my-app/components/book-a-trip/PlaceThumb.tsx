@@ -62,57 +62,13 @@ export function PlaceThumb({
   useEffect(() => {
     setUrlIndex(0);
     setLoaded(false);
-    setFailed(false);
-  }, [urlsKey]);
+    setFailed(urls.length === 0);
+  }, [urlsKey, urls.length]);
 
   useEffect(() => {
     setLoaded(false);
-    if (!raw) {
-      setFailed(urls.length === 0);
-      return;
-    }
-    setFailed(false);
-
-    let cancelled = false;
-    const probe = new window.Image();
-    // Same-origin R2 proxy does not need referrer stripping; keep for Google.
-    if (!raw.startsWith("/api/r2-media")) {
-      probe.referrerPolicy = "no-referrer";
-    }
-
-    const fail = () => {
-      if (cancelled) return;
-      if (urlIndex + 1 < urls.length) {
-        setUrlIndex((i) => i + 1);
-        return;
-      }
-      setFailed(true);
-      setLoaded(false);
-    };
-    const ok = () => {
-      if (cancelled) return;
-      setLoaded(true);
-      setFailed(false);
-    };
-
-    const timer = window.setTimeout(fail, 10_000);
-    probe.onload = () => {
-      window.clearTimeout(timer);
-      ok();
-    };
-    probe.onerror = () => {
-      window.clearTimeout(timer);
-      fail();
-    };
-    probe.src = raw;
-
-    return () => {
-      cancelled = true;
-      window.clearTimeout(timer);
-      probe.onload = null;
-      probe.onerror = null;
-    };
-  }, [raw, urlIndex, urls.length]);
+    setFailed(!raw && urls.length === 0);
+  }, [raw, urls.length]);
 
   const shellClass =
     variant === "tile" ? styles.placeThumbTile : styles.placeThumbDetail;
@@ -167,19 +123,31 @@ export function PlaceThumb({
   return (
     <div className={merged} style={{ minHeight: minH }}>
       {!loaded ? skeleton : null}
-      {loaded ? (
-        /* eslint-disable-next-line @next/next/no-img-element */
-        <img
-          src={raw}
-          alt={alt}
-          className={styles.placeThumbImg}
-          decoding="async"
-          referrerPolicy={
-            raw.startsWith("/api/r2-media") ? undefined : "no-referrer"
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={raw}
+        alt={alt}
+        className={styles.placeThumbImg}
+        style={loaded ? undefined : { position: "absolute", opacity: 0 }}
+        decoding="async"
+        loading={variant === "tile" ? "lazy" : "eager"}
+        referrerPolicy={
+          raw.startsWith("/api/r2-media") ? undefined : "no-referrer"
+        }
+        draggable={false}
+        onLoad={() => {
+          setLoaded(true);
+          setFailed(false);
+        }}
+        onError={() => {
+          if (urlIndex + 1 < urls.length) {
+            setUrlIndex((i) => i + 1);
+            return;
           }
-          draggable={false}
-        />
-      ) : null}
+          setFailed(true);
+          setLoaded(false);
+        }}
+      />
     </div>
   );
 }
