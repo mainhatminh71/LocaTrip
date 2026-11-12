@@ -554,8 +554,13 @@ export function BookATripView({
     if (!pendingDraftRestoredRef.current) {
       pendingDraftRestoredRef.current = true;
       setDraft(nextDraft);
-      if (pending.locationOverride) {
+      if (
+        (nextDraft.startMode ?? "preset") === "gps" &&
+        pending.locationOverride
+      ) {
         setLastLocationOverride(pending.locationOverride);
+      } else {
+        setLastLocationOverride(null);
       }
     }
 
@@ -573,10 +578,19 @@ export function BookATripView({
     }
     pendingResumeTriedRef.current = true;
 
+    const gpsMode = (nextDraft.startMode ?? "preset") === "gps";
+    const loc =
+      gpsMode &&
+      pending.locationOverride &&
+      Number.isFinite(pending.locationOverride.latitude) &&
+      Number.isFinite(pending.locationOverride.longitude)
+        ? pending.locationOverride
+        : null;
+
     // Drop resume flag so refresh doesn't loop; keep draft until generate succeeds.
     savePendingAutoTripForm({
       draft: nextDraft,
-      locationOverride: pending.locationOverride ?? null,
+      locationOverride: loc,
       resumeGenerate: false,
       regenerate: pending.regenerate,
     });
@@ -584,19 +598,13 @@ export function BookATripView({
       router.replace("/book-a-trip/", { scroll: false });
     }
 
-    const loc =
-      pending.locationOverride &&
-      Number.isFinite(pending.locationOverride.latitude) &&
-      Number.isFinite(pending.locationOverride.longitude)
-        ? pending.locationOverride
-        : null;
     const genOpts = {
       regenerate: pending.regenerate,
       draftOverride: nextDraft,
     };
 
     void (async () => {
-      if ((nextDraft.startMode ?? "preset") === "gps" && !loc) {
+      if (gpsMode && !loc) {
         await startGenerateFromGps(genOpts);
         return;
       }
@@ -646,22 +654,23 @@ export function BookATripView({
   const mapStops = useMemo(() => {
     if (!selectedOption) return [];
     const visits = stopsForMap(selectedOption.itinerary);
-    const start =
-      lastLocationOverride ??
-      ({
-        latitude: activeStart.latitude,
-        longitude: activeStart.longitude,
-      } as const);
+    const useGps =
+      (draft.startMode ?? "preset") === "gps" && lastLocationOverride;
+    const start = useGps
+      ? lastLocationOverride
+      : ({
+          latitude: activeStart.latitude,
+          longitude: activeStart.longitude,
+        } as const);
     if (
       !Number.isFinite(start.latitude) ||
       !Number.isFinite(start.longitude)
     ) {
       return visits;
     }
-    const startLabel =
-      (draft.startMode ?? "preset") === "gps"
-        ? "Điểm bắt đầu (GPS)"
-        : activeStart.label || "Điểm bắt đầu";
+    const startLabel = useGps
+      ? "Điểm bắt đầu (GPS)"
+      : activeStart.label || "Điểm bắt đầu";
     return [
       {
         key: "__start__",
@@ -680,12 +689,14 @@ export function BookATripView({
       setRouteGeoJSON(null);
       return;
     }
-    const start =
-      lastLocationOverride ??
-      ({
-        latitude: activeStart.latitude,
-        longitude: activeStart.longitude,
-      } as const);
+    const useGps =
+      (draft.startMode ?? "preset") === "gps" && lastLocationOverride;
+    const start = useGps
+      ? lastLocationOverride
+      : ({
+          latitude: activeStart.latitude,
+          longitude: activeStart.longitude,
+        } as const);
     const itinerary = selectedOption.itinerary;
     let cancelled = false;
 
@@ -711,7 +722,7 @@ export function BookATripView({
     return () => {
       cancelled = true;
     };
-  }, [selectedOption, lastLocationOverride, activeStart]);
+  }, [selectedOption, lastLocationOverride, activeStart, draft.startMode]);
 
   const replaceStop = useMemo(
     () => itineraryStops.find((s) => s.key === replaceTargetKey) ?? null,
@@ -721,6 +732,15 @@ export function BookATripView({
   function patchDraft(partial: Partial<AutoTripDraft>) {
     setDraft((d) => ({ ...d, ...partial }));
     setPrefillNotice(null);
+    const modeAfter = partial.startMode ?? draft.startMode ?? "preset";
+    // Stale GPS (e.g. HCMC) must not stick after switching to Đà Lạt presets.
+    if (
+      partial.startMode === "gps" ||
+      partial.startMode === "preset" ||
+      (partial.startId != null && modeAfter === "preset")
+    ) {
+      setLastLocationOverride(null);
+    }
   }
 
   /** tripType OR ≥1 soft preference — matches LocalTrip auto generate contract. */
@@ -748,7 +768,9 @@ export function BookATripView({
     latitude: number;
     longitude: number;
   } | null {
-    // Prefer exact coords from last generate / restored trip.
+    // GPS override only applies while startMode is gps.
+    // After switching to a Đà Lạt preset, ignore stale phone coords (e.g. HCMC).
+    if ((draft.startMode ?? "preset") !== "gps") return null;
     if (
       lastLocationOverride &&
       Number.isFinite(lastLocationOverride.latitude) &&
@@ -1131,11 +1153,12 @@ export function BookATripView({
     }
 
     const start =
-      lastLocationOverride ??
-      ({
-        latitude: activeStart.latitude,
-        longitude: activeStart.longitude,
-      } as const);
+      (draft.startMode ?? "preset") === "gps" && lastLocationOverride
+        ? lastLocationOverride
+        : ({
+            latitude: activeStart.latitude,
+            longitude: activeStart.longitude,
+          } as const);
     const { start: startTimePerDay, end: endTimePerDay } = parseDraftHours(
       draft.hours,
     );
@@ -1398,11 +1421,14 @@ export function BookATripView({
       optionTotal?: number;
     },
   ): CreateSavedTripBody {
-    const start = opts?.locationOverride ??
-      lastLocationOverride ?? {
-        latitude: activeStart.latitude,
-        longitude: activeStart.longitude,
-      };
+    const start =
+      opts?.locationOverride ??
+      ((draft.startMode ?? "preset") === "gps" && lastLocationOverride
+        ? lastLocationOverride
+        : {
+            latitude: activeStart.latitude,
+            longitude: activeStart.longitude,
+          });
     const { start: startTimePerDay, end: endTimePerDay } = parseDraftHours(
       draft.hours,
     );
@@ -2156,6 +2182,7 @@ export function BookATripView({
 
                 {(() => {
                   const weatherStart =
+                    (draft.startMode ?? "preset") === "gps" &&
                     lastLocationOverride &&
                     Number.isFinite(lastLocationOverride.latitude) &&
                     Number.isFinite(lastLocationOverride.longitude)
