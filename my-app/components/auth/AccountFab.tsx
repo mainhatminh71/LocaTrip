@@ -12,6 +12,8 @@ import { BOOK_TRIP_ASSETS } from "@/lib/book-a-trip-assets";
 import styles from "./account-fab.module.css";
 
 const HIDDEN_PREFIXES = ["/login", "/auth/callback"];
+/** Form CTA sits under the FAB on mobile; focus bar hosts AccountMenu instead. */
+const HIDDEN_FAB_PREFIXES = ["/book-a-trip"];
 
 type MenuItem = {
   href: string;
@@ -92,6 +94,15 @@ export function AccountMenu({ variant = "fab" }: AccountMenuProps) {
 
   // Bottom FAB is hidden while itinerary focus bar hosts the bar menu.
   if (variant === "fab" && immersive) return null;
+  // book-a-trip form: sticky “Tạo lịch trình” is covered by the FAB on phones.
+  if (
+    variant === "fab" &&
+    HIDDEN_FAB_PREFIXES.some(
+      (p) => pathname === p || pathname?.startsWith(`${p}/`),
+    )
+  ) {
+    return null;
+  }
   if (isLoading || !isAuthenticated || hidden) return null;
 
   const rootClass =

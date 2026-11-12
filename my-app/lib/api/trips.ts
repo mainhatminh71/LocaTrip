@@ -487,6 +487,47 @@ export type UserVibeResult = {
   message?: string;
 };
 
+export type TripServiceFeedbackBody = {
+  tripId?: string;
+  rating: number;
+  comment?: string;
+  mode?: "save" | "update";
+  tripTitle?: string;
+};
+
+export type TripServiceFeedbackResult = {
+  id: string;
+  tripId: string | null;
+  rating: number;
+  comment: string;
+  mode: "save" | "update";
+  tripTitle?: string;
+  createdAt?: string;
+};
+
+/** Service rating after save/update → `POST /trips/feedback`. */
+export async function submitTripServiceFeedback(
+  body: TripServiceFeedbackBody,
+): Promise<TripServiceFeedbackResult> {
+  const res = await apiFetch("/api/trips/feedback", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Accept: "application/json" },
+    body: JSON.stringify(body),
+    cache: "no-store",
+  });
+  const data = (await res.json()) as {
+    feedback?: TripServiceFeedbackResult;
+    error?: string;
+  };
+  if (!res.ok) {
+    throw new ApiError(data.error || (await readError(res)), res.status);
+  }
+  if (!data.feedback?.id) {
+    throw new ApiError("Server không trả về đánh giá đã lưu", 502);
+  }
+  return data.feedback;
+}
+
 /** Personal travel vibe → `GET /trips/vibe`. */
 export async function getMyVibe(): Promise<UserVibeResult> {
   const res = await apiFetch("/api/trips/vibe", {

@@ -2,7 +2,8 @@
   position: fixed;
   top: 1rem;
   right: 1rem;
-  z-index: 120;
+  /* Above site nav (10000), account FAB (10050), auth modal (11000). */
+  z-index: 13000;
   display: flex;
   flex-direction: column;
   align-items: flex-end;

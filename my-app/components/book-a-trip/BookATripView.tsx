@@ -21,6 +21,7 @@ import {
   previewReorderDay,
   replacePlaceInTrip,
   resolveTripProgressStatus,
+  submitTripServiceFeedback,
   TRIP_PROGRESS_OPTIONS,
   updateSavedTrip,
   updateTripPrefs,
@@ -122,7 +123,9 @@ import {
   ReorderVisitPickerModal,
   type ReorderPickerVisit,
 } from "./ReorderVisitPickerModal";
+import { TripServiceFeedbackModal } from "./TripServiceFeedbackModal";
 import { PlaceThumb } from "./PlaceThumb";
+import { saveTripServiceFeedback } from "@/lib/trip-service-feedback";
 import styles from "./book-a-trip.module.css";
 import { useRouter, useSearchParams } from "next/navigation";
 
@@ -213,6 +216,19 @@ export function BookATripView({
   } | null>(null);
   const [saving, setSaving] = useState(false);
   const [savingPrefs, setSavingPrefs] = useState(false);
+  /** Inline success on sticky Lưu / Cập nhật button. */
+  const [saveFeedback, setSaveFeedback] = useState<string | null>(null);
+  const saveFeedbackTimerRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null,
+  );
+  /** Centered service-rating popup after save / update. */
+  const [serviceFeedback, setServiceFeedback] = useState<{
+    tripId: string;
+    mode: "save" | "update";
+    tripTitle?: string;
+  } | null>(null);
+  const [serviceFeedbackSubmitting, setServiceFeedbackSubmitting] =
+    useState(false);
   const [savedTripId, setSavedTripId] = useState<string | null>(null);
   /** When set (from `?from=` / `?edit=`), user can PATCH this trip after regenerate. */
   const [editingTripId, setEditingTripId] = useState<string | null>(null);
@@ -249,6 +265,75 @@ export function BookATripView({
     setEditingTripId(id);
     writeStoredEditingTripId(id);
   }
+
+  function showSaveFeedback(message: string) {
+    if (saveFeedbackTimerRef.current) {
+      clearTimeout(saveFeedbackTimerRef.current);
+    }
+    setSaveFeedback(message);
+    saveFeedbackTimerRef.current = setTimeout(() => {
+      setSaveFeedback(null);
+      saveFeedbackTimerRef.current = null;
+    }, 4200);
+  }
+
+  function openServiceFeedback(opts: {
+    tripId: string;
+    mode: "save" | "update";
+    tripTitle?: string;
+  }) {
+    setServiceFeedback({
+      tripId: opts.tripId,
+      mode: opts.mode,
+      tripTitle: opts.tripTitle?.trim() || draft.title?.trim() || undefined,
+    });
+  }
+
+  async function submitServiceFeedback(payload: {
+    rating: number;
+    comment: string;
+  }) {
+    if (!serviceFeedback) return;
+    setServiceFeedbackSubmitting(true);
+    try {
+      await submitTripServiceFeedback({
+        tripId: serviceFeedback.tripId,
+        rating: payload.rating,
+        comment: payload.comment,
+        mode: serviceFeedback.mode,
+        tripTitle: serviceFeedback.tripTitle,
+      });
+      // Local mirror for offline/debug; source of truth is API/Mongo.
+      saveTripServiceFeedback({
+        tripId: serviceFeedback.tripId,
+        rating: payload.rating,
+        comment: payload.comment,
+        mode: serviceFeedback.mode,
+        savedAt: new Date().toISOString(),
+      });
+      setServiceFeedback(null);
+      toastSuccess("Cảm ơn bạn đã đánh giá dịch vụ.");
+    } catch (err) {
+      const msg =
+        err instanceof ApiError
+          ? err.message
+          : err instanceof Error
+            ? err.message
+            : "Không gửi được đánh giá";
+      toastError(msg);
+    } finally {
+      setServiceFeedbackSubmitting(false);
+    }
+  }
+
+  useEffect(() => {
+    return () => {
+      if (saveFeedbackTimerRef.current) {
+        clearTimeout(saveFeedbackTimerRef.current);
+      }
+    };
+  }, []);
+
   const [prefillNotice, setPrefillNotice] = useState<string | null>(null);
   const { isAuthenticated, isLoading: authLoading } = useAuthActions();
   const { openAuth } = useAuthModal();
@@ -645,13 +730,15 @@ export function BookATripView({
     });
     if (identityErr) {
       setError(identityErr);
+      toastError(identityErr);
       return false;
     }
     const prefs = buildPreferences(draft);
     if (!draft.tripType && prefs.length === 0) {
-      setError(
-        "Bạn phải chọn ít nhất 1 Chủ đề chuyến đi hoặc 1 Sở thích.",
-      );
+      const msg =
+        "Bạn phải chọn ít nhất 1 Chủ đề chuyến đi hoặc 1 Sở thích.";
+      setError(msg);
+      toastError(msg);
       return false;
     }
     return true;
@@ -786,11 +873,12 @@ export function BookATripView({
           `Chỉ lưu được ${savedCount}/${total} chuyến. Các lộ trình còn lại có thể lưu lại từ danh sách.`,
         );
       } else {
-        toastSuccess(
+        const ok =
           total === 1
             ? "Đã tạo và lưu lịch trình."
-            : `Đã tạo và lưu ${total} lộ trình.`,
-        );
+            : `Đã tạo và lưu ${total} lộ trình.`;
+        showSaveFeedback(ok);
+        toastSuccess(ok);
       }
 
       if (data.itineraries.length === 1) {
@@ -1479,6 +1567,8 @@ export function BookATripView({
     });
     if (identityErr) {
       setError(identityErr);
+      setSaveFeedback(null);
+      toastError(identityErr);
       return null;
     }
 
@@ -1506,7 +1596,14 @@ export function BookATripView({
           ...d,
           tripStatus: trip.tripStatus || "Pending",
         }));
-        toastSuccess("Đã lưu chuyến.");
+        const ok = "Đã lưu chuyến.";
+        showSaveFeedback(ok);
+        toastSuccess(ok);
+        openServiceFeedback({
+          tripId: trip.id,
+          mode: "save",
+          tripTitle: trip.title || body.title,
+        });
         return trip.id;
       }
 
@@ -1519,13 +1616,34 @@ export function BookATripView({
           ...d,
           tripStatus: trip.tripStatus || "OnGoing",
         }));
-        toastSuccess("Đã lưu chuyến đi.");
+        const ok = "Đã lưu chuyến đi.";
+        showSaveFeedback(ok);
+        toastSuccess(ok);
+        openServiceFeedback({
+          tripId: trip.id,
+          mode: "save",
+          tripTitle: trip.title || body.title,
+        });
       } else if (mode === "updatePending") {
         setEditingTripStatus(trip.tripStatus || "Pending");
-        toastSuccess("Đã cập nhật chuyến.");
+        const ok = "Đã cập nhật chuyến.";
+        showSaveFeedback(ok);
+        toastSuccess(ok);
+        openServiceFeedback({
+          tripId: trip.id,
+          mode: "update",
+          tripTitle: trip.title || body.title,
+        });
       } else {
         setEditingTripStatus(trip.tripStatus || editingTripStatus);
-        toastSuccess("Đã cập nhật chuyến đi.");
+        const ok = "Đã cập nhật chuyến đi.";
+        showSaveFeedback(ok);
+        toastSuccess(ok);
+        openServiceFeedback({
+          tripId: trip.id,
+          mode: "update",
+          tripTitle: trip.title || body.title,
+        });
       }
       setEditingTrip(trip.id);
       setSavedTripId(null);
@@ -1542,6 +1660,7 @@ export function BookATripView({
             ? err.message
             : "Không lưu được chuyến đi";
       setError(msg);
+      setSaveFeedback(null);
       toastError(msg);
       return null;
     } finally {
@@ -1567,7 +1686,14 @@ export function BookATripView({
       );
       warnIfStatusMismatch("Pending", trip.tripStatus);
       setOptionTripIds((prev) => ({ ...prev, [opt.optionId]: trip.id }));
-      toastSuccess("Đã lưu chuyến.");
+      const ok = "Đã lưu chuyến.";
+      showSaveFeedback(ok);
+      toastSuccess(ok);
+      openServiceFeedback({
+        tripId: trip.id,
+        mode: "save",
+        tripTitle: trip.title || draft.title,
+      });
     } catch (err) {
       if (handleInsufficientXu(err)) {
         setError(null);
@@ -1580,6 +1706,7 @@ export function BookATripView({
             ? err.message
             : "Không lưu được chuyến";
       setError(msg);
+      setSaveFeedback(null);
       toastError(msg);
     } finally {
       setSaving(false);
@@ -2357,12 +2484,19 @@ export function BookATripView({
                   {isTripPending && editingTripId ? (
                     <button
                       type="button"
-                      className={styles.btnPrimary}
-                      disabled={saving}
+                      className={
+                        saveFeedback
+                          ? `${styles.btnPrimary} ${styles.btnPrimarySaveOk}`
+                          : styles.btnPrimary
+                      }
+                      disabled={saving || Boolean(saveFeedback)}
+                      aria-live="polite"
                       onClick={() => void confirmOfficialTrip()}
                     >
                       {saving ? (
                         <LtButtonLoading label="Đang lưu…" />
+                      ) : saveFeedback ? (
+                        saveFeedback
                       ) : (
                         "Lưu"
                       )}
@@ -2370,12 +2504,19 @@ export function BookATripView({
                   ) : editingTripId ? (
                     <button
                       type="button"
-                      className={styles.btnPrimary}
-                      disabled={saving}
+                      className={
+                        saveFeedback
+                          ? `${styles.btnPrimary} ${styles.btnPrimarySaveOk}`
+                          : styles.btnPrimary
+                      }
+                      disabled={saving || Boolean(saveFeedback)}
+                      aria-live="polite"
                       onClick={() => void updateCurrentTrip()}
                     >
                       {saving ? (
                         <LtButtonLoading label="Đang cập nhật…" />
+                      ) : saveFeedback ? (
+                        saveFeedback
                       ) : (
                         "Cập nhật chuyến này"
                       )}
@@ -2384,8 +2525,13 @@ export function BookATripView({
                     optionTripIds[selectedOption.optionId] ? (
                     <button
                       type="button"
-                      className={styles.btnPrimary}
-                      disabled={saving}
+                      className={
+                        saveFeedback
+                          ? `${styles.btnPrimary} ${styles.btnPrimarySaveOk}`
+                          : styles.btnPrimary
+                      }
+                      disabled={saving || Boolean(saveFeedback)}
+                      aria-live="polite"
                       onClick={() => {
                         const id = optionTripIds[selectedOption.optionId];
                         if (!id) return;
@@ -2396,6 +2542,8 @@ export function BookATripView({
                     >
                       {saving ? (
                         <LtButtonLoading label="Đang lưu…" />
+                      ) : saveFeedback ? (
+                        saveFeedback
                       ) : (
                         "Lưu"
                       )}
@@ -2403,12 +2551,19 @@ export function BookATripView({
                   ) : selectedOption ? (
                     <button
                       type="button"
-                      className={styles.btnPrimary}
-                      disabled={saving}
+                      className={
+                        saveFeedback
+                          ? `${styles.btnPrimary} ${styles.btnPrimarySaveOk}`
+                          : styles.btnPrimary
+                      }
+                      disabled={saving || Boolean(saveFeedback)}
+                      aria-live="polite"
                       onClick={() => void retryPendingForOption(selectedOption)}
                     >
                       {saving ? (
                         <LtButtonLoading label="Đang lưu…" />
+                      ) : saveFeedback ? (
+                        saveFeedback
                       ) : (
                         "Lưu"
                       )}
@@ -2694,6 +2849,21 @@ export function BookATripView({
               applying={reorderApplying}
               onClose={() => setReorderPreview(null)}
               onConfirm={() => void confirmReorderDay()}
+            />,
+            document.body,
+          )
+        : null}
+
+      {typeof document !== "undefined" && serviceFeedback
+        ? createPortal(
+            <TripServiceFeedbackModal
+              mode={serviceFeedback.mode}
+              tripTitle={serviceFeedback.tripTitle}
+              submitting={serviceFeedbackSubmitting}
+              onClose={() => {
+                if (!serviceFeedbackSubmitting) setServiceFeedback(null);
+              }}
+              onSubmit={(payload) => void submitServiceFeedback(payload)}
             />,
             document.body,
           )

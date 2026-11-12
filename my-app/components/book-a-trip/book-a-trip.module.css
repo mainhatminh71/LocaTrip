@@ -1752,6 +1752,18 @@
   border-color: var(--lt-deep);
 }
 
+.btnPrimarySaveOk {
+  border-color: #0a6b7c;
+  background: #0a6b7c;
+  color: #fff;
+  pointer-events: none;
+}
+
+.btnPrimarySaveOk:hover:not(:disabled) {
+  background: #0a6b7c;
+  border-color: #0a6b7c;
+}
+
 .btnPrimarySoft {
   border: 1px solid var(--lt-ink);
   background: #fff;
@@ -2547,7 +2559,8 @@
 .autoSticky {
   position: sticky;
   bottom: 0;
-  z-index: 20;
+  /* Above page chrome so mobile CTA stays tappable. */
+  z-index: 40;
   margin: 8px -4px 0;
   padding: 16px 12px calc(16px + env(safe-area-inset-bottom));
   background: linear-gradient(
@@ -2558,6 +2571,11 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
+}
+
+.autoSticky .btnPrimary,
+.autoSticky .btnPrimarySoft {
+  width: 100%;
 }
 
 .autoPreview,
@@ -2778,19 +2796,179 @@
   );
 }
 
+@media (max-width: 809.98px) {
+  .autoSheet {
+    padding: 24px 14px 0;
+  }
+
+  .autoForm {
+    gap: 16px;
+    padding: 8px 0 140px;
+  }
+
+  .autoFormIntro h2 {
+    font-size: clamp(22px, 6.4vw, 28px);
+  }
+
+  .autoFormIntro p {
+    font-size: 14px;
+  }
+
+  .autoSection {
+    padding: 14px 12px;
+    gap: 10px;
+    border-radius: 16px;
+  }
+
+  .autoSectionTitle {
+    font-size: 15px;
+  }
+
+  .prefsGroupLabel {
+    font-size: 17px;
+  }
+
+  .tripInfoRow {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .tripInfoField,
+  .tripInfoDate {
+    flex: 1 1 auto;
+    width: 100%;
+    max-width: none;
+  }
+
+  .hoursTimeRow {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .hoursTimeField {
+    max-width: none;
+    flex: 1 1 auto;
+  }
+
+  .chipRow {
+    gap: 8px;
+  }
+}
+
 @media (max-width: 640px) {
   .autoForm {
-    padding-bottom: 140px;
+    padding: 4px 0 168px;
   }
 
   .startGrid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .chip,
+  .chipOn {
+    font-size: 12.5px;
+    padding: 10px 12px;
+    min-height: 40px;
+    border-radius: 12px;
+  }
+
+  .focusBar {
+    grid-template-columns: auto 1fr auto;
+    gap: 8px;
+    min-height: 52px;
+    padding: 8px 12px;
+  }
+
+  .focusBrand span {
+    display: none;
+  }
+
+  .focusMeta {
+    gap: 0.35rem;
+  }
+
+  /* Docked bottom CTA — always clear of thumbs / safe-area */
+  .autoSticky {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 10060;
+    margin: 0;
+    padding: 10px 14px calc(10px + env(safe-area-inset-bottom));
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.94);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-top: 1px solid rgba(1, 40, 48, 0.08);
+    box-shadow: 0 -12px 32px rgba(1, 40, 48, 0.12);
+  }
+
+  .autoSticky .autoPreview,
+  .autoSticky .autoPreviewMuted,
+  .autoSticky .error,
+  .autoSticky .saveOk {
+    font-size: 12.5px;
+    line-height: 1.35;
+  }
+
+  .autoSticky .btnPrimary,
+  .autoSticky .btnGhost {
+    min-height: 48px;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    border-radius: 14px;
+  }
+
+  .autoSticky .btnPrimary {
+    min-height: 52px;
+    font-size: 16px;
+  }
+
+  .pageFocus .autoSticky {
+    background: rgba(238, 243, 241, 0.96);
+  }
+
+  .itineraryPane {
+    padding-bottom: 120px;
+  }
+
+  .itineraryPane .autoSticky {
+    flex-wrap: wrap;
+  }
+
+  .itineraryPane .autoSticky .btnPrimary,
+  .itineraryPane .autoSticky .btnGhost {
+    flex: 1 1 calc(50% - 6px);
+    min-width: 0;
+  }
+}
+
+@media (max-width: 420px) {
+  .autoSheet {
+    padding: 18px 10px 0;
+  }
+
+  .autoSection {
+    padding: 12px 10px;
   }
 
   .chip,
   .chipOn {
     font-size: 12px;
-    padding: 9px 12px;
+    padding: 9px 11px;
+  }
+
+  .startGrid {
+    gap: 8px;
+  }
+
+  .startLabel {
+    font-size: 12px;
+    padding: 8px 10px 10px;
   }
 }
 
@@ -4241,6 +4419,13 @@
   flex: 1 1 120px;
 }
 
+.itineraryPane .autoSticky .saveOk {
+  flex: 1 0 100%;
+  width: 100%;
+  margin: 0;
+  order: 10;
+}
+
 .itineraryPane .prefsSticky .prefsSaveOptionsBtn {
   flex: 0 0 auto;
   align-self: stretch;
@@ -4544,6 +4729,145 @@
     inset: 0;
     z-index: 85;
   }
+}
+
+.feedbackOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 13050;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: rgba(1, 40, 48, 0.52);
+  backdrop-filter: blur(4px);
+}
+
+.feedbackCard {
+  width: min(420px, 100%);
+  padding: 22px 20px 18px;
+  border-radius: 20px;
+  background: #fff;
+  box-shadow: 0 22px 56px rgba(1, 40, 48, 0.28);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.feedbackEyebrow {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--lt-teal, #0a6b7c);
+}
+
+.feedbackCard h3 {
+  margin: 0;
+  font-family: var(--lt-font-display);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--lt-deep, #012830);
+  letter-spacing: -0.02em;
+}
+
+.feedbackLead {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--lt-muted, #545454);
+}
+
+.feedbackRatingBlock,
+.feedbackField {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.feedbackLabel {
+  font-size: 12px;
+  font-weight: 750;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--lt-deep, #012830);
+}
+
+.feedbackStars {
+  display: flex;
+  gap: 6px;
+}
+
+.feedbackStar {
+  appearance: none;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid rgba(1, 40, 48, 0.12);
+  border-radius: 12px;
+  background: #f4f7f6;
+  color: rgba(1, 40, 48, 0.28);
+  font-size: 1.35rem;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease,
+    border-color 0.15s ease,
+    transform 0.12s ease;
+}
+
+.feedbackStar:hover:not(:disabled),
+.feedbackStar:focus-visible {
+  transform: translateY(-1px);
+  outline: none;
+}
+
+.feedbackStarOn {
+  background: color-mix(in srgb, #0a6b7c 12%, #fff);
+  border-color: rgba(10, 107, 124, 0.35);
+  color: #0a6b7c;
+}
+
+.feedbackTextarea {
+  width: 100%;
+  min-height: 96px;
+  resize: vertical;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(1, 40, 48, 0.14);
+  background: #f8faf9;
+  color: var(--lt-deep, #012830);
+  font-family: var(--lt-font-body);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.feedbackTextarea:focus {
+  outline: none;
+  border-color: rgba(10, 107, 124, 0.45);
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(10, 107, 124, 0.12);
+}
+
+.feedbackError {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 650;
+  color: #b42318;
+}
+
+.feedbackActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 4px;
+}
+
+.feedbackActions .btnPrimary,
+.feedbackActions .btnGhost {
+  min-width: 112px;
 }
 
 .pickConfirmOverlay {

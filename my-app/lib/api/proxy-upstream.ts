@@ -24,7 +24,7 @@ export const LOCALTRIP_TRIP_SERVICE_DEFAULT =
 /** Default payment upstream (DO gateway — payments + wallet + SePay webhooks). */
 export const LOCALTRIP_PAYMENT_SERVICE_DEFAULT = "https://api.locatrip.app";
 
-export type UpstreamKind = "trip" | "payment";
+export type UpstreamKind = "trip" | "payment" | "feedback";
 
 function truthy(value: string | undefined): boolean {
   if (!value) return false;
@@ -63,7 +63,12 @@ export function resolveUpstreamBase(
   kind: UpstreamKind = "trip",
 ): string {
   if (truthy(env.LOCALTRIP_USE_PUBLIC_API)) {
-    if (kind === "payment") {
+    if (kind === "payment" || kind === "feedback") {
+      // Feedback always prefers DO gateway (api.locatrip.app) over Railway trip.
+      const feedbackExplicit = env.LOCALTRIP_FEEDBACK_API_URL?.trim();
+      if (kind === "feedback" && feedbackExplicit) {
+        return stripTrailingSlash(feedbackExplicit);
+      }
       const explicit = env.LOCALTRIP_PAYMENT_SERVICE_URL?.trim();
       if (explicit) return stripTrailingSlash(explicit);
       return (

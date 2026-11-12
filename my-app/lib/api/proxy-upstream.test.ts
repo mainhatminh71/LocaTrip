@@ -83,6 +83,19 @@ assert.equal(
 );
 
 assert.equal(
+  resolveUpstreamBase(
+    {
+      LOCALTRIP_USE_PUBLIC_API: "true",
+      LOCALTRIP_FEEDBACK_API_URL: "https://api.locatrip.app",
+      LOCALTRIP_TRIP_SERVICE_URL: "https://localtrip-tripservice-production.up.railway.app",
+    },
+    "feedback",
+  ),
+  "https://api.locatrip.app",
+  "feedback prefers LOCALTRIP_FEEDBACK_API_URL",
+);
+
+assert.equal(
   resolveUpstreamBase({
     LOCALTRIP_USE_PUBLIC_API: "true",
     LOCALTRIP_PUBLIC_API_URL: LOCALTRIP_PUBLIC_API_DEFAULT,
