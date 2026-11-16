@@ -63,14 +63,22 @@ type AccountMenuProps = {
 export function AccountMenu({ variant = "fab" }: AccountMenuProps) {
   const pathname = usePathname();
   const { immersive } = useImmersiveUi();
-  const { isAuthenticated, isLoading, displayName, signOut } = useAuthActions();
+  const {
+    isAuthenticated,
+    isLoading,
+    displayName,
+    role,
+    signOut,
+  } = useAuthActions();
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
   const menuId = useId();
 
-  const hidden = HIDDEN_PREFIXES.some(
-    (p) => pathname === p || pathname?.startsWith(`${p}/`),
-  );
+  const hidden =
+    role === "admin" ||
+    HIDDEN_PREFIXES.some(
+      (p) => pathname === p || pathname?.startsWith(`${p}/`),
+    );
 
   useEffect(() => {
     setOpen(false);

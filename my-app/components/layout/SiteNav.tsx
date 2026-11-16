@@ -47,10 +47,16 @@ export function SiteNav({ open, onOpenChange }: SiteNavProps) {
       label: string;
       href: string;
       action?: "logout" | "signin" | "signup";
-    }[] = [...BASE_LINKS];
+    }[] = [];
+
+    // Admin session: only admin console + logout.
     if (role === "admin") {
       links.push({ label: "Admin", href: "/admin/" });
+      links.push({ label: "Đăng xuất", href: "#logout", action: "logout" });
+      return links;
     }
+
+    links.push(...BASE_LINKS);
     if (isAuthenticated) {
       links.push({ label: "Chuyến đi của tôi", href: "/my-trips/" });
       links.push({ label: "Ví xu", href: "/wallet" });
@@ -95,7 +101,7 @@ export function SiteNav({ open, onOpenChange }: SiteNavProps) {
             }}
           >
             <Link
-              href="/"
+              href={role === "admin" ? "/admin/" : "/"}
               className={styles.logo}
               data-framer-name="Logo"
               onClick={() => onOpenChange(false)}
@@ -118,38 +124,50 @@ export function SiteNav({ open, onOpenChange }: SiteNavProps) {
             </Link>
 
             <nav className={styles.inlineNav} aria-label="Điều hướng chính">
-              {INLINE_LINKS.map((item) => (
+              {role === "admin" ? (
                 <Link
-                  key={item.href}
-                  href={item.href}
-                  className={styles.inlineLink}
+                  href="/admin/"
+                  className={styles.inlineCta}
                   onClick={() => onOpenChange(false)}
                 >
-                  {item.label}
+                  Admin
                 </Link>
-              ))}
-              {!isLoading && !isAuthenticated ? (
-                <button
-                  type="button"
-                  className={styles.inlineLink}
-                  onClick={() => {
-                    onOpenChange(false);
-                    openAuth();
-                  }}
-                >
-                  Đăng nhập
-                </button>
-              ) : null}
-              <Link
-                href={INLINE_CTA.href}
-                className={styles.inlineCta}
-                onClick={() => onOpenChange(false)}
-              >
-                {INLINE_CTA.label}
-              </Link>
+              ) : (
+                <>
+                  {INLINE_LINKS.map((item) => (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className={styles.inlineLink}
+                      onClick={() => onOpenChange(false)}
+                    >
+                      {item.label}
+                    </Link>
+                  ))}
+                  {!isLoading && !isAuthenticated ? (
+                    <button
+                      type="button"
+                      className={styles.inlineLink}
+                      onClick={() => {
+                        onOpenChange(false);
+                        openAuth();
+                      }}
+                    >
+                      Đăng nhập
+                    </button>
+                  ) : null}
+                  <Link
+                    href={INLINE_CTA.href}
+                    className={styles.inlineCta}
+                    onClick={() => onOpenChange(false)}
+                  >
+                    {INLINE_CTA.label}
+                  </Link>
+                </>
+              )}
             </nav>
 
-            {isAuthenticated ? (
+            {isAuthenticated && role !== "admin" ? (
               <div className={styles.walletSlot}>
                 <WalletBalanceBadge tone="dark" size="md" showLabel />
               </div>

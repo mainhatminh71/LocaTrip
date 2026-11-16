@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { AuthProvider } from "@/components/auth/AuthProvider";
 import { AuthModalProvider } from "@/components/auth/AuthModalProvider";
+import { AdminOnlyGuard } from "@/components/auth/AdminOnlyGuard";
 import { AccountFab } from "@/components/auth/AccountFab";
 import { ImmersiveUiProvider } from "@/components/layout/ImmersiveUiContext";
 import { ToastProvider } from "@/components/ui/ToastProvider";
@@ -79,14 +80,16 @@ export default function RootLayout({
         <JsonLd data={[organizationJsonLd(), websiteJsonLd()]} />
         <AuthProvider>
           <AuthModalProvider>
-            <ImmersiveUiProvider>
-              <ToastProvider>
-                <WalletProvider>
-                  {children}
-                  <AccountFab />
-                </WalletProvider>
-              </ToastProvider>
-            </ImmersiveUiProvider>
+            <AdminOnlyGuard>
+              <ImmersiveUiProvider>
+                <ToastProvider>
+                  <WalletProvider>
+                    {children}
+                    <AccountFab />
+                  </WalletProvider>
+                </ToastProvider>
+              </ImmersiveUiProvider>
+            </AdminOnlyGuard>
           </AuthModalProvider>
         </AuthProvider>
       </body>

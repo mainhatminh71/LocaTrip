@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useAuthModal } from "@/components/auth/AuthModalProvider";
 import { useAuthActions } from "@/components/auth/useAuthActions";
 import { LtBrandLoader } from "@/components/book-a-trip/LtBrandLoader";
+import { resolvePostLoginPath } from "@/lib/auth/admin-scope";
 
 /**
  * Deep-link / fallback route: open the global auth popup on the intended page.
@@ -13,7 +14,7 @@ function LoginRedirectInner() {
   const router = useRouter();
   const params = useSearchParams();
   const { openAuth } = useAuthModal();
-  const { isAuthenticated, isLoading } = useAuthActions();
+  const { isAuthenticated, isLoading, role } = useAuthActions();
 
   useEffect(() => {
     if (isLoading) return;
@@ -24,7 +25,7 @@ function LoginRedirectInner() {
     const mode = params.get("mode") === "signup" ? "signup" : null;
 
     if (isAuthenticated && mode !== "signup") {
-      router.replace(next);
+      router.replace(resolvePostLoginPath(role, next));
       return;
     }
 
@@ -34,7 +35,7 @@ function LoginRedirectInner() {
       error: error ? "callback" : null,
     });
     router.replace(next);
-  }, [isLoading, isAuthenticated, params, openAuth, router]);
+  }, [isLoading, isAuthenticated, role, params, openAuth, router]);
 
   return (
     <div

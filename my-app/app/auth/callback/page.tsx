@@ -3,13 +3,15 @@
 import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { LtBrandLoader } from "@/components/book-a-trip/LtBrandLoader";
+import { resolvePostLoginPath } from "@/lib/auth/admin-scope";
+import { roleFromUser } from "@/lib/auth/roles";
 import {
   clearOidcStaleState,
   completeSigninCallback,
   getUserManager,
 } from "@/lib/auth/user-manager";
 
-function returnToFromUserState(raw: unknown): string {
+function returnToFromUserState(raw: unknown): string | null {
   try {
     if (typeof raw === "string") {
       const parsed = JSON.parse(raw) as { returnTo?: string };
@@ -18,7 +20,7 @@ function returnToFromUserState(raw: unknown): string {
   } catch {
     /* ignore */
   }
-  return "/";
+  return null;
 }
 
 function stripAuthParamsFromUrl() {
@@ -53,7 +55,12 @@ export default function AuthCallbackPage() {
         }
 
         if (user) {
-          router.replace(returnToFromUserState(user.state));
+          router.replace(
+            resolvePostLoginPath(
+              roleFromUser(user),
+              returnToFromUserState(user.state),
+            ),
+          );
           return;
         }
 
