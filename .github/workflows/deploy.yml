@@ -139,6 +139,18 @@ jobs:
           LOCALTRIP_PUBLIC_API_URL: https://api.locatrip.app
           LOCALTRIP_PAYMENT_SERVICE_URL: https://localtrip-paymentservice-production.up.railway.app
 
+      - name: Sync MONGO_URL worker secret
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          MONGO_URL: ${{ secrets.MONGO_URL }}
+        run: |
+          if [ -z "$MONGO_URL" ]; then
+            echo "::warning::MONGO_URL secret missing; admin users API / feedback Mongo fallback will be unavailable."
+            exit 0
+          fi
+          printf '%s' "$MONGO_URL" | npx wrangler secret put MONGO_URL
+
       - name: Deploy
         run: npm run deploy:cf
         env:

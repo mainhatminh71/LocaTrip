@@ -49,6 +49,15 @@ export function roleFromUser(user: User | null | undefined): AppRole | null {
   return roleFromClaims(profile);
 }
 
+/** Server-side: role from Authorization Bearer access token. */
+export function roleFromBearerToken(
+  authHeader: string | null | undefined,
+): AppRole | null {
+  if (!authHeader?.startsWith("Bearer ")) return null;
+  const token = authHeader.slice("Bearer ".length).trim();
+  return roleFromClaims(decodeJwtPayload(token));
+}
+
 export function displayNameFromUser(user: User | null | undefined): string {
   if (!user?.profile) return "Tài khoản";
   const p = user.profile;
