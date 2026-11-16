@@ -12,37 +12,6 @@
   gap: 16px;
 }
 
-.tabs {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.tab,
-.tabActive {
-  appearance: none;
-  min-height: 40px;
-  padding: 0 16px;
-  border-radius: 999px;
-  font: inherit;
-  font-size: 14px;
-  font-weight: 650;
-  cursor: pointer;
-}
-
-.tab {
-  border: 1px solid color-mix(in srgb, var(--lt-ink, #191919) 16%, transparent);
-  background: #fff;
-  color: var(--lt-ink, #191919);
-}
-
-.tabActive {
-  border: 1px solid var(--lt-ink, #191919);
-  background: var(--lt-ink, #191919);
-  color: #fff;
-}
-
-.panel,
 .panelWide {
   width: 100%;
   margin: 0 auto;
@@ -53,10 +22,6 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
-}
-
-.panel {
-  width: min(640px, 100%);
 }
 
 .panelHead {
@@ -76,7 +41,6 @@
   color: var(--lt-teal, #0a6b7c);
 }
 
-.panel h1,
 .panelWide h1 {
   margin: 0;
   font-family: var(--lt-font-display, system-ui);
@@ -84,7 +48,6 @@
   color: var(--lt-deep, #012830);
 }
 
-.panel h2,
 .panelWide h2 {
   margin: 0;
   font-size: 16px;
@@ -238,7 +201,6 @@
   font-size: 12px;
 }
 
-.btnPrimary,
 .btnGhost,
 .btnLink {
   appearance: none;
@@ -247,7 +209,6 @@
   cursor: pointer;
 }
 
-.btnPrimary,
 .btnGhost {
   min-height: 44px;
   padding: 0 18px;
@@ -256,20 +217,6 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-}
-
-.btnPrimary {
-  border: 1px solid var(--lt-ink, #191919);
-  background: var(--lt-ink, #191919);
-  color: #fff;
-}
-
-.btnPrimary:disabled {
-  opacity: 0.65;
-  cursor: wait;
-}
-
-.btnGhost {
   border: 1px solid color-mix(in srgb, var(--lt-ink, #191919) 16%, transparent);
   background: #fff;
   color: var(--lt-ink, #191919);
@@ -285,64 +232,10 @@
   text-underline-offset: 3px;
 }
 
-.ok {
-  margin: 0;
-  font-size: 13px;
-  color: #0a7a4a;
-}
-
 .error {
   margin: 0;
   font-size: 13px;
   color: #b42318;
-}
-
-.statusBox {
-  margin-top: 8px;
-  padding-top: 16px;
-  border-top: 1px solid var(--lt-line, #ebebeb);
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.statusHead {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-.pre {
-  margin: 0;
-  padding: 12px;
-  border-radius: 12px;
-  background: var(--lt-field, #f5f5f5);
-  font-size: 12px;
-  overflow: auto;
-  max-height: 280px;
-}
-
-.form {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-top: 8px;
-}
-
-.fileLabel {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  font-size: 13px;
-  font-weight: 650;
-  color: var(--lt-ink, #191919);
-}
-
-.fileName {
-  margin: 0;
-  font-size: 13px;
-  color: var(--lt-teal, #0a6b7c);
 }
 
 .detailCard {
