@@ -399,10 +399,24 @@ export function PlaceStopDetail({
   const [searching, setSearching] = useState(false);
   const [searchError, setSearchError] = useState<string | null>(null);
   const altsSectionRef = useRef<HTMLElement | null>(null);
+  const previewSectionRef = useRef<HTMLElement | null>(null);
+  const bodyScrollRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  // After AI suggestions load, bring the list into view on small screens.
+  useEffect(() => {
+    if (!altsRequested || altsLoading || alts.length === 0 || candidate) return;
+    const id = window.setTimeout(() => {
+      altsSectionRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }, 80);
+    return () => window.clearTimeout(id);
+  }, [altsRequested, altsLoading, alts.length, candidate]);
 
   // Warm hero image ASAP (itinerary snapshot first, then cached detail).
   useEffect(() => {
@@ -672,6 +686,14 @@ export function PlaceStopDetail({
       loading: Boolean(pid && !cached),
       error: null,
     });
+    // Mobile: jump scroll to preview (focus mode also hides other panels).
+    requestAnimationFrame(() => {
+      previewSectionRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+      if (bodyScrollRef.current) bodyScrollRef.current.scrollTop = 0;
+    });
     if (!pid || cached) return;
 
     void (async () => {
@@ -807,9 +829,10 @@ export function PlaceStopDetail({
         ) : null}
 
         <div
+          ref={bodyScrollRef}
           className={`${styles.placeDetailBody}${
             candidate ? ` ${styles.placeDetailBodyTriple}` : ""
-          }`}
+          }${candidate ? ` ${styles.placeDetailBodyMobileFocus}` : ""}`}
         >
           <section
             className={`${styles.placeDetailHalf} ${styles.placeDetailHalfCurrent}`}
@@ -1078,10 +1101,11 @@ export function PlaceStopDetail({
 
           {candidate ? (
             <section
+              ref={previewSectionRef}
               className={`${styles.placeDetailHalf} ${styles.placeDetailHalfPreview}`}
               aria-label="Địa điểm dự định"
             >
-              <p className={styles.placeHalfLabel}>Địa điểm dự định</p>
+              <p className={styles.placeHalfLabel}>Địa điểm thay thế (xem trước)</p>
               <div className={styles.placeDetailScroll}>
                 {candidate.error && !candidate.loading ? (
                   <p className={styles.placeDetailMuted}>{candidate.error}</p>
