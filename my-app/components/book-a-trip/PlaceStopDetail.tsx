@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import {
   getPlaceAlternatives,
@@ -398,6 +398,7 @@ export function PlaceStopDetail({
   const [hits, setHits] = useState<PlaceSearchHit[]>([]);
   const [searching, setSearching] = useState(false);
   const [searchError, setSearchError] = useState<string | null>(null);
+  const altsSectionRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -811,7 +812,7 @@ export function PlaceStopDetail({
           }`}
         >
           <section
-            className={styles.placeDetailHalf}
+            className={`${styles.placeDetailHalf} ${styles.placeDetailHalfCurrent}`}
             aria-label="Địa điểm hiện tại"
           >
             <p className={styles.placeHalfLabel}>Địa điểm hiện tại</p>
@@ -848,6 +849,7 @@ export function PlaceStopDetail({
 
           {!readOnly ? (
             <section
+              ref={altsSectionRef}
               className={`${styles.placeDetailHalf} ${styles.placeDetailHalfAlts}`}
               aria-label="Địa điểm thay thế"
             >
@@ -957,7 +959,7 @@ export function PlaceStopDetail({
                       </p>
                       <button
                         type="button"
-                        className={styles.btnPrimary}
+                        className={`${styles.btnPrimary} ${styles.placeAltIdleDesktopCta}`}
                         disabled={!!pickingKey || altsLoading}
                         onClick={() => void loadAlternatives()}
                       >
@@ -1132,7 +1134,9 @@ export function PlaceStopDetail({
                   showContactEmpty={!candidate.loading && !!candidate.detail}
                 />
               </div>
-              <div className={styles.placePreviewActions}>
+              <div
+                className={`${styles.placePreviewActions} ${styles.placePreviewActionsDesktop}`}
+              >
                 <button
                   type="button"
                   className={styles.btnGhost}
@@ -1157,6 +1161,81 @@ export function PlaceStopDetail({
             </section>
           ) : null}
         </div>
+
+        {!readOnly && !candidate && !altsRequested && !suggestAlreadyPaid ? (
+          <div className={styles.placeMobileStickyBar}>
+            <button
+              type="button"
+              className={styles.btnPrimary}
+              disabled={!!pickingKey || altsLoading}
+              onClick={() => void loadAlternatives()}
+            >
+              {tripId
+                ? withXuCost("Tìm địa điểm thay thế", COSTS.tripSuggest)
+                : "Tìm địa điểm thay thế"}
+            </button>
+          </div>
+        ) : null}
+
+        {!readOnly && !candidate && altsRequested && altsError ? (
+          <div className={styles.placeMobileStickyBar}>
+            <button
+              type="button"
+              className={styles.btnGhost}
+              disabled={altsLoading}
+              onClick={() => void loadAlternatives()}
+            >
+              Thử lại gợi ý thay thế
+            </button>
+          </div>
+        ) : null}
+
+        {!readOnly &&
+        !candidate &&
+        altsRequested &&
+        !altsLoading &&
+        !altsError &&
+        alts.length > 0 ? (
+          <div className={styles.placeMobileStickyBar}>
+            <button
+              type="button"
+              className={styles.btnGhost}
+              onClick={() =>
+                altsSectionRef.current?.scrollIntoView({
+                  behavior: "smooth",
+                  block: "start",
+                })
+              }
+            >
+              Xem {alts.length} gợi ý thay thế
+            </button>
+          </div>
+        ) : null}
+
+        {!readOnly && candidate ? (
+          <div className={styles.placeMobileStickyBar}>
+            <button
+              type="button"
+              className={styles.btnGhost}
+              disabled={!!pickingKey}
+              onClick={() => setCandidate(null)}
+            >
+              Bỏ chọn
+            </button>
+            <button
+              type="button"
+              className={styles.btnPrimary}
+              disabled={!!pickingKey || candidate.loading}
+              onClick={() => void pickAlt(candidate.alt, candidate.key)}
+            >
+              {pickingKey === candidate.key ? (
+                <LtButtonLoading label="Đang chốt…" onDark />
+              ) : (
+                "Chốt thay thế"
+              )}
+            </button>
+          </div>
+        ) : null}
 
         {readOnly ? (
           <div className={styles.placeDetailFooter}>
