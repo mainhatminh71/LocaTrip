@@ -3483,37 +3483,135 @@
   background: color-mix(in srgb, var(--lt-field) 40%, #fff);
 }
 
+/* Tablet / phone: one column, natural scroll — không chia đôi trái/phải. */
 @media (max-width: 960px) {
+  .placeDetailModalRoot {
+    padding: 10px;
+    place-items: end center;
+  }
+
   .placeDetailModalSheet,
   .placeDetailModalSheetWide {
     width: min(720px, 100%);
+    height: min(94vh, 900px);
+    max-height: min(94vh, 900px);
   }
 
   .placeDetailBody,
   .placeDetailBodyTriple {
-    grid-template-columns: 1fr;
-    grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
+    display: flex;
+    flex-direction: column;
+    grid-template-columns: none;
+    grid-template-rows: none;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
   }
 
-  .placeDetailBodyTriple {
-    grid-template-rows: minmax(180px, 0.85fr) minmax(160px, 0.7fr) minmax(220px, 1fr);
+  .placeDetailHalf {
+    flex: 0 0 auto;
+    overflow: visible;
+  }
+
+  .placeDetailHalfAlts {
+    flex: 0 0 auto;
+    border-left: 0;
+    border-top: 1px solid color-mix(in srgb, var(--lt-ink) 10%, transparent);
+  }
+
+  .placeDetailHalfPreview {
+    flex: 0 0 auto;
+    border-left: 0;
+    border-top: 1px solid color-mix(in srgb, var(--lt-ink) 10%, transparent);
+    position: sticky;
+    bottom: 0;
+    z-index: 2;
+    box-shadow: 0 -10px 28px rgba(1, 40, 48, 0.08);
+  }
+
+  .placeDetailScroll,
+  .placeAltPane {
+    overflow: visible;
+    flex: none;
+  }
+
+  .placeDetailHalfPreview .placeDetailScroll {
+    max-height: min(42vh, 320px);
+    overflow-y: auto;
+  }
+
+  .placeAltIdle {
+    min-height: 0;
+    padding: 4px 0 8px;
   }
 
   .placeDetailBody:has(> :only-child) {
-    grid-template-rows: minmax(0, 1fr);
-  }
-
-  .placeDetailHalfAlts,
-  .placeDetailHalfPreview {
-    border-left: 0;
-    border-top: 1px solid color-mix(in srgb, var(--lt-ink) 10%, transparent);
+    display: flex;
   }
 }
 
 @media (max-width: 720px) {
+  .placeDetailModalRoot {
+    padding: 0;
+    place-items: stretch;
+  }
+
   .placeDetailModalSheet,
   .placeDetailModalSheetWide {
-    width: min(560px, 100%);
+    width: 100%;
+    height: 100%;
+    max-height: 100%;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .placeHalfLabel {
+    padding: 12px 16px 4px;
+  }
+
+  .placeDetailRoot .detailCardHead {
+    padding: 12px 16px 6px;
+  }
+
+  .placeDetailSearchTop {
+    padding: 0 16px 10px;
+  }
+
+  /* Hero ảnh gọn hơn để còn chỗ cho khối thay thế */
+  .placeDetailHalf:first-child .placeThumbDetail {
+    height: 160px;
+  }
+
+  .placeAltPane {
+    padding: 6px 16px 20px;
+    gap: 12px;
+  }
+
+  .placeAltItem {
+    padding: 14px 14px;
+    border-radius: 14px;
+    gap: 4px;
+  }
+
+  .placeAltItem strong {
+    font-size: 15px;
+  }
+
+  .placeAltItem span,
+  .placeAltItem em {
+    font-size: 13px;
+  }
+
+  .placePreviewActions {
+    padding: 12px 16px calc(12px + env(safe-area-inset-bottom, 0px));
+    gap: 8px;
+  }
+
+  .placePreviewActions .btnGhost,
+  .placePreviewActions .btnPrimary {
+    flex: 1 1 0;
+    min-height: 46px;
   }
 }
 
