@@ -125,6 +125,7 @@ import {
 } from "./ReorderVisitPickerModal";
 import { TripServiceFeedbackModal } from "./TripServiceFeedbackModal";
 import { PlaceThumb } from "./PlaceThumb";
+import { prefetchPlaceThumb } from "@/lib/prefetch-place-thumb";
 import { saveTripServiceFeedback } from "@/lib/trip-service-feedback";
 import styles from "./book-a-trip.module.css";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -640,6 +641,13 @@ export function BookATripView({
     [selectedOption],
   );
 
+  // Warm place thumbs while viewing the list so the detail modal feels instant.
+  useEffect(() => {
+    for (const stop of itineraryStops) {
+      if (stop.place?.thumbnail) prefetchPlaceThumb(stop.place.thumbnail);
+    }
+  }, [itineraryStops]);
+
   const travelKeysOrdered = useMemo(
     () =>
       selectedOption ? listTravelKeys(selectedOption.itinerary) : ([] as string[]),
@@ -1063,6 +1071,10 @@ export function BookATripView({
   }
 
   function selectStop(key: string) {
+    const stop = itineraryStops.find((s) => s.key === key);
+    if (stop?.place?.thumbnail) {
+      prefetchPlaceThumb(stop.place.thumbnail);
+    }
     setSelectedStopKey(key);
     setSelectedTravelKey(null);
   }
@@ -2486,6 +2498,7 @@ export function BookATripView({
                                       src={item.place?.thumbnail}
                                       alt={title}
                                       variant="tile"
+                                      priority
                                       className={styles.stopThumb}
                                     />
                                   ) : null}

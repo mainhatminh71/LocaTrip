@@ -59,6 +59,8 @@ async function fromWorkerBinding(key: string): Promise<Response | null> {
         "Content-Type": type,
         "Cache-Control":
           "public, max-age=604800, stale-while-revalidate=2592000, immutable",
+        "CDN-Cache-Control": "public, max-age=2592000",
+        "Cloudflare-CDN-Cache-Control": "public, max-age=2592000",
       },
     });
   } catch {
@@ -82,6 +84,8 @@ async function fromS3(key: string): Promise<Response | null> {
         "Content-Type": out.ContentType || "image/jpeg",
         "Cache-Control":
           "public, max-age=604800, stale-while-revalidate=2592000, immutable",
+        "CDN-Cache-Control": "public, max-age=2592000",
+        "Cloudflare-CDN-Cache-Control": "public, max-age=2592000",
       },
     });
   } catch {

@@ -11,6 +11,8 @@ type PlaceThumbProps = {
   alt?: string;
   /** `detail` = large modal hero; `tile` = list / replace thumbs */
   variant?: "detail" | "tile";
+  /** Eager + high priority (itinerary stop tiles that open the modal). */
+  priority?: boolean;
   className?: string;
 };
 
@@ -51,6 +53,7 @@ export function PlaceThumb({
   src,
   alt = "",
   variant = "detail",
+  priority = false,
   className,
 }: PlaceThumbProps) {
   const urls = useMemo(() => candidateUrls(src), [src]);
@@ -60,6 +63,8 @@ export function PlaceThumb({
   const [failed, setFailed] = useState(false);
   const raw = urls[urlIndex] || "";
   const prevRawRef = useRef(raw);
+  const imgRef = useRef<HTMLImageElement | null>(null);
+  const eager = variant === "detail" || priority;
 
   // Warm cache as soon as we know a URL (list tile → modal reuse).
   useEffect(() => {
@@ -82,6 +87,16 @@ export function PlaceThumb({
     setLoaded(false);
     setFailed(!raw && urls.length === 0);
   }, [raw, urls.length]);
+
+  // Cached images may finish before onLoad attaches — skip skeleton then.
+  useEffect(() => {
+    const el = imgRef.current;
+    if (!el || !raw) return;
+    if (el.complete && el.naturalWidth > 0) {
+      setLoaded(true);
+      setFailed(false);
+    }
+  }, [raw]);
 
   const shellClass =
     variant === "tile" ? styles.placeThumbTile : styles.placeThumbDetail;
@@ -138,13 +153,14 @@ export function PlaceThumb({
       {!loaded ? skeleton : null}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
+        ref={imgRef}
         src={raw}
         alt={alt}
         className={styles.placeThumbImg}
         style={loaded ? undefined : { position: "absolute", opacity: 0 }}
-        decoding={variant === "detail" ? "sync" : "async"}
-        loading={variant === "tile" ? "lazy" : "eager"}
-        fetchPriority={variant === "detail" ? "high" : "auto"}
+        decoding="async"
+        loading={eager ? "eager" : "lazy"}
+        fetchPriority={eager ? "high" : "auto"}
         referrerPolicy={
           raw.startsWith("/api/r2-media") ? undefined : "no-referrer"
         }
