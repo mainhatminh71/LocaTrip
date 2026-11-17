@@ -15,8 +15,8 @@ import {
   COSTS,
   TOPUP_PACKAGES,
   getWalletTransactions,
+  topupPackageForAmount,
   walletReasonLabel,
-  xuFromVnd,
   type WalletTx,
 } from "@/lib/api/wallet";
 import {
@@ -39,7 +39,6 @@ import styles from "./wallet.module.css";
 type HistoryTab = "ledger" | "payments";
 
 const HISTORY_PAGE_SIZE = 5;
-const POPULAR_AMOUNTS = new Set([10000, 20000]);
 
 function formatWhen(iso: string) {
   try {
@@ -69,10 +68,11 @@ function WalletInner() {
         ? BOOK_A_TRIP_RESUME_PATH
         : undefined;
   const { toastSuccess, toastError } = useToast();
-  const { balance, rate, loading: walletLoading, refresh } = useWallet();
+  const { balance, loading: walletLoading, refresh } = useWallet();
 
-  const [selectedAmount, setSelectedAmount] = useState(10000);
-  const [customAmount, setCustomAmount] = useState("");
+  const [selectedAmount, setSelectedAmount] = useState(
+    TOPUP_PACKAGES[1]?.amount ?? TOPUP_PACKAGES[0]!.amount,
+  );
   const [submitting, setSubmitting] = useState(false);
   const [topupError, setTopupError] = useState<string | null>(null);
 
@@ -83,17 +83,9 @@ function WalletInner() {
   const [histLoading, setHistLoading] = useState(true);
   const [histError, setHistError] = useState<string | null>(null);
 
-  const effectiveAmount = useMemo(() => {
-    if (customAmount.trim()) {
-      const n = Math.round(
-        Number(String(customAmount).replace(/\D/g, "") || customAmount),
-      );
-      return Number.isFinite(n) ? n : selectedAmount;
-    }
-    return selectedAmount;
-  }, [customAmount, selectedAmount]);
-
-  const previewXu = xuFromVnd(Math.max(0, effectiveAmount));
+  const selectedPkg =
+    topupPackageForAmount(selectedAmount) ?? TOPUP_PACKAGES[0]!;
+  const previewXu = selectedPkg.xu;
   const tripBudget =
     balance != null && COSTS.tripGenerate > 0
       ? Math.floor(balance / COSTS.tripGenerate)
@@ -166,15 +158,16 @@ function WalletInner() {
   async function onTopup(e: FormEvent) {
     e.preventDefault();
     setTopupError(null);
-    if (!Number.isFinite(effectiveAmount) || effectiveAmount < 1000) {
-      setTopupError("Số tiền tối thiểu 1.000 VND");
+    const pkg = topupPackageForAmount(selectedAmount);
+    if (!pkg) {
+      setTopupError("Chọn một gói nạp");
       return;
     }
     setSubmitting(true);
     try {
       const { payment } = await createPayment({
-        amount: effectiveAmount,
-        note: "Nap xu",
+        amount: pkg.amount,
+        note: `Nap xu ${pkg.title} (${pkg.xu} xu)`,
       });
       toastSuccess("Đã tạo mã QR nạp xu");
       router.push(
@@ -230,7 +223,7 @@ function WalletInner() {
                 : "Chưa đủ xu để tạo chuyến — nạp thêm bên dưới"}
           </p>
           <p className={styles.balanceRate}>
-            {rate?.example || "10000 VND = 50 xu"}
+            Nạp theo gói · chuẩn 10.000₫ = 50 xu
           </p>
         </section>
 
@@ -243,55 +236,41 @@ function WalletInner() {
 
         <section className={styles.panel}>
           <h2 className={styles.panelTitle}>Nạp xu</h2>
+          <p className={styles.panelSub}>
+            Không thuê bao năm — chọn gói nạp theo nhu cầu.
+          </p>
           <div className={styles.packages} role="group" aria-label="Gói nạp">
             {TOPUP_PACKAGES.map((pkg) => {
-              const selected =
-                !customAmount.trim() && selectedAmount === pkg.amount;
-              const popular = POPULAR_AMOUNTS.has(pkg.amount);
+              const selected = selectedAmount === pkg.amount;
               return (
                 <button
-                  key={pkg.amount}
+                  key={pkg.id}
                   type="button"
                   className={
                     selected ? styles.packageBtnOn : styles.packageBtn
                   }
-                  onClick={() => {
-                    setSelectedAmount(pkg.amount);
-                    setCustomAmount("");
-                  }}
+                  onClick={() => setSelectedAmount(pkg.amount)}
                 >
-                  {popular ? (
-                    <span className={styles.packageBadge}>Hay chọn</span>
+                  {pkg.badge ? (
+                    <span className={styles.packageBadge}>{pkg.badge}</span>
                   ) : null}
-                  <span className={styles.packageAmount}>{pkg.label}</span>
-                  <span className={styles.packageXu}>
-                    {xuFromVnd(pkg.amount)} xu
+                  <span className={styles.packageTitle}>{pkg.title}</span>
+                  <span className={styles.packageXuHero}>
+                    {pkg.xu.toLocaleString("vi-VN")} xu
                   </span>
+                  <span className={styles.packageAmount}>{pkg.label}</span>
+                  <span className={styles.packageHint}>{pkg.hint}</span>
                 </button>
               );
             })}
           </div>
 
           <form className={styles.form} onSubmit={onTopup}>
-            <label>
-              Hoặc nhập số tiền (VND)
-              <input
-                type="text"
-                inputMode="numeric"
-                value={customAmount}
-                onChange={(e) => setCustomAmount(e.target.value)}
-                placeholder="VD: 30000"
-                autoComplete="off"
-              />
-            </label>
             <p className={styles.previewXu}>
-              Bạn sẽ nhận{" "}
-              <strong>{previewXu.toLocaleString("vi-VN")} xu</strong>
-              {effectiveAmount >= 1000
-                ? ` từ ${formatVnd(effectiveAmount)}`
-                : ""}
+              Gói <strong>{selectedPkg.title}</strong> — nhận{" "}
+              <strong>{previewXu.toLocaleString("vi-VN")} xu</strong> từ{" "}
+              {formatVnd(selectedPkg.amount)}
             </p>
-            <p className={styles.fieldHint}>Tối thiểu 1.000 VND.</p>
             {topupError ? <p className={styles.error}>{topupError}</p> : null}
             <div className={styles.actions}>
               <button

@@ -42,16 +42,66 @@ export function withXuCost(label: string, cost: number): string {
   return `${label} (−${cost} xu)`;
 }
 
-/** Preview only — rate 10000 VND = 50 xu. */
-export function xuFromVnd(amountVnd: number): number {
-  return Math.floor((amountVnd * 50) / 10000);
+export type TopupPackage = {
+  id: "basic" | "save" | "optimal";
+  amount: number;
+  xu: number;
+  label: string;
+  title: string;
+  hint: string;
+  badge?: string;
+};
+
+/** 3 gói nạp coin — cố định xu theo gói (không quy đổi tuyến tính). */
+export const TOPUP_PACKAGES: readonly TopupPackage[] = [
+  {
+    id: "basic",
+    amount: 10000,
+    xu: 50,
+    label: "10.000₫",
+    title: "Trải nghiệm",
+    hint: "200đ/xu · Giá chuẩn",
+  },
+  {
+    id: "save",
+    amount: 20000,
+    xu: 65,
+    label: "20.000₫",
+    title: "Tiết kiệm",
+    hint: "≈308đ/xu · Gói phổ biến",
+    badge: "Hay chọn",
+  },
+  {
+    id: "optimal",
+    amount: 85000,
+    xu: 100,
+    label: "85.000₫",
+    title: "Tối ưu",
+    hint: "850đ/xu · Nhiều xu nhất",
+  },
+] as const;
+
+const PACKAGE_BY_AMOUNT = new Map(
+  TOPUP_PACKAGES.map((p) => [p.amount, p] as const),
+);
+
+export function topupPackageForAmount(
+  amountVnd: number,
+): TopupPackage | undefined {
+  return PACKAGE_BY_AMOUNT.get(Math.round(Number(amountVnd)) || 0);
 }
 
-export const TOPUP_PACKAGES = [
-  { amount: 10000, label: "10.000₫" },
-  { amount: 20000, label: "20.000₫" },
-  { amount: 50000, label: "50.000₫" },
-] as const;
+/**
+ * Xu nhận được khi nạp `amountVnd`.
+ * Gói cố định (10k/20k/85k) dùng bảng gói; số khác fallback tỷ lệ chuẩn 10.000₫ = 50 xu.
+ */
+export function xuFromVnd(amountVnd: number): number {
+  const amount = Math.round(Number(amountVnd));
+  if (!Number.isFinite(amount) || amount <= 0) return 0;
+  const pkg = PACKAGE_BY_AMOUNT.get(amount);
+  if (pkg) return pkg.xu;
+  return Math.floor((amount * 50) / 10000);
+}
 
 export function walletReasonLabel(reason: WalletLedgerReason | string): string {
   switch (reason) {
@@ -90,7 +140,7 @@ export async function getWallet(): Promise<WalletInfo> {
     rate: data.rate || {
       vnd: 10000,
       coins: 50,
-      example: "10000 VND = 50 xu",
+      example: "Gói từ 10.000₫ = 50 xu",
     },
   };
 }
