@@ -959,7 +959,7 @@ export function PlaceStopDetail({
                       </p>
                       <button
                         type="button"
-                        className={`${styles.btnPrimary} ${styles.placeAltIdleDesktopCta}`}
+                        className={styles.btnPrimary}
                         disabled={!!pickingKey || altsLoading}
                         onClick={() => void loadAlternatives()}
                       >

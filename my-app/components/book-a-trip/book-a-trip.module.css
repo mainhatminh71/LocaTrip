@@ -3483,6 +3483,27 @@
   background: color-mix(in srgb, var(--lt-field) 40%, #fff);
 }
 
+/* Sticky CTA — base ẩn; bật trong @media phía dưới (phải đứng TRƯỚC media). */
+.placeMobileStickyBar {
+  display: none;
+  flex: 0 0 auto;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid color-mix(in srgb, var(--lt-ink) 10%, transparent);
+  background: #fff;
+  box-shadow: 0 -8px 24px rgba(1, 40, 48, 0.08);
+  z-index: 3;
+}
+
+.placeMobileStickyBar .btnPrimary,
+.placeMobileStickyBar .btnGhost {
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 48px;
+}
+
 /* Tablet / phone: 1 cột + một vùng scroll duy nhất. */
 @media (max-width: 960px) {
   .placeDetailModalRoot {
@@ -3493,14 +3514,14 @@
   .placeDetailModalSheet,
   .placeDetailModalSheetWide {
     width: min(720px, 100%);
-    height: min(94vh, 900px);
-    max-height: min(94vh, 900px);
+    height: min(94dvh, 900px);
+    max-height: min(94dvh, 900px);
   }
 
   .placeDetailRoot {
     flex: 1 1 0%;
     min-height: 0;
-    height: auto;
+    height: 100%;
     max-height: none;
     overflow: hidden;
   }
@@ -3526,21 +3547,19 @@
     overflow: visible;
   }
 
-  /* Đưa khối thay thế lên trước để CTA luôn trong tầm tay. */
   .placeDetailHalfCurrent {
-    order: 2;
+    order: 0;
   }
 
   .placeDetailHalfAlts {
-    order: 1;
+    order: 0;
     flex: 0 0 auto;
     border-left: 0;
-    border-top: 0;
-    border-bottom: 1px solid color-mix(in srgb, var(--lt-ink) 10%, transparent);
+    border-top: 1px solid color-mix(in srgb, var(--lt-ink) 10%, transparent);
   }
 
   .placeDetailHalfPreview {
-    order: 3;
+    order: 0;
     flex: 0 0 auto;
     border-left: 0;
     border-top: 1px solid color-mix(in srgb, var(--lt-ink) 10%, transparent);
@@ -3558,7 +3577,7 @@
     padding: 4px 0 8px;
   }
 
-  .placeAltIdleDesktopCta,
+  /* Actions chốt trong preview: dùng sticky bar trên mobile. */
   .placePreviewActionsDesktop {
     display: none;
   }
@@ -3583,6 +3602,8 @@
     width: 100%;
     height: 100%;
     max-height: 100%;
+    height: 100dvh;
+    max-height: 100dvh;
     border-radius: 0;
     box-shadow: none;
   }
@@ -3599,7 +3620,7 @@
     padding: 0 16px 10px;
   }
 
-  .placeDetailHalf:first-child .placeThumbDetail {
+  .placeDetailHalfCurrent .placeThumbDetail {
     height: 160px;
   }
 
@@ -3633,27 +3654,6 @@
     flex: 1 1 0;
     min-height: 46px;
   }
-}
-
-/* Sticky CTA — chỉ hiện trên mobile/tablet (xem media ở trên). */
-.placeMobileStickyBar {
-  display: none;
-  flex: 0 0 auto;
-  flex-direction: row;
-  flex-wrap: wrap;
-  gap: 8px;
-  padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px));
-  border-top: 1px solid color-mix(in srgb, var(--lt-ink) 10%, transparent);
-  background: #fff;
-  box-shadow: 0 -8px 24px rgba(1, 40, 48, 0.08);
-  z-index: 3;
-}
-
-.placeMobileStickyBar .btnPrimary,
-.placeMobileStickyBar .btnGhost {
-  flex: 1 1 0;
-  min-width: 0;
-  min-height: 48px;
 }
 
 .placeHalfLabel {
