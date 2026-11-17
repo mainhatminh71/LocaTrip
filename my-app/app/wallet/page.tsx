@@ -223,7 +223,7 @@ function WalletInner() {
                 : "Chưa đủ xu để tạo chuyến — nạp thêm bên dưới"}
           </p>
           <p className={styles.balanceRate}>
-            Nạp theo gói · chuẩn 10.000₫ = 50 xu
+            Nạp theo gói · chuẩn 20.000₫ = 10 xu
           </p>
         </section>
 

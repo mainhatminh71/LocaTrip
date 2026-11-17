@@ -56,28 +56,28 @@ export type TopupPackage = {
 export const TOPUP_PACKAGES: readonly TopupPackage[] = [
   {
     id: "basic",
-    amount: 10000,
-    xu: 50,
-    label: "10.000₫",
+    amount: 20000,
+    xu: 10,
+    label: "20.000₫",
     title: "Trải nghiệm",
-    hint: "200đ/xu · Giá chuẩn",
+    hint: "2.000đ/xu · Giá chuẩn",
   },
   {
     id: "save",
-    amount: 20000,
-    xu: 65,
-    label: "20.000₫",
+    amount: 95000,
+    xu: 50,
+    label: "95.000₫",
     title: "Tiết kiệm",
-    hint: "≈308đ/xu · Gói phổ biến",
+    hint: "1.900đ/xu · Giảm 5%",
     badge: "Hay chọn",
   },
   {
     id: "optimal",
-    amount: 85000,
+    amount: 180000,
     xu: 100,
-    label: "85.000₫",
+    label: "180.000₫",
     title: "Tối ưu",
-    hint: "850đ/xu · Nhiều xu nhất",
+    hint: "1.800đ/xu · Giảm 10%",
   },
 ] as const;
 
@@ -93,14 +93,14 @@ export function topupPackageForAmount(
 
 /**
  * Xu nhận được khi nạp `amountVnd`.
- * Gói cố định (10k/20k/85k) dùng bảng gói; số khác fallback tỷ lệ chuẩn 10.000₫ = 50 xu.
+ * Gói cố định (20k/95k/180k) dùng bảng gói; số khác fallback tỷ lệ chuẩn 20.000₫ = 10 xu.
  */
 export function xuFromVnd(amountVnd: number): number {
   const amount = Math.round(Number(amountVnd));
   if (!Number.isFinite(amount) || amount <= 0) return 0;
   const pkg = PACKAGE_BY_AMOUNT.get(amount);
   if (pkg) return pkg.xu;
-  return Math.floor((amount * 50) / 10000);
+  return Math.floor((amount * 10) / 20000);
 }
 
 export function walletReasonLabel(reason: WalletLedgerReason | string): string {
@@ -138,9 +138,9 @@ export async function getWallet(): Promise<WalletInfo> {
     balance: Number(data.balance) || 0,
     currency: "XU",
     rate: data.rate || {
-      vnd: 10000,
-      coins: 50,
-      example: "Gói từ 10.000₫ = 50 xu",
+      vnd: 20000,
+      coins: 10,
+      example: "Gói từ 20.000₫ = 10 xu",
     },
   };
 }
