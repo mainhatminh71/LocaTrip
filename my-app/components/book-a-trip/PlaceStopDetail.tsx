@@ -30,6 +30,7 @@ import {
   suggestReplaceCacheKey,
 } from "@/lib/suggest-replace-cache";
 import { LtBrandLoader, LtButtonLoading } from "./LtBrandLoader";
+import { prefetchPlaceThumb } from "@/lib/prefetch-place-thumb";
 import { PlaceThumb } from "./PlaceThumb";
 import styles from "./book-a-trip.module.css";
 
@@ -401,6 +402,14 @@ export function PlaceStopDetail({
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  // Warm hero image ASAP (itinerary snapshot first, then cached detail).
+  useEffect(() => {
+    prefetchPlaceThumb([
+      stop.place.thumbnail,
+      placeId ? getCachedPlaceDetail(placeId)?.thumbnail : null,
+    ]);
+  }, [placeId, stop.place.thumbnail]);
 
   useEffect(() => {
     const prev = document.body.style.overflow;
@@ -811,7 +820,7 @@ export function PlaceStopDetail({
                 <p className={styles.placeDetailMuted}>{error}</p>
               ) : null}
               <PlaceInfoBody
-                thumbKey={`${stop.place.placeId || stop.key}:${rawThumb.filter(Boolean).join("|") || "none"}`}
+                thumbKey={stop.place.placeId || stop.key}
                 thumbSrc={rawThumb}
                 title={title || ""}
                 address={address}
@@ -1076,8 +1085,11 @@ export function PlaceStopDetail({
                   <p className={styles.placeDetailMuted}>{candidate.error}</p>
                 ) : null}
                 <PlaceInfoBody
-                  thumbKey={`${candidate.alt.placeId || candidate.key}:${candidate.detail?.thumbnail || "none"}`}
-                  thumbSrc={candidate.detail?.thumbnail || null}
+                  thumbKey={candidate.alt.placeId || candidate.key}
+                  thumbSrc={[
+                    candidate.detail?.thumbnail,
+                    candidate.alt.thumbnail,
+                  ]}
                   title={candidate.detail?.title || candidate.alt.title || ""}
                   address={
                     candidate.detail?.address || candidate.alt.address || null

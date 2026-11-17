@@ -57,7 +57,8 @@ async function fromWorkerBinding(key: string): Promise<Response | null> {
       status: 200,
       headers: {
         "Content-Type": type,
-        "Cache-Control": "public, max-age=86400, stale-while-revalidate=604800",
+        "Cache-Control":
+          "public, max-age=604800, stale-while-revalidate=2592000, immutable",
       },
     });
   } catch {
@@ -79,7 +80,8 @@ async function fromS3(key: string): Promise<Response | null> {
       status: 200,
       headers: {
         "Content-Type": out.ContentType || "image/jpeg",
-        "Cache-Control": "public, max-age=86400, stale-while-revalidate=604800",
+        "Cache-Control":
+          "public, max-age=604800, stale-while-revalidate=2592000, immutable",
       },
     });
   } catch {

@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { proxiedMediaUrl } from "@/lib/media-url";
+import { prefetchPlaceThumb } from "@/lib/prefetch-place-thumb";
 import styles from "./book-a-trip.module.css";
 
 type PlaceThumbProps = {
@@ -53,19 +54,31 @@ export function PlaceThumb({
   className,
 }: PlaceThumbProps) {
   const urls = useMemo(() => candidateUrls(src), [src]);
-  const urlsKey = urls.join("\0");
+  const firstUrl = urls[0] || "";
   const [urlIndex, setUrlIndex] = useState(0);
   const [loaded, setLoaded] = useState(false);
   const [failed, setFailed] = useState(false);
   const raw = urls[urlIndex] || "";
+  const prevRawRef = useRef(raw);
+
+  // Warm cache as soon as we know a URL (list tile → modal reuse).
+  useEffect(() => {
+    if (firstUrl) prefetchPlaceThumb(firstUrl);
+  }, [firstUrl]);
 
   useEffect(() => {
     setUrlIndex(0);
-    setLoaded(false);
     setFailed(urls.length === 0);
-  }, [urlsKey, urls.length]);
+    // Keep `loaded` if the primary URL is unchanged (detail refresh adds fallbacks).
+    if (!firstUrl || prevRawRef.current !== firstUrl) {
+      setLoaded(false);
+      prevRawRef.current = firstUrl;
+    }
+  }, [firstUrl, urls.length]);
 
   useEffect(() => {
+    if (prevRawRef.current === raw) return;
+    prevRawRef.current = raw;
     setLoaded(false);
     setFailed(!raw && urls.length === 0);
   }, [raw, urls.length]);
@@ -129,8 +142,9 @@ export function PlaceThumb({
         alt={alt}
         className={styles.placeThumbImg}
         style={loaded ? undefined : { position: "absolute", opacity: 0 }}
-        decoding="async"
+        decoding={variant === "detail" ? "sync" : "async"}
         loading={variant === "tile" ? "lazy" : "eager"}
+        fetchPriority={variant === "detail" ? "high" : "auto"}
         referrerPolicy={
           raw.startsWith("/api/r2-media") ? undefined : "no-referrer"
         }
