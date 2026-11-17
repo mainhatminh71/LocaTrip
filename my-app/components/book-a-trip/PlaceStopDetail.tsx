@@ -1086,10 +1086,7 @@ export function PlaceStopDetail({
                 ) : null}
                 <PlaceInfoBody
                   thumbKey={candidate.alt.placeId || candidate.key}
-                  thumbSrc={[
-                    candidate.detail?.thumbnail,
-                    candidate.alt.thumbnail,
-                  ]}
+                  thumbSrc={candidate.detail?.thumbnail || null}
                   title={candidate.detail?.title || candidate.alt.title || ""}
                   address={
                     candidate.detail?.address || candidate.alt.address || null
