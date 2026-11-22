@@ -33,6 +33,16 @@ export function useAuthActions() {
     await auth.signinRedirect({ state });
   }
 
+  /** Keycloak Identity Provider alias `google` (broker → Google OAuth). */
+  async function signInWithGoogle(returnTo?: string) {
+    await clearOidcStaleState();
+    const state = returnTo ? JSON.stringify({ returnTo }) : undefined;
+    await auth.signinRedirect({
+      state,
+      extraQueryParams: { kc_idp_hint: "google" },
+    });
+  }
+
   /**
    * Keycloak registration endpoint, with the same PKCE state shape UserManager
    * expects on /auth/callback (`request_type: "si:r"`).
@@ -79,6 +89,7 @@ export function useAuthActions() {
     displayName: displayNameFromUser(auth.user),
     role: roleFromUser(auth.user),
     signIn,
+    signInWithGoogle,
     signUp,
     signOut,
   };
