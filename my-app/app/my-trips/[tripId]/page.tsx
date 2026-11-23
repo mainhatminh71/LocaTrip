@@ -17,9 +17,10 @@ import {
 import { ApiError } from "@/lib/api/http";
 import { labelForValue } from "@/lib/auto-trip-form";
 import { pickSavedTripPrefs } from "@/lib/saved-trip-draft";
+import { publishSharedTrip } from "@/lib/api/shared-trips";
 import { absoluteUrl } from "@/lib/seo";
 import { BUDGET_OPTIONS, PACE_OPTIONS } from "@/lib/trip";
-import { shareOrCopy, tripSharePath } from "@/lib/ui/share";
+import { shareOrCopy, sharedTripPath } from "@/lib/ui/share";
 import styles from "../my-trips.module.css";
 
 function formatTripDay(ymd?: string) {
@@ -132,22 +133,31 @@ function TripDetailInner() {
     if (!trip || sharing) return;
     setSharing(true);
     try {
-      const path = tripSharePath(trip.id);
+      const published = await publishSharedTrip(trip.id);
+      const path = sharedTripPath(published.id);
       const url =
         typeof window !== "undefined"
           ? `${window.location.origin}${path}`
           : absoluteUrl(path);
-      const title = trip.title.trim() || "Chuyến đi";
+      const title = trip.title.trim() || published.title || "Chuyến đi";
       const result = await shareOrCopy({
         title: `${title} · LocaTrip`,
         text: trip.summary?.trim() || title,
         url,
       });
       if (result.ok && result.method === "clipboard") {
-        toastSuccess("Đã sao chép liên kết chuyến đi");
-      } else if (!result.ok && !result.cancelled) {
-        toastError("Không chia sẻ được. Thử lại sau.");
+        toastSuccess("Đã đăng cộng đồng và sao chép liên kết");
+      } else if (result.ok || !result.cancelled) {
+        toastSuccess("Đã đăng chuyến lên cộng đồng");
       }
+    } catch (err) {
+      toastError(
+        err instanceof ApiError
+          ? err.message
+          : err instanceof Error
+            ? err.message
+            : "Không chia sẻ được. Thử lại sau.",
+      );
     } finally {
       setSharing(false);
     }

@@ -59,6 +59,7 @@ export function SiteNav({ open, onOpenChange }: SiteNavProps) {
     links.push(...BASE_LINKS);
     if (isAuthenticated) {
       links.push({ label: "Chuyến đi của tôi", href: "/my-trips/" });
+      links.push({ label: "Chuyến được chia sẻ", href: "/shared-trips/" });
       links.push({ label: "Ví xu", href: "/wallet" });
       links.push({ label: "Tài khoản", href: "/account/" });
       links.push({ label: "Đăng xuất", href: "#logout", action: "logout" });

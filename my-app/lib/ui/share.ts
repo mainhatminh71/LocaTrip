@@ -46,7 +46,12 @@ export function placeSharePath(placeId: string): string {
   return `/places/${encodeURIComponent(placeId.trim())}`;
 }
 
-/** Canonical public trip URL for sharing. */
+/** Legacy public trip-by-id URL (owner Mongo snapshot). */
 export function tripSharePath(tripId: string): string {
   return `/trips/${encodeURIComponent(tripId.trim())}`;
+}
+
+/** Community feed detail URL for a published shared trip. */
+export function sharedTripPath(sharedId: string): string {
+  return `/shared-trips/${encodeURIComponent(sharedId.trim())}`;
 }

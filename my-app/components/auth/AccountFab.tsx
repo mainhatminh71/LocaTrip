@@ -36,6 +36,12 @@ const MENU_ITEMS: MenuItem[] = [
     icon: "trips",
   },
   {
+    href: "/shared-trips/",
+    label: "Chuyến được chia sẻ",
+    description: "Cộng đồng lịch trình — đánh giá & tái sử dụng",
+    icon: "trips",
+  },
+  {
     href: "/wallet",
     label: "Ví xu",
     description: "Số dư xu và nạp qua QR",

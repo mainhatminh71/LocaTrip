@@ -113,8 +113,9 @@ import {
 } from "@/lib/ui/view-prefs";
 import { Route } from "lucide-react";
 import { useToast } from "@/components/ui/ToastProvider";
+import { publishSharedTrip } from "@/lib/api/shared-trips";
 import { absoluteUrl } from "@/lib/seo";
-import { shareOrCopy, tripSharePath } from "@/lib/ui/share";
+import { shareOrCopy, sharedTripPath } from "@/lib/ui/share";
 import { AutoTripPrefsFields } from "./AutoTripPrefsFields";
 import { ItineraryMap } from "./ItineraryMap";
 import { LtBrandLoader, LtButtonLoading } from "./LtBrandLoader";
@@ -1814,7 +1815,8 @@ export function BookATripView({
     if (!tripId || sharingTrip) return;
     setSharingTrip(true);
     try {
-      const path = tripSharePath(tripId);
+      const published = await publishSharedTrip(tripId);
+      const path = sharedTripPath(published.id);
       const url =
         typeof window !== "undefined"
           ? `${window.location.origin}${path}`
@@ -1822,18 +1824,29 @@ export function BookATripView({
       const title = (
         draft.title.trim() ||
         selectedOption?.title ||
+        published.title ||
         "Chuyến đi"
       ).trim();
       const result = await shareOrCopy({
         title: `${title} · LocaTrip`,
-        text: title,
+        text: `Xem chuyến được chia sẻ trên LocaTrip: ${title}`,
         url,
       });
       if (result.ok && result.method === "clipboard") {
-        toastSuccess("Đã sao chép liên kết chuyến đi");
-      } else if (!result.ok && !result.cancelled) {
-        toastError("Không chia sẻ được. Thử lại sau.");
+        toastSuccess("Đã đăng cộng đồng và sao chép liên kết");
+      } else if (result.ok) {
+        toastSuccess("Đã đăng chuyến lên cộng đồng");
+      } else if (!result.cancelled) {
+        toastSuccess("Đã đăng chuyến lên cộng đồng");
       }
+    } catch (err) {
+      toastError(
+        err instanceof ApiError
+          ? err.message
+          : err instanceof Error
+            ? err.message
+            : "Không chia sẻ được. Thử lại sau.",
+      );
     } finally {
       setSharingTrip(false);
     }
