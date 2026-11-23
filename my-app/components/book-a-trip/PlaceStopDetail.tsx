@@ -29,6 +29,9 @@ import {
   setSuggestReplaceCache,
   suggestReplaceCacheKey,
 } from "@/lib/suggest-replace-cache";
+import { useToast } from "@/components/ui/ToastProvider";
+import { absoluteUrl } from "@/lib/seo";
+import { placeSharePath, shareOrCopy } from "@/lib/ui/share";
 import { LtBrandLoader, LtButtonLoading } from "./LtBrandLoader";
 import { prefetchPlaceThumb } from "@/lib/prefetch-place-thumb";
 import { PlaceThumb } from "./PlaceThumb";
@@ -371,6 +374,8 @@ export function PlaceStopDetail({
   onPickLocal,
   onPickServer,
 }: PlaceStopDetailProps) {
+  const { toastSuccess, toastError } = useToast();
+  const [sharing, setSharing] = useState(false);
   const placeId = stop.place.placeId?.trim() || "";
   const [detail, setDetail] = useState<PlaceDetail | null>(() =>
     placeId ? getCachedPlaceDetail(placeId) : null,
@@ -771,6 +776,33 @@ export function PlaceStopDetail({
   const website = detail?.website?.trim() || "";
   const menuLink = detail?.menuLink?.trim() || "";
   const email = detail?.emails?.trim() || "";
+
+  async function sharePlace() {
+    if (!placeId || sharing) return;
+    setSharing(true);
+    try {
+      const path = placeSharePath(placeId);
+      const url =
+        typeof window !== "undefined"
+          ? `${window.location.origin}${path}`
+          : absoluteUrl(path);
+      const shareTitle = (title || "Địa điểm").trim();
+      const result = await shareOrCopy({
+        title: `${shareTitle} · LocaTrip`,
+        text: address
+          ? `${shareTitle} — ${String(address).trim()}`
+          : shareTitle,
+        url,
+      });
+      if (result.ok && result.method === "clipboard") {
+        toastSuccess("Đã sao chép liên kết địa điểm");
+      } else if (!result.ok && !result.cancelled) {
+        toastError("Không chia sẻ được. Thử lại sau.");
+      }
+    } finally {
+      setSharing(false);
+    }
+  }
   const duration =
     detail?.estimatedVisitDurationMin != null
       ? `~${detail.estimatedVisitDurationMin} phút`
@@ -792,22 +824,47 @@ export function PlaceStopDetail({
           <p className={styles.detailEyebrow}>
             Điểm {stop.order} · {stop.time}
           </p>
-          <button
-            type="button"
-            className={styles.detailClose}
-            aria-label="Đóng"
-            onClick={onClose}
-          >
-            <svg viewBox="0 0 14 14" aria-hidden="true">
-              <path
-                d="M3 3l8 8M11 3L3 11"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.75"
-                strokeLinecap="round"
-              />
-            </svg>
-          </button>
+          <div className={styles.detailHeadActions}>
+            {placeId ? (
+              <button
+                type="button"
+                className={styles.detailShare}
+                aria-label="Chia sẻ địa điểm"
+                title="Chia sẻ địa điểm"
+                disabled={sharing}
+                onClick={() => void sharePlace()}
+              >
+                <svg viewBox="0 0 16 16" aria-hidden="true">
+                  <circle cx="12.5" cy="3.5" r="1.75" fill="none" stroke="currentColor" strokeWidth="1.5" />
+                  <circle cx="3.5" cy="8" r="1.75" fill="none" stroke="currentColor" strokeWidth="1.5" />
+                  <circle cx="12.5" cy="12.5" r="1.75" fill="none" stroke="currentColor" strokeWidth="1.5" />
+                  <path
+                    d="M5.1 7.1l6.3-2.6M5.1 8.9l6.3 2.6"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                  />
+                </svg>
+              </button>
+            ) : null}
+            <button
+              type="button"
+              className={styles.detailClose}
+              aria-label="Đóng"
+              onClick={onClose}
+            >
+              <svg viewBox="0 0 14 14" aria-hidden="true">
+                <path
+                  d="M3 3l8 8M11 3L3 11"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.75"
+                  strokeLinecap="round"
+                />
+              </svg>
+            </button>
+          </div>
         </div>
 
         {!readOnly ? (
