@@ -6,15 +6,17 @@ import { useEffect, useMemo, useState } from "react";
 import { MarketingChrome } from "@/components/layout/MarketingChrome";
 import { RequireAuth } from "@/components/auth/RequireAuth";
 import { LtBrandLoader } from "@/components/book-a-trip/LtBrandLoader";
-import { StarRatingInput } from "@/components/shared-trips/StarRatingInput";
 import {
   getSharedTrip,
-  rateSharedTrip,
   reuseSharedTrip,
+  unshareSharedTrip,
   type SharedTripDoc,
 } from "@/lib/api/shared-trips";
 import { ApiError } from "@/lib/api/http";
-import { labelForValue } from "@/lib/auto-trip-form";
+import {
+  sharedStyleChips,
+  sharedStyleChipText,
+} from "@/lib/shared-trip-labels";
 import { useToast } from "@/components/ui/ToastProvider";
 import listStyles from "../../my-trips/my-trips.module.css";
 import styles from "../shared-trips.module.css";
@@ -38,8 +40,8 @@ function SharedTripDetailInner() {
   const [trip, setTrip] = useState<SharedTripDoc | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [ratingBusy, setRatingBusy] = useState(false);
   const [reuseBusy, setReuseBusy] = useState(false);
+  const [unshareBusy, setUnshareBusy] = useState(false);
 
   useEffect(() => {
     if (!sharedId) return;
@@ -71,34 +73,13 @@ function SharedTripDetailInner() {
 
   const styleTags = useMemo(() => {
     if (!trip) return [];
-    return [
-      trip.tripType,
-      trip.targetCustomer,
-      ...(trip.preferences || []).slice(0, 10),
-    ]
-      .filter(Boolean)
-      .map((v) => labelForValue(String(v)));
+    return sharedStyleChips({
+      tripType: trip.tripType,
+      targetCustomer: trip.targetCustomer,
+      preferences: trip.preferences,
+      limit: 12,
+    });
   }, [trip]);
-
-  async function onRate(rating: number) {
-    if (!trip || trip.isOwner || ratingBusy) return;
-    setRatingBusy(true);
-    try {
-      const next = await rateSharedTrip(trip.id, rating);
-      setTrip(next);
-      toastSuccess("Đã lưu đánh giá");
-    } catch (err) {
-      toastError(
-        err instanceof ApiError
-          ? err.message
-          : err instanceof Error
-            ? err.message
-            : "Không đánh giá được",
-      );
-    } finally {
-      setRatingBusy(false);
-    }
-  }
 
   async function onReuse() {
     if (!trip || reuseBusy) return;
@@ -117,6 +98,30 @@ function SharedTripDetailInner() {
       );
     } finally {
       setReuseBusy(false);
+    }
+  }
+
+  async function onUnshare() {
+    if (!trip || unshareBusy) return;
+    const ok = window.confirm(
+      "Thu hồi chuyến này khỏi trang cộng đồng? Người khác sẽ không còn thấy.",
+    );
+    if (!ok) return;
+    setUnshareBusy(true);
+    try {
+      await unshareSharedTrip(trip.id);
+      toastSuccess("Đã thu hồi chuyến khỏi cộng đồng");
+      router.push("/shared-trips/");
+    } catch (err) {
+      toastError(
+        err instanceof ApiError
+          ? err.message
+          : err instanceof Error
+            ? err.message
+            : "Không thu hồi được",
+      );
+    } finally {
+      setUnshareBusy(false);
     }
   }
 
@@ -143,32 +148,38 @@ function SharedTripDetailInner() {
             ) : null}
             <p className={listStyles.meta}>
               {[
-                trip.sharerDisplayName,
-                formatSharedAt(trip.sharedAt),
+                `Người chia sẻ: ${trip.sharerDisplayName}`,
+                `Ngày share: ${formatSharedAt(trip.sharedAt)}`,
                 trip.durationDays
-                  ? `${trip.durationDays} ngày`
-                  : `${trip.itinerary?.length || 0} ngày`,
-                trip.pace || null,
+                  ? `Thời lượng: ${trip.durationDays} ngày`
+                  : `Thời lượng: ${trip.itinerary?.length || 0} ngày`,
+                trip.pace ? `Nhịp độ: ${trip.pace}` : null,
               ]
                 .filter(Boolean)
                 .join(" · ")}
             </p>
 
             {styleTags.length ? (
-              <ul className={listStyles.prefsChips}>
-                {styleTags.map((label) => (
-                  <li key={label}>{label}</li>
-                ))}
-              </ul>
+              <div className={styles.tagBlock}>
+                <p className={styles.tagBlockLabel}>Phong cách chuyến đi</p>
+                <ul className={listStyles.prefsChips}>
+                  {styleTags.map((t) => (
+                    <li key={t.key} title={sharedStyleChipText(t)}>
+                      <span className={styles.tagGroup}>{t.group}</span>
+                      <span className={styles.tagValue}>{t.label}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             ) : null}
 
             <div className={styles.stats}>
               <span className={styles.statPill}>
-                ★ {trip.avgRating.toFixed(1)} ({trip.ratingCount})
+                Đã tái sử dụng: {trip.reuseCount}
               </span>
-              <span className={styles.statPill}>
-                Tái sử dụng {trip.reuseCount}
-              </span>
+              {trip.isOwner ? (
+                <span className={styles.statPill}>Bài của bạn</span>
+              ) : null}
             </div>
 
             {(trip.itinerary || []).map((day) => (
@@ -200,32 +211,26 @@ function SharedTripDetailInner() {
               </section>
             ))}
 
-            <div className={styles.cardActions}>
-              {!trip.isOwner ? (
-                <div>
-                  <p className={listStyles.eyebrow} style={{ marginBottom: 4 }}>
-                    Đánh giá của bạn
-                  </p>
-                  <StarRatingInput
-                    value={trip.myRating || 0}
-                    disabled={ratingBusy}
-                    onChange={(n) => void onRate(n)}
-                  />
-                </div>
-              ) : (
-                <p className={listStyles.meta}>Đây là bài bạn đã chia sẻ</p>
-              )}
-            </div>
-
             <div className={listStyles.actionsRow}>
-              <button
-                type="button"
-                className={listStyles.btnPrimary}
-                disabled={reuseBusy}
-                onClick={() => void onReuse()}
-              >
-                {reuseBusy ? "Đang tạo…" : "Tái sử dụng"}
-              </button>
+              {trip.isOwner ? (
+                <button
+                  type="button"
+                  className={listStyles.btnDanger}
+                  disabled={unshareBusy}
+                  onClick={() => void onUnshare()}
+                >
+                  {unshareBusy ? "Đang thu hồi…" : "Thu hồi chuyến"}
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  className={listStyles.btnPrimary}
+                  disabled={reuseBusy}
+                  onClick={() => void onReuse()}
+                >
+                  {reuseBusy ? "Đang tạo…" : "Tái sử dụng"}
+                </button>
+              )}
               <Link href="/shared-trips/" className={listStyles.btnGhost}>
                 Quay lại
               </Link>

@@ -4,11 +4,13 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import type { SharedTripDoc } from "@/lib/api/shared-trips";
-import { rateSharedTrip, reuseSharedTrip } from "@/lib/api/shared-trips";
+import { reuseSharedTrip, unshareSharedTrip } from "@/lib/api/shared-trips";
 import { ApiError } from "@/lib/api/http";
-import { labelForValue } from "@/lib/auto-trip-form";
+import {
+  sharedStyleChips,
+  sharedStyleChipText,
+} from "@/lib/shared-trip-labels";
 import { useToast } from "@/components/ui/ToastProvider";
-import { StarRatingInput } from "./StarRatingInput";
 import listStyles from "@/app/my-trips/my-trips.module.css";
 import styles from "@/app/shared-trips/shared-trips.module.css";
 
@@ -26,42 +28,25 @@ function formatSharedAt(iso: string) {
 type Props = {
   trip: SharedTripDoc;
   onUpdated?: (next: SharedTripDoc) => void;
+  onRemoved?: (id: string) => void;
 };
 
-export function SharedTripCard({ trip, onUpdated }: Props) {
+export function SharedTripCard({ trip, onRemoved }: Props) {
   const router = useRouter();
   const { toastSuccess, toastError } = useToast();
-  const [ratingBusy, setRatingBusy] = useState(false);
   const [reuseBusy, setReuseBusy] = useState(false);
+  const [unshareBusy, setUnshareBusy] = useState(false);
 
-  const styleTags = useMemo(() => {
-    const values = [
-      trip.tripType,
-      trip.targetCustomer,
-      ...(trip.preferences || []).slice(0, 6),
-    ].filter(Boolean) as string[];
-    return values.map((v) => ({ value: v, label: labelForValue(v) }));
-  }, [trip]);
-
-  async function onRate(rating: number) {
-    if (trip.isOwner || ratingBusy) return;
-    setRatingBusy(true);
-    try {
-      const next = await rateSharedTrip(trip.id, rating);
-      onUpdated?.(next);
-      toastSuccess("Đã lưu đánh giá");
-    } catch (err) {
-      toastError(
-        err instanceof ApiError
-          ? err.message
-          : err instanceof Error
-            ? err.message
-            : "Không đánh giá được",
-      );
-    } finally {
-      setRatingBusy(false);
-    }
-  }
+  const styleTags = useMemo(
+    () =>
+      sharedStyleChips({
+        tripType: trip.tripType,
+        targetCustomer: trip.targetCustomer,
+        preferences: trip.preferences,
+        limit: 8,
+      }),
+    [trip],
+  );
 
   async function onReuse() {
     if (reuseBusy) return;
@@ -83,6 +68,30 @@ export function SharedTripCard({ trip, onUpdated }: Props) {
     }
   }
 
+  async function onUnshare() {
+    if (unshareBusy) return;
+    const ok = window.confirm(
+      "Thu hồi chuyến này khỏi trang cộng đồng? Người khác sẽ không còn thấy.",
+    );
+    if (!ok) return;
+    setUnshareBusy(true);
+    try {
+      await unshareSharedTrip(trip.id);
+      toastSuccess("Đã thu hồi chuyến khỏi cộng đồng");
+      onRemoved?.(trip.id);
+    } catch (err) {
+      toastError(
+        err instanceof ApiError
+          ? err.message
+          : err instanceof Error
+            ? err.message
+            : "Không thu hồi được",
+      );
+    } finally {
+      setUnshareBusy(false);
+    }
+  }
+
   return (
     <article className={listStyles.detailCard}>
       <p className={listStyles.eyebrow}>Chuyến được chia sẻ</p>
@@ -94,48 +103,35 @@ export function SharedTripCard({ trip, onUpdated }: Props) {
       {trip.summary ? <p className={listStyles.sub}>{trip.summary}</p> : null}
       <p className={listStyles.meta}>
         {[
-          trip.sharerDisplayName,
-          formatSharedAt(trip.sharedAt),
+          `Người chia sẻ: ${trip.sharerDisplayName}`,
+          `Ngày share: ${formatSharedAt(trip.sharedAt)}`,
           trip.durationDays
-            ? `${trip.durationDays} ngày`
-            : `${trip.itinerary?.length || 0} ngày`,
-        ]
-          .filter(Boolean)
-          .join(" · ")}
+            ? `Thời lượng: ${trip.durationDays} ngày`
+            : `Thời lượng: ${trip.itinerary?.length || 0} ngày`,
+        ].join(" · ")}
       </p>
 
       {styleTags.length ? (
-        <ul className={listStyles.prefsChips}>
-          {styleTags.map((t) => (
-            <li key={t.value}>{t.label}</li>
-          ))}
-        </ul>
+        <div className={styles.tagBlock}>
+          <p className={styles.tagBlockLabel}>Phong cách chuyến đi</p>
+          <ul className={listStyles.prefsChips}>
+            {styleTags.map((t) => (
+              <li key={t.key} title={sharedStyleChipText(t)}>
+                <span className={styles.tagGroup}>{t.group}</span>
+                <span className={styles.tagValue}>{t.label}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
       ) : null}
 
       <div className={styles.stats}>
         <span className={styles.statPill}>
-          ★ {trip.avgRating.toFixed(1)} ({trip.ratingCount})
+          Đã tái sử dụng: {trip.reuseCount}
         </span>
-        <span className={styles.statPill}>
-          Tái sử dụng {trip.reuseCount}
-        </span>
-      </div>
-
-      <div className={styles.cardActions}>
-        {!trip.isOwner ? (
-          <div>
-            <p className={listStyles.eyebrow} style={{ marginBottom: 4 }}>
-              Đánh giá của bạn
-            </p>
-            <StarRatingInput
-              value={trip.myRating || 0}
-              disabled={ratingBusy}
-              onChange={(n) => void onRate(n)}
-            />
-          </div>
-        ) : (
-          <p className={listStyles.meta}>Đây là bài bạn đã chia sẻ</p>
-        )}
+        {trip.isOwner ? (
+          <span className={styles.statPill}>Bài của bạn</span>
+        ) : null}
       </div>
 
       <div className={styles.cardActions}>
@@ -145,14 +141,25 @@ export function SharedTripCard({ trip, onUpdated }: Props) {
         >
           Xem chi tiết
         </Link>
-        <button
-          type="button"
-          className={listStyles.btnPrimary}
-          disabled={reuseBusy}
-          onClick={() => void onReuse()}
-        >
-          {reuseBusy ? "Đang tạo…" : "Tái sử dụng"}
-        </button>
+        {trip.isOwner ? (
+          <button
+            type="button"
+            className={listStyles.btnDanger}
+            disabled={unshareBusy}
+            onClick={() => void onUnshare()}
+          >
+            {unshareBusy ? "Đang thu hồi…" : "Thu hồi"}
+          </button>
+        ) : (
+          <button
+            type="button"
+            className={listStyles.btnPrimary}
+            disabled={reuseBusy}
+            onClick={() => void onReuse()}
+          >
+            {reuseBusy ? "Đang tạo…" : "Tái sử dụng"}
+          </button>
+        )}
       </div>
     </article>
   );

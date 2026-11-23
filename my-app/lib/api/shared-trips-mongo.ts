@@ -331,7 +331,7 @@ export async function listSharedTrips(
     const docs = await db
       .collection("shared_trips")
       .find(match)
-      .sort({ reuseCount: -1, avgRating: -1, sharedAt: -1 })
+      .sort({ reuseCount: -1, sharedAt: -1 })
       .limit(limit)
       .toArray();
 
@@ -491,6 +491,38 @@ export type ReuseSharedTripResult = {
 };
 
 /** Load snapshot + bump reuse; caller must create the cloned trip via upstream. */
+/** Owner withdraws a shared trip from the community feed. */
+export async function unshareSharedTrip(input: {
+  keycloakSub: string;
+  sharedId: string;
+}): Promise<{ id: string }> {
+  return withDb(async (db, ObjectId) => {
+    if (!ObjectId.isValid(input.sharedId)) {
+      throw new Error("sharedId không hợp lệ");
+    }
+    const user = await resolveUser(db, input.keycloakSub);
+    const sharedOid = new ObjectId(input.sharedId);
+    const shared = await db.collection("shared_trips").findOne({
+      _id: sharedOid,
+      status: "public",
+    });
+    if (!shared) throw new Error("Không tìm thấy chuyến được chia sẻ");
+    if (String(shared.sharerId) !== user.id) {
+      throw new Error("Chỉ người chia sẻ mới thu hồi được");
+    }
+    await db.collection("shared_trips").updateOne(
+      { _id: sharedOid },
+      {
+        $set: {
+          status: "removed",
+          updatedAt: new Date(),
+        },
+      },
+    );
+    return { id: String(sharedOid) };
+  });
+}
+
 export async function prepareReuseSharedTrip(input: {
   keycloakSub: string;
   sharedId: string;

@@ -103,33 +103,18 @@ export async function getSharedTrip(
   return data.sharedTrip;
 }
 
-export async function rateSharedTrip(
-  sharedId: string,
-  rating: number,
-): Promise<SharedTripDoc> {
+export async function unshareSharedTrip(sharedId: string): Promise<void> {
   const res = await apiFetch(
-    `/api/shared-trips/${encodeURIComponent(sharedId)}/rate`,
+    `/api/shared-trips/${encodeURIComponent(sharedId)}/unshare`,
     {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-      body: JSON.stringify({ rating }),
+      headers: { Accept: "application/json" },
       cache: "no-store",
     },
   );
-  const data = (await res.json()) as {
-    sharedTrip?: SharedTripDoc;
-    error?: string;
-  };
   if (!res.ok) {
-    throw new ApiError(data.error || (await readError(res)), res.status);
+    throw new ApiError(await readError(res), res.status);
   }
-  if (!data.sharedTrip) {
-    throw new ApiError("Không cập nhật được đánh giá", 502);
-  }
-  return data.sharedTrip;
 }
 
 export async function reuseSharedTrip(

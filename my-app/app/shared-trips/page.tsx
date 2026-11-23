@@ -19,11 +19,14 @@ import {
 import listStyles from "../my-trips/my-trips.module.css";
 import styles from "./shared-trips.module.css";
 
-const STYLE_FILTER_OPTIONS = [
-  ...FORM_TRIP_TYPE_OPTIONS,
-  ...FORM_TARGET_CUSTOMER_OPTIONS,
-  ...FORM_ATMOSPHERE_OPTIONS.slice(0, 6),
-];
+const FILTER_GROUPS = [
+  { title: "Loại chuyến", options: FORM_TRIP_TYPE_OPTIONS },
+  { title: "Đối tượng đi", options: FORM_TARGET_CUSTOMER_OPTIONS },
+  {
+    title: "Không khí",
+    options: FORM_ATMOSPHERE_OPTIONS.slice(0, 6),
+  },
+] as const;
 
 function SharedTripsInner() {
   const [items, setItems] = useState<SharedTripDoc[]>([]);
@@ -86,8 +89,8 @@ function SharedTripsInner() {
             <p className={listStyles.eyebrow}>Cộng đồng</p>
             <h1 className={listStyles.title}>Chuyến được chia sẻ</h1>
             <p className={listStyles.sub}>
-              Xem lịch trình mọi người đăng — đánh giá sao và tái sử dụng về
-              chuyến của bạn. Sắp xếp mặc định theo tái sử dụng và rating.
+              Xem lịch trình cộng đồng đăng — tái sử dụng về chuyến của bạn.
+              Bài càng được tái sử dụng nhiều càng lên đầu.
             </p>
           </div>
           <Link href="/my-trips/" className={listStyles.btnGhost}>
@@ -98,7 +101,7 @@ function SharedTripsInner() {
         <section className={styles.filters} aria-label="Bộ lọc">
           <div className={styles.filterRow}>
             <div className={styles.filterField}>
-              <label htmlFor="st-title">Tên chuyến đi</label>
+              <label htmlFor="st-title">Lọc theo tên chuyến đi</label>
               <input
                 id="st-title"
                 value={title}
@@ -107,18 +110,18 @@ function SharedTripsInner() {
               />
             </div>
             <div className={styles.filterField}>
-              <label htmlFor="st-sharer">Người chia sẻ</label>
+              <label htmlFor="st-sharer">Lọc theo người chia sẻ</label>
               <input
                 id="st-sharer"
                 value={sharer}
                 onChange={(e) => setSharer(e.target.value)}
-                placeholder="Tên hoặc email"
+                placeholder="Tên hoặc email người đăng"
               />
             </div>
           </div>
           <div className={styles.filterRow}>
             <div className={styles.filterField}>
-              <label htmlFor="st-from">Ngày chia sẻ từ</label>
+              <label htmlFor="st-from">Ngày chia sẻ — từ ngày</label>
               <input
                 id="st-from"
                 type="date"
@@ -127,7 +130,7 @@ function SharedTripsInner() {
               />
             </div>
             <div className={styles.filterField}>
-              <label htmlFor="st-to">Ngày chia sẻ đến</label>
+              <label htmlFor="st-to">Ngày chia sẻ — đến ngày</label>
               <input
                 id="st-to"
                 type="date"
@@ -137,27 +140,33 @@ function SharedTripsInner() {
             </div>
           </div>
           <div className={styles.filterField}>
-            <label>Phong cách chuyến đi</label>
-            <div className={styles.tagWrap}>
-              {STYLE_FILTER_OPTIONS.map((opt) => {
-                const on = tags.includes(opt.value);
-                return (
-                  <button
-                    key={opt.value}
-                    type="button"
-                    className={
-                      on
-                        ? `${styles.tagChip} ${styles.tagChipOn}`
-                        : styles.tagChip
-                    }
-                    aria-pressed={on}
-                    onClick={() => toggleTag(opt.value)}
-                  >
-                    {opt.label}
-                  </button>
-                );
-              })}
-            </div>
+            <label>Lọc theo phong cách</label>
+            {FILTER_GROUPS.map((group) => (
+              <div key={group.title}>
+                <p className={styles.filterGroupTitle}>{group.title}</p>
+                <div className={styles.tagWrap}>
+                  {group.options.map((opt) => {
+                    const on = tags.includes(opt.value);
+                    return (
+                      <button
+                        key={opt.value}
+                        type="button"
+                        className={
+                          on
+                            ? `${styles.tagChip} ${styles.tagChipOn}`
+                            : styles.tagChip
+                        }
+                        aria-pressed={on}
+                        title={`${group.title}: ${opt.label}`}
+                        onClick={() => toggleTag(opt.value)}
+                      >
+                        {opt.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
           </div>
         </section>
 
@@ -184,10 +193,8 @@ function SharedTripsInner() {
             <SharedTripCard
               key={trip.id}
               trip={trip}
-              onUpdated={(next) =>
-                setItems((prev) =>
-                  prev.map((p) => (p.id === next.id ? next : p)),
-                )
+              onRemoved={(id) =>
+                setItems((prev) => prev.filter((p) => p.id !== id))
               }
             />
           ))}
