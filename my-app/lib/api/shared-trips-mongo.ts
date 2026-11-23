@@ -1,9 +1,5 @@
-import type { DayItinerary, Pace } from "@/lib/trip";
-import type {
-  BudgetLevel,
-  SavedTripSource,
-  TripProgressStatus,
-} from "@/lib/api/trips";
+import type { BudgetLevel, DayItinerary, Pace } from "@/lib/trip";
+import type { SavedTripSource, TripProgressStatus } from "@/lib/api/trips";
 import { slimItineraryForSave } from "@/lib/api/trips";
 import { readJwtSub } from "@/lib/api/feedback-mongo";
 
