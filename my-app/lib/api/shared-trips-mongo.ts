@@ -389,6 +389,24 @@ export async function getSharedTrip(
   });
 }
 
+/** Owner lookup: public shared post for a given saved trip, if any. */
+export async function findOwnedPublicSharedBySourceTrip(input: {
+  keycloakSub: string;
+  tripId: string;
+}): Promise<SharedTripDoc | null> {
+  return withDb(async (db, ObjectId) => {
+    if (!ObjectId.isValid(input.tripId)) return null;
+    const user = await resolveUser(db, input.keycloakSub);
+    const doc = await db.collection("shared_trips").findOne({
+      sourceTripId: new ObjectId(input.tripId),
+      sharerId: new ObjectId(user.id),
+      status: "public",
+    });
+    if (!doc) return null;
+    return mapSharedDoc(doc, user.id);
+  });
+}
+
 export async function rateSharedTrip(input: {
   keycloakSub: string;
   sharedId: string;

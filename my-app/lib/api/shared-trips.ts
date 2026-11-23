@@ -103,6 +103,28 @@ export async function getSharedTrip(
   return data.sharedTrip;
 }
 
+/** Owner: public shared post for this saved trip, or null if not shared. */
+export async function getOwnedSharedTripBySource(
+  tripId: string,
+): Promise<SharedTripDoc | null> {
+  const res = await apiFetch(
+    `/api/shared-trips/by-source/${encodeURIComponent(tripId)}`,
+    {
+      method: "GET",
+      headers: { Accept: "application/json" },
+      cache: "no-store",
+    },
+  );
+  const data = (await res.json()) as {
+    sharedTrip?: SharedTripDoc | null;
+    error?: string;
+  };
+  if (!res.ok) {
+    throw new ApiError(data.error || (await readError(res)), res.status);
+  }
+  return data.sharedTrip ?? null;
+}
+
 export async function unshareSharedTrip(sharedId: string): Promise<void> {
   const res = await apiFetch(
     `/api/shared-trips/${encodeURIComponent(sharedId)}/unshare`,

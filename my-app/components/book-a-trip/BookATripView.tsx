@@ -113,7 +113,11 @@ import {
 } from "@/lib/ui/view-prefs";
 import { Route } from "lucide-react";
 import { useToast } from "@/components/ui/ToastProvider";
-import { publishSharedTrip } from "@/lib/api/shared-trips";
+import {
+  getOwnedSharedTripBySource,
+  publishSharedTrip,
+  unshareSharedTrip,
+} from "@/lib/api/shared-trips";
 import { absoluteUrl } from "@/lib/seo";
 import { shareOrCopy, sharedTripPath } from "@/lib/ui/share";
 import { AutoTripPrefsFields } from "./AutoTripPrefsFields";
@@ -343,6 +347,7 @@ export function BookATripView({
   const { openAuth } = useAuthModal();
   const { toastSuccess, toastError } = useToast();
   const [sharingTrip, setSharingTrip] = useState(false);
+  const [sharedPostId, setSharedPostId] = useState<string | null>(null);
   const { balance, refresh: refreshWallet } = useWallet();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -1099,6 +1104,25 @@ export function BookATripView({
       (o) => o.value === (editingTripStatus || "Pending"),
     )?.label || "Đề xuất";
 
+  useEffect(() => {
+    if (!activeTripId || !isAuthenticated) {
+      setSharedPostId(null);
+      return;
+    }
+    let cancelled = false;
+    void (async () => {
+      try {
+        const shared = await getOwnedSharedTripBySource(activeTripId);
+        if (!cancelled) setSharedPostId(shared?.id ?? null);
+      } catch {
+        if (!cancelled) setSharedPostId(null);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [activeTripId, isAuthenticated]);
+
   async function enrichOptionCoords(
     option: ItineraryOption,
   ): Promise<ItineraryOption> {
@@ -1816,6 +1840,7 @@ export function BookATripView({
     setSharingTrip(true);
     try {
       const published = await publishSharedTrip(tripId);
+      setSharedPostId(published.id);
       const path = sharedTripPath(published.id);
       const url =
         typeof window !== "undefined"
@@ -1846,6 +1871,26 @@ export function BookATripView({
           : err instanceof Error
             ? err.message
             : "Không chia sẻ được. Thử lại sau.",
+      );
+    } finally {
+      setSharingTrip(false);
+    }
+  }
+
+  async function unshareCurrentTrip() {
+    if (!sharedPostId || sharingTrip) return;
+    setSharingTrip(true);
+    try {
+      await unshareSharedTrip(sharedPostId);
+      setSharedPostId(null);
+      toastSuccess("Đã thu hồi chuyến khỏi cộng đồng");
+    } catch (err) {
+      toastError(
+        err instanceof ApiError
+          ? err.message
+          : err instanceof Error
+            ? err.message
+            : "Không thu hồi được. Thử lại sau.",
       );
     } finally {
       setSharingTrip(false);
@@ -2580,9 +2625,19 @@ export function BookATripView({
                       type="button"
                       className={styles.btnGhost}
                       disabled={sharingTrip}
-                      onClick={() => void shareCurrentTrip()}
+                      onClick={() =>
+                        void (sharedPostId
+                          ? unshareCurrentTrip()
+                          : shareCurrentTrip())
+                      }
                     >
-                      {sharingTrip ? "Đang chia sẻ…" : "Chia sẻ"}
+                      {sharingTrip
+                        ? sharedPostId
+                          ? "Đang thu hồi…"
+                          : "Đang chia sẻ…"
+                        : sharedPostId
+                          ? "Thu hồi"
+                          : "Chia sẻ"}
                     </button>
                   ) : null}
                   {isTripPending && editingTripId ? (

@@ -17,7 +17,11 @@ import {
 import { ApiError } from "@/lib/api/http";
 import { labelForValue } from "@/lib/auto-trip-form";
 import { pickSavedTripPrefs } from "@/lib/saved-trip-draft";
-import { publishSharedTrip } from "@/lib/api/shared-trips";
+import {
+  getOwnedSharedTripBySource,
+  publishSharedTrip,
+  unshareSharedTrip,
+} from "@/lib/api/shared-trips";
 import { absoluteUrl } from "@/lib/seo";
 import { BUDGET_OPTIONS, PACE_OPTIONS } from "@/lib/trip";
 import { shareOrCopy, sharedTripPath } from "@/lib/ui/share";
@@ -128,12 +132,14 @@ function TripDetailInner() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [sharing, setSharing] = useState(false);
+  const [sharedPostId, setSharedPostId] = useState<string | null>(null);
 
   async function shareTrip() {
     if (!trip || sharing) return;
     setSharing(true);
     try {
       const published = await publishSharedTrip(trip.id);
+      setSharedPostId(published.id);
       const path = sharedTripPath(published.id);
       const url =
         typeof window !== "undefined"
@@ -163,15 +169,42 @@ function TripDetailInner() {
     }
   }
 
+  async function unshareTrip() {
+    if (!sharedPostId || sharing) return;
+    setSharing(true);
+    try {
+      await unshareSharedTrip(sharedPostId);
+      setSharedPostId(null);
+      toastSuccess("Đã thu hồi chuyến khỏi cộng đồng");
+    } catch (err) {
+      toastError(
+        err instanceof ApiError
+          ? err.message
+          : err instanceof Error
+            ? err.message
+            : "Không thu hồi được. Thử lại sau.",
+      );
+    } finally {
+      setSharing(false);
+    }
+  }
+
   useEffect(() => {
     if (!tripId) return;
     let cancelled = false;
     void (async () => {
       setLoading(true);
       setError(null);
+      setSharedPostId(null);
       try {
         const data = await getSavedTrip(tripId);
         if (!cancelled) setTrip(data);
+        try {
+          const shared = await getOwnedSharedTripBySource(tripId);
+          if (!cancelled) setSharedPostId(shared?.id ?? null);
+        } catch {
+          if (!cancelled) setSharedPostId(null);
+        }
       } catch (err) {
         if (!cancelled) {
           setError(
@@ -283,9 +316,17 @@ function TripDetailInner() {
                 type="button"
                 className={styles.btnGhost}
                 disabled={sharing}
-                onClick={() => void shareTrip()}
+                onClick={() =>
+                  void (sharedPostId ? unshareTrip() : shareTrip())
+                }
               >
-                {sharing ? "Đang chia sẻ…" : "Chia sẻ chuyến đi"}
+                {sharing
+                  ? sharedPostId
+                    ? "Đang thu hồi…"
+                    : "Đang chia sẻ…"
+                  : sharedPostId
+                    ? "Thu hồi"
+                    : "Chia sẻ chuyến đi"}
               </button>
               <Link href="/my-trips/" className={styles.btnGhost}>
                 Quay lại
