@@ -113,6 +113,8 @@ import {
 } from "@/lib/ui/view-prefs";
 import { Route } from "lucide-react";
 import { useToast } from "@/components/ui/ToastProvider";
+import { absoluteUrl } from "@/lib/seo";
+import { shareOrCopy, tripSharePath } from "@/lib/ui/share";
 import { AutoTripPrefsFields } from "./AutoTripPrefsFields";
 import { ItineraryMap } from "./ItineraryMap";
 import { LtBrandLoader, LtButtonLoading } from "./LtBrandLoader";
@@ -339,6 +341,7 @@ export function BookATripView({
   const { isAuthenticated, isLoading: authLoading } = useAuthActions();
   const { openAuth } = useAuthModal();
   const { toastSuccess, toastError } = useToast();
+  const [sharingTrip, setSharingTrip] = useState(false);
   const { balance, refresh: refreshWallet } = useWallet();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -1806,6 +1809,36 @@ export function BookATripView({
     };
   }
 
+  async function shareCurrentTrip() {
+    const tripId = editingTripId || savedTripId;
+    if (!tripId || sharingTrip) return;
+    setSharingTrip(true);
+    try {
+      const path = tripSharePath(tripId);
+      const url =
+        typeof window !== "undefined"
+          ? `${window.location.origin}${path}`
+          : absoluteUrl(path);
+      const title = (
+        draft.title.trim() ||
+        selectedOption?.title ||
+        "Chuyến đi"
+      ).trim();
+      const result = await shareOrCopy({
+        title: `${title} · LocaTrip`,
+        text: title,
+        url,
+      });
+      if (result.ok && result.method === "clipboard") {
+        toastSuccess("Đã sao chép liên kết chuyến đi");
+      } else if (!result.ok && !result.cancelled) {
+        toastError("Không chia sẻ được. Thử lại sau.");
+      }
+    } finally {
+      setSharingTrip(false);
+    }
+  }
+
   /** Persist planner options only — does not regenerate itinerary. */
   async function savePrefsOnly() {
     if (savingPrefs || loading || locating) return;
@@ -2527,6 +2560,16 @@ export function BookATripView({
                       onClick={() => setPhase("options")}
                     >
                       Đổi lộ trình khác
+                    </button>
+                  ) : null}
+                  {editingTripId || savedTripId ? (
+                    <button
+                      type="button"
+                      className={styles.btnGhost}
+                      disabled={sharingTrip}
+                      onClick={() => void shareCurrentTrip()}
+                    >
+                      {sharingTrip ? "Đang chia sẻ…" : "Chia sẻ"}
                     </button>
                   ) : null}
                   {isTripPending && editingTripId ? (

@@ -45,3 +45,8 @@ export async function shareOrCopy(payload: SharePayload): Promise<ShareResult> {
 export function placeSharePath(placeId: string): string {
   return `/places/${encodeURIComponent(placeId.trim())}`;
 }
+
+/** Canonical public trip URL for sharing. */
+export function tripSharePath(tripId: string): string {
+  return `/trips/${encodeURIComponent(tripId.trim())}`;
+}

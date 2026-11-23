@@ -7,6 +7,7 @@ import { MarketingChrome } from "@/components/layout/MarketingChrome";
 import { RequireAuth } from "@/components/auth/RequireAuth";
 import { LtBrandLoader } from "@/components/book-a-trip/LtBrandLoader";
 import { TripWeatherAdvisoryWidget } from "@/components/weather/TripWeatherAdvisoryWidget";
+import { useToast } from "@/components/ui/ToastProvider";
 import {
   getSavedTrip,
   resolveTripDate,
@@ -16,7 +17,9 @@ import {
 import { ApiError } from "@/lib/api/http";
 import { labelForValue } from "@/lib/auto-trip-form";
 import { pickSavedTripPrefs } from "@/lib/saved-trip-draft";
+import { absoluteUrl } from "@/lib/seo";
 import { BUDGET_OPTIONS, PACE_OPTIONS } from "@/lib/trip";
+import { shareOrCopy, tripSharePath } from "@/lib/ui/share";
 import styles from "../my-trips.module.css";
 
 function formatTripDay(ymd?: string) {
@@ -119,9 +122,36 @@ function resolveWeatherCoords(trip: SavedTrip): {
 function TripDetailInner() {
   const params = useParams();
   const tripId = String(params.tripId || "");
+  const { toastSuccess, toastError } = useToast();
   const [trip, setTrip] = useState<SavedTrip | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [sharing, setSharing] = useState(false);
+
+  async function shareTrip() {
+    if (!trip || sharing) return;
+    setSharing(true);
+    try {
+      const path = tripSharePath(trip.id);
+      const url =
+        typeof window !== "undefined"
+          ? `${window.location.origin}${path}`
+          : absoluteUrl(path);
+      const title = trip.title.trim() || "Chuyến đi";
+      const result = await shareOrCopy({
+        title: `${title} · LocaTrip`,
+        text: trip.summary?.trim() || title,
+        url,
+      });
+      if (result.ok && result.method === "clipboard") {
+        toastSuccess("Đã sao chép liên kết chuyến đi");
+      } else if (!result.ok && !result.cancelled) {
+        toastError("Không chia sẻ được. Thử lại sau.");
+      }
+    } finally {
+      setSharing(false);
+    }
+  }
 
   useEffect(() => {
     if (!tripId) return;
@@ -239,6 +269,14 @@ function TripDetailInner() {
               >
                 Xem và chỉnh sửa
               </Link>
+              <button
+                type="button"
+                className={styles.btnGhost}
+                disabled={sharing}
+                onClick={() => void shareTrip()}
+              >
+                {sharing ? "Đang chia sẻ…" : "Chia sẻ chuyến đi"}
+              </button>
               <Link href="/my-trips/" className={styles.btnGhost}>
                 Quay lại
               </Link>
