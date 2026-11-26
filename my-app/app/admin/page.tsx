@@ -234,9 +234,12 @@ function UsersPanel() {
         acc.xu += u.wallet.xuToppedUp;
         acc.vnd += u.payments.vndPaid;
         acc.feedback += u.feedback.count;
+        if (u.payments.paidCount > 0 || u.wallet.topupCount > 0) {
+          acc.transactingUsers += 1;
+        }
         return acc;
       },
-      { trips: 0, xu: 0, vnd: 0, feedback: 0 },
+      { trips: 0, xu: 0, vnd: 0, feedback: 0, transactingUsers: 0 },
     );
   }, [filtered]);
 
@@ -267,6 +270,10 @@ function UsersPanel() {
         <div className={styles.stat}>
           <span className={styles.statLabel}>Users</span>
           <strong>{filtered.length}</strong>
+        </div>
+        <div className={styles.stat}>
+          <span className={styles.statLabel}>Đã giao dịch</span>
+          <strong>{totals.transactingUsers}</strong>
         </div>
         <div className={styles.stat}>
           <span className={styles.statLabel}>Chuyến đi</span>
